@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
+import Profile from './components/Profile'
 import { auth } from './lib/auth'
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
   }
 
   const handleLogout = () => {
+    auth.clearToken()
     setIsAuthenticated(false)
   }
 
@@ -31,13 +34,42 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      {isAuthenticated ? (
-        <Dashboard onLogout={handleLogout} />
-      ) : (
-        <Login onLoginSuccess={handleLoginSuccess} />
-      )}
-    </div>
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route 
+            path="/login" 
+            element={
+              !isAuthenticated ? (
+                <Login onLoginSuccess={handleLoginSuccess} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/" 
+            element={
+              isAuthenticated ? (
+                <Dashboard onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              isAuthenticated ? (
+                <Profile onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

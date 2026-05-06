@@ -1,544 +1,659 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react'
 import { 
-    getCurrentUserApiV1LoginCurrentUserGet, 
-    readTodosApiV1TodosGet,
-    createTodoApiV1TodosPost,
-    updateTodoApiV1TodosIdPatch,
+    readTodosApiV1TodosGet, 
+    createTodoApiV1TodosPost, 
     deleteTodoApiV1TodosIdDelete,
+    getCurrentUserApiV1LoginCurrentUserGet,
     readUsersApiV1UsersGet,
-    createUserApiV1UsersPost,
     deleteUserApiV1UsersIdDelete,
-    type UserPublic, 
-    type ToDoListPublic,
-} from '../client';
-import { auth } from '../lib/auth';
+    updateTodoApiV1TodosIdPatch
+} from '../client/sdk.gen'
+import { Link } from 'react-router-dom'
+import { 
+    type ToDoListPublic, 
+    type ToDoPriority, 
+    type ToDoStatus,
+    type UserPublic,
+} from '../client/types.gen'
+import { auth } from '../lib/auth'
 
 interface DashboardProps {
-    onLogout: () => void;
+    onLogout: () => void
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-    const [user, setUser] = useState<UserPublic | null>(null);
-    const [todos, setTodos] = useState<ToDoListPublic[]>([]);
-    const [users, setUsers] = useState<UserPublic[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+const Dashboard = ({ onLogout }: DashboardProps) => {
+    const [currentUser, setCurrentUser] = useState<UserPublic | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     
-    // Form state for new todo
-    const [newTodoTitle, setNewTodoTitle] = useState('');
-    const [isAddingTodo, setIsAddingTodo] = useState(false);
+    // User Dashboard State
+    const [todos, setTodos] = useState<ToDoListPublic[]>([])
+    const [isAddingTodo, setIsAddingTodo] = useState(false)
+    const [newTodoTitle, setNewTodoTitle] = useState('')
+    const [newTodoDescription, setNewTodoDescription] = useState('')
+    const [newTodoDueDate, setNewTodoDueDate] = useState('')
+    const [newTodoPriority, setNewTodoPriority] = useState<ToDoPriority>('medium')
+    const [newTodoStatus, setNewTodoStatus] = useState<ToDoStatus>('pending')
+    const [taskSearchTerm, setTaskSearchTerm] = useState('')
 
-    // Form state for new user
-    const [newUserEmail, setNewUserEmail] = useState('');
-    const [newUserPassword, setNewUserPassword] = useState('');
-    const [isAddingUser, setIsAddingUser] = useState(false);
+    // Editing Task State
+    const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
+    const [editTodoTitle, setEditTodoTitle] = useState('')
+    const [editTodoDescription, setEditTodoDescription] = useState('')
+    const [editTodoPriority, setEditTodoPriority] = useState<ToDoPriority>('medium')
+    const [editTodoStatus, setEditTodoStatus] = useState<ToDoStatus>('pending')
+    const [editTodoDueDate, setEditTodoDueDate] = useState('')
+    const [isUpdatingTodo, setIsUpdatingTodo] = useState(false)
 
-    // State for editing user
-    const [editingUserId, setEditingUserId] = useState<string | null>(null);
-    const [editFullName, setEditFullName] = useState('');
-    const [isUpdatingUser, setIsUpdatingUser] = useState(false);
-
-    const isAdmin = user?.role === 'admin';
+    // Admin Dashboard State
+    const [users, setUsers] = useState<UserPublic[]>([])
+    const [searchTerm, setSearchTerm] = useState('')
+    const [roleFilter, setRoleFilter] = useState<string>('all')
 
     useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                const [userRes, todosRes] = await Promise.all([
-                    getCurrentUserApiV1LoginCurrentUserGet(),
-                    readTodosApiV1TodosGet()
-                ]);
+        fetchInitialData()
+    }, [])
 
-                if (userRes.error) {
-                    auth.clearToken();
-                    onLogout();
-                    return;
-                }
-
-                if (userRes.data) {
-                    setUser(userRes.data);
-                    // If user is admin, fetch all users
-                    if (userRes.data.role === 'admin') {
-                        const usersRes = await readUsersApiV1UsersGet();
-                        if (usersRes.data) {
-                            setUsers(usersRes.data.data);
-                        }
-                    }
-                }
-                if (todosRes.data) setTodos(todosRes.data.data);
-                
-            } catch (err) {
-                setError('Failed to load dashboard data.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchInitialData();
-    }, [onLogout]);
-
-    const handleLogout = () => {
-        auth.clearToken();
-        onLogout();
-    };
-
-    // Todo handlers
-    const handleAddTodo = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newTodoTitle.trim()) return;
-
-        setIsAddingTodo(true);
+    const fetchInitialData = async () => {
         try {
-            const { data, error: apiError } = await createTodoApiV1TodosPost({
-                body: { title: newTodoTitle }
-            });
+            setIsLoading(true)
+            const userResponse = await getCurrentUserApiV1LoginCurrentUserGet()
+            
+            if (userResponse.data) {
+                setCurrentUser(userResponse.data)
 
-            if (apiError) {
-                alert('Failed to add task.');
-            } else if (data) {
-                setTodos([data, ...todos]);
-                setNewTodoTitle('');
+                if (userResponse.data.role === 'admin') {
+                    await fetchUsers()
+                } else {
+                    await fetchTodos()
+                }
             }
-        } catch (err) {
-            alert('An error occurred while adding the task.');
+        } catch (error) {
+            console.error('Failed to initialize dashboard:', error)
         } finally {
-            setIsAddingTodo(false);
+            setIsLoading(false)
         }
-    };
+    }
 
-    const handleToggleTodo = async (todo: ToDoListPublic) => {
-        const newStatus = todo.status === 'completed' ? 'pending' : 'completed';
+    const fetchUsers = async () => {
         try {
-            const { data, error: apiError } = await updateTodoApiV1TodosIdPatch({
-                path: { id: todo.id },
-                body: { status: newStatus }
-            });
-
-            if (!apiError && data) {
-                setTodos(todos.map(t => t.id === todo.id ? data : t));
+            const response = await readUsersApiV1UsersGet()
+            if (response.data && response.data.data) {
+                setUsers(response.data.data)
             }
-        } catch (err) {
-            console.error('Failed to update todo status', err);
+        } catch (error) {
+            console.error('Failed to fetch users:', error)
         }
-    };
+    }
+
+    const fetchTodos = async () => {
+        try {
+            const response = await readTodosApiV1TodosGet()
+            if (response.data && response.data.data) {
+                setTodos(response.data.data)
+            }
+        } catch (error) {
+            console.error('Failed to fetch todos:', error)
+        }
+    }
+
+    // --- User Actions ---
+    const handleAddTodo = async (e: React.FormEvent) => {
+        e.preventDefault()
+        try {
+            setIsAddingTodo(true)
+            await createTodoApiV1TodosPost({
+                body: {
+                    title: newTodoTitle,
+                    description: newTodoDescription,
+                    due_date_time: newTodoDueDate || null,
+                    priority: newTodoPriority,
+                    status: newTodoStatus
+                }
+            })
+            setNewTodoTitle('')
+            setNewTodoDescription('')
+            setNewTodoDueDate('')
+            setNewTodoPriority('medium')
+            setNewTodoStatus('pending')
+            await fetchTodos()
+        } catch (error) {
+            console.error('Failed to add todo:', error)
+        } finally {
+            setIsAddingTodo(false)
+        }
+    }
 
     const handleDeleteTodo = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this task?')) return;
-
         try {
-            const { error: apiError } = await deleteTodoApiV1TodosIdDelete({
-                path: { id }
-            });
-
-            if (!apiError) {
-                setTodos(todos.filter(t => t.id !== id));
-            }
-        } catch (err) {
-            alert('Failed to delete task.');
+            await deleteTodoApiV1TodosIdDelete({ path: { id } })
+            await fetchTodos()
+        } catch (error) {
+            console.error('Failed to delete todo:', error)
         }
-    };
+    }
 
-    // User management handlers
-    const handleAddUser = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newUserEmail.trim() || !newUserPassword.trim()) return;
-
-        setIsAddingUser(true);
+    const handleToggleTodoStatus = async (todo: ToDoListPublic) => {
+        const nextStatus: ToDoStatus = todo.status === 'completed' ? 'pending' : 'completed'
         try {
-            const { data, error: apiError } = await createUserApiV1UsersPost({
-                body: { 
-                    email: newUserEmail, 
-                    password: newUserPassword,
-                    role: 'user'
+            await updateTodoApiV1TodosIdPatch({
+                path: { id: todo.id },
+                body: { status: nextStatus }
+            })
+            await fetchTodos()
+        } catch (error) {
+            console.error('Failed to update todo status:', error)
+        }
+    }
+
+    const handleEditClick = (todo: ToDoListPublic) => {
+        setEditingTodoId(todo.id)
+        setEditTodoTitle(todo.title)
+        setEditTodoDescription(todo.description || '')
+        setEditTodoPriority(todo.priority || 'medium')
+        setEditTodoStatus(todo.status || 'pending')
+        setEditTodoDueDate(todo.due_date_time ? todo.due_date_time.slice(0, 16) : '')
+    }
+
+    const handleCancelEdit = () => {
+        setEditingTodoId(null)
+    }
+
+    const handleUpdateTodo = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!editingTodoId) return
+
+        try {
+            setIsUpdatingTodo(true)
+            await updateTodoApiV1TodosIdPatch({
+                path: { id: editingTodoId },
+                body: {
+                    title: editTodoTitle,
+                    description: editTodoDescription,
+                    priority: editTodoPriority,
+                    status: editTodoStatus,
+                    due_date_time: editTodoDueDate || null
                 }
-            });
-
-            if (apiError) {
-                alert((apiError as any).detail || 'Failed to create user.');
-            } else if (data) {
-                setUsers([data, ...users]);
-                setNewUserEmail('');
-                setNewUserPassword('');
-                alert('User created successfully!');
-            }
-        } catch (err) {
-            alert('An error occurred while creating the user.');
+            })
+            setEditingTodoId(null)
+            await fetchTodos()
+        } catch (error) {
+            console.error('Failed to update todo:', error)
         } finally {
-            setIsAddingUser(false);
+            setIsUpdatingTodo(false)
         }
-    };
+    }
 
-    const handleUpdateUser = async (id: string) => {
-        setIsUpdatingUser(true);
+    // --- Admin Actions ---
+    const handleDeleteUser = async (user: UserPublic) => {
+        if (user.id === currentUser?.id) {
+            alert("You cannot delete yourself!")
+            return
+        }
+        if (user.role === 'admin') {
+            alert("You cannot delete another admin!")
+            return
+        }
+        if (!window.confirm(`Are you sure you want to delete user ${user.email}?`)) return
+        
         try {
-            const { data, error: apiError } = await updateUserApiV1UsersIdPatch({
-                path: { id },
-                body: { full_name: editFullName }
-            });
-
-            if (!apiError && data) {
-                setUsers(users.map(u => u.id === id ? data : u));
-                setEditingUserId(null);
-                setEditFullName('');
-            } else {
-                alert('Failed to update user.');
-            }
-        } catch (err) {
-            alert('An error occurred while updating the user.');
-        } finally {
-            setIsUpdatingUser(false);
+            await deleteUserApiV1UsersIdDelete({ path: { id: user.id } })
+            await fetchUsers()
+        } catch (error) {
+            console.error('Failed to delete user:', error)
         }
-    };
+    }
 
-    const startEditingUser = (u: UserPublic) => {
-        setEditingUserId(u.id);
-        setEditFullName(u.full_name || '');
-    };
-
-    const handleDeleteUser = async (id: string) => {
-        if (id === user?.id) {
-            alert('You cannot delete your own account.');
-            return;
-        }
-        if (!confirm('Are you sure you want to delete this user?')) return;
-
-        try {
-            const { error: apiError } = await deleteUserApiV1UsersIdDelete({
-                path: { id }
-            });
-
-            if (!apiError) {
-                setUsers(users.filter(u => u.id !== id));
-            } else {
-                alert('Failed to delete user.');
-            }
-        } catch (err) {
-            alert('An error occurred while deleting the user.');
-        }
-    };
+    const handleLogoutClick = () => {
+        auth.clearToken()
+        onLogout()
+    }
 
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)]"></div>
             </div>
-        );
+        )
     }
 
-    const stats = {
-        total: todos.length,
-        completed: todos.filter(t => t.status === 'completed').length,
-        pending: todos.filter(t => t.status !== 'completed').length,
-        users: users.length,
-    };
-
     return (
-        <div className="min-h-screen bg-[var(--bg)]">
-            {/* Navigation */}
-            <nav className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)] shadow-[var(--shadow)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center">
-                            <span className="text-xl font-bold text-[var(--accent)]">FastAPI Dashboard</span>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <div className="flex flex-col items-end mr-2">
-                                <span className="hidden sm:block text-sm font-bold text-[var(--text-h)]">{user?.full_name || user?.email}</span>
-                                <span className="hidden sm:block text-[10px] uppercase tracking-tighter text-[var(--accent)] font-bold">{user?.role}</span>
-                            </div>
-                            <button
-                                onClick={handleLogout}
-                                className="bg-[var(--bg)] border border-[var(--border)] rounded-md py-1.5 px-3 text-sm font-medium text-[var(--text)] hover:bg-[var(--accent-bg)] transition-colors"
-                            >
-                                Logout
-                            </button>
-                        </div>
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 md:p-8">
+            <div className="max-w-7xl mx-auto">
+                <header className="flex justify-between items-center mb-8 bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border)] shadow-sm">
+                    <div>
+                        <h1 className="text-3xl font-bold text-[var(--text-h)]">
+                            {currentUser?.role === 'admin' ? 'Admin Control Center' : 'My Task Dashboard'}
+                        </h1>
+                        <p className="text-[var(--text-dim)] mt-1">
+                            Welcome back, <Link to="/profile" className="font-semibold text-[var(--accent)] hover:underline">{currentUser?.full_name || currentUser?.email}</Link>
+                        </p>
                     </div>
-                </div>
-            </nav>
+                    <button 
+                        onClick={handleLogoutClick}
+                        className="px-6 py-2.5 bg-[var(--bg)] border border-[var(--border)] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 rounded-xl transition-all font-medium"
+                    >
+                        Logout
+                    </button>
+                </header>
 
-            <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-                {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-extrabold text-[var(--text-h)]">
-                        Welcome back, {user?.full_name || user?.email?.split('@')[0]}!
-                    </h1>
-                    <p className="mt-1 text-[var(--text)]">Here's an overview of your account and tasks.</p>
-                </div>
-
-                {/* Stats Row */}
-                <div className={`grid grid-cols-1 ${isAdmin ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-6`}>
-                    <div className="bg-[var(--bg)] p-6 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
-                        <p className="text-sm font-medium text-[var(--text)] uppercase tracking-wider">Total Tasks</p>
-                        <p className="mt-2 text-3xl font-bold text-[var(--text-h)]">{stats.total}</p>
-                    </div>
-                    <div className="bg-[var(--bg)] p-6 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
-                        <p className="text-sm font-medium text-[var(--text)] uppercase tracking-wider">Pending</p>
-                        <p className="mt-2 text-3xl font-bold text-orange-500">{stats.pending}</p>
-                    </div>
-                    <div className="bg-[var(--bg)] p-6 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
-                        <p className="text-sm font-medium text-[var(--text)] uppercase tracking-wider">Completed</p>
-                        <p className="mt-2 text-3xl font-bold text-green-500">{stats.completed}</p>
-                    </div>
-                    {isAdmin && (
-                        <div className="bg-[var(--bg)] p-6 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
-                            <p className="text-sm font-medium text-[var(--text)] uppercase tracking-wider">Total Users</p>
-                            <p className="mt-2 text-3xl font-bold text-[var(--accent)]">{stats.users}</p>
-                        </div>
-                    )}
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Task Manager & User Management (if admin) */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Task Manager Section */}
-                        <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] shadow-[var(--shadow)] overflow-hidden">
-                            <div className="p-6 border-b border-[var(--border)] flex justify-between items-center">
-                                <h2 className="text-xl font-bold text-[var(--text-h)]">Your Tasks</h2>
-                                <span className="text-sm text-[var(--text)]">{todos.length} items</span>
+                {currentUser?.role === 'admin' ? (
+                    /* Admin View: User Management */
+                    <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-lg overflow-hidden">
+                        <div className="p-6 border-b border-[var(--border)] bg-[var(--accent-bg)] space-y-4">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-xl font-bold">User Management</h2>
+                                <div className="flex gap-4 items-center">
+                                    <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-sm font-bold">
+                                        {users.filter(u => u.is_active).length} Active
+                                    </span>
+                                    <span className="px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-full text-sm font-bold">
+                                        {users.length} Total
+                                    </span>
+                                </div>
                             </div>
                             
-                            {/* Add Todo Form */}
-                            <form onSubmit={handleAddTodo} className="p-6 bg-[var(--accent-bg)] flex gap-4 border-b border-[var(--border)]">
-                                <input 
-                                    type="text"
-                                    placeholder="What needs to be done?"
-                                    className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-lg px-4 py-2 text-[var(--text-h)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                                    value={newTodoTitle}
-                                    onChange={(e) => setNewTodoTitle(e.target.value)}
-                                    disabled={isAddingTodo}
-                                />
-                                <button 
-                                    type="submit"
-                                    disabled={isAddingTodo || !newTodoTitle.trim()}
-                                    className="bg-[var(--accent)] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                                >
-                                    {isAddingTodo ? 'Adding...' : 'Add'}
-                                </button>
-                            </form>
-
-                            {/* Todo List */}
-                            <div className="divide-y divide-[var(--border)] max-h-[400px] overflow-y-auto">
-                                {todos.length === 0 ? (
-                                    <div className="p-12 text-center text-[var(--text)]">
-                                        <p>No tasks yet. Add one above to get started!</p>
-                                    </div>
-                                ) : (
-                                    todos.map((todo) => (
-                                        <div key={todo.id} className="p-4 flex items-center justify-between hover:bg-[var(--accent-bg)] transition-colors group">
-                                            <div className="flex items-center space-x-4">
-                                                <button 
-                                                    onClick={() => handleToggleTodo(todo)}
-                                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                                        todo.status === 'completed' 
-                                                        ? 'bg-green-500 border-green-500 text-white' 
-                                                        : 'border-[var(--border)]'
-                                                    }`}
-                                                >
-                                                    {todo.status === 'completed' && (
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex-1 relative">
+                                    <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <input 
+                                        type="text"
+                                        placeholder="Search by name or email..."
+                                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <select 
+                                        className="bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm font-medium"
+                                        value={roleFilter}
+                                        onChange={(e) => setRoleFilter(e.target.value)}
+                                    >
+                                        <option value="all">All Roles</option>
+                                        <option value="admin">Admins Only</option>
+                                        <option value="user">Users Only</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-[var(--bg)]/50 text-[var(--text-dim)] text-sm uppercase tracking-wider">
+                                        <th className="px-6 py-4 font-semibold">User</th>
+                                        <th className="px-6 py-4 font-semibold">Role</th>
+                                        <th className="px-6 py-4 font-semibold">Status</th>
+                                        <th className="px-6 py-4 font-semibold">Joined</th>
+                                        <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[var(--border)]">
+                                    {users
+                                        .filter(user => {
+                                            const matchesSearch = 
+                                                user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                                            const matchesRole = roleFilter === 'all' || user.role === roleFilter
+                                            return matchesSearch && matchesRole
+                                        }).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-[var(--text-dim)]">
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <svg className="w-10 h-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                         </svg>
-                                                    )}
-                                                </button>
-                                                <span className={`text-[var(--text-h)] ${todo.status === 'completed' ? 'line-through opacity-50' : ''}`}>
-                                                    {todo.title}
-                                                </span>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleDeleteTodo(todo.id)}
-                                                className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                                                        <p className="font-medium text-lg">No users found</p>
+                                                        <p className="text-sm">Try adjusting your search or filter</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            users
+                                                .filter(user => {
+                                                    const matchesSearch = 
+                                                        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                                                    const matchesRole = roleFilter === 'all' || user.role === roleFilter
+                                                    return matchesSearch && matchesRole
+                                                })
+                                                .map((user) => (
+                                                 <tr key={user.id} className="hover:bg-[var(--bg)]/30 transition-colors">
+                                                     <td className="px-6 py-4">
+                                                         <div className="flex flex-col">
+                                                             <span className="font-semibold text-[var(--text-h)]">{user.full_name || 'Anonymous'}</span>
+                                                             <span className="text-sm text-[var(--text-dim)]">{user.email}</span>
+                                                         </div>
+                                                     </td>
+                                                     <td className="px-6 py-4">
+                                                         <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase ${
+                                                             user.role === 'admin' 
+                                                                 ? 'bg-purple-500/10 text-purple-500' 
+                                                                 : 'bg-blue-500/10 text-blue-500'
+                                                         }`}>
+                                                             {user.role}
+                                                         </span>
+                                                     </td>
+                                                     <td className="px-6 py-4">
+                                                         <div className="flex items-center gap-2">
+                                                             <div className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                                             <span className="text-sm">{user.is_active ? 'Active' : 'Inactive'}</span>
+                                                         </div>
+                                                     </td>
+                                                     <td className="px-6 py-4 text-sm text-[var(--text-dim)]">
+                                                         {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                                                     </td>
+                                                     <td className="px-6 py-4 text-right">
+                                                         <button 
+                                                             onClick={() => handleDeleteUser(user)}
+                                                             disabled={user.id === currentUser?.id || user.role === 'admin'}
+                                                             className="p-2 text-[var(--text-dim)] hover:text-red-500 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                                             title={user.role === 'admin' ? "Admins cannot be deleted" : "Delete user"}
+                                                         >
+                                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                             </svg>
+                                                         </button>
+                                                     </td>
+                                                 </tr>
+                                             ))
+                                        )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ) : (
+                    /* User View: Todo List */
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Sidebar: Add Todo */}
+                        <div className="lg:col-span-1">
+                            {/* Add Todo Section */}
+                            <div className="bg-[var(--card-bg)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden sticky top-8">
+                                <div className="p-4 bg-[var(--accent-bg)] border-b border-[var(--border)]">
+                                    <h2 className="font-bold text-lg flex items-center gap-2">
+                                        <svg className="w-5 h-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Create New Task
+                                    </h2>
+                                </div>
+                                <form onSubmit={handleAddTodo} className="p-6 flex flex-col gap-5">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Title</label>
+                                        <input 
+                                            type="text"
+                                            placeholder="What needs to be done?"
+                                            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                            value={newTodoTitle}
+                                            onChange={(e) => setNewTodoTitle(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Description</label>
+                                        <textarea
+                                            placeholder="Add more details..."
+                                            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                            value={newTodoDescription}
+                                            onChange={(e) => setNewTodoDescription(e.target.value)}
+                                        ></textarea>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Priority</label>
+                                            <select
+                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                                value={newTodoPriority}
+                                                onChange={(e) => setNewTodoPriority(e.target.value as ToDoPriority)}
                                             >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
                                         </div>
-                                    ))
-                                )}
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Status</label>
+                                            <select
+                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                                value={newTodoStatus}
+                                                onChange={(e) => setNewTodoStatus(e.target.value as ToDoStatus)}
+                                            >
+                                                <option value="pending">Pending</option>
+                                                <option value="in progress">In Progress</option>
+                                                <option value="completed">Completed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Due Date</label>
+                                        <input
+                                            type="datetime-local"
+                                            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                            value={newTodoDueDate}
+                                            onChange={(e) => setNewTodoDueDate(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <button 
+                                        type="submit"
+                                        disabled={isAddingTodo}
+                                        className="w-full bg-[var(--accent)] text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-[var(--accent)]/20 active:scale-[0.98] transition-all disabled:opacity-50 mt-2"
+                                    >
+                                        {isAddingTodo ? 'Creating...' : 'Create Task'}
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
-                        {/* User Management Section (Admin Only) */}
-                        {isAdmin && (
-                            <div className="bg-[var(--bg)] rounded-xl border border-[var(--border)] shadow-[var(--shadow)] overflow-hidden">
-                                <div className="p-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--bg)]">
-                                    <h2 className="text-xl font-bold text-[var(--text-h)]">User Management</h2>
-                                    <span className="text-sm text-[var(--text)]">{users.length} users</span>
-                                </div>
-                                
-                                {/* Add User Form */}
-                                <form onSubmit={handleAddUser} className="p-6 bg-[var(--accent-bg)] flex flex-wrap gap-4 border-b border-[var(--border)]">
-                                    <input 
-                                        type="email"
-                                        placeholder="User Email"
-                                        className="flex-1 min-w-[200px] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-4 py-2 text-[var(--text-h)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                                        value={newUserEmail}
-                                        onChange={(e) => setNewUserEmail(e.target.value)}
-                                        disabled={isAddingUser}
-                                        required
-                                    />
-                                    <input 
-                                        type="password"
-                                        placeholder="Initial Password"
-                                        className="flex-1 min-w-[200px] bg-[var(--bg)] border border-[var(--border)] rounded-lg px-4 py-2 text-[var(--text-h)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                                        value={newUserPassword}
-                                        onChange={(e) => setNewUserPassword(e.target.value)}
-                                        disabled={isAddingUser}
-                                        required
-                                    />
-                                    <button 
-                                        type="submit"
-                                        disabled={isAddingUser}
-                                        className="bg-[var(--accent)] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                                    >
-                                        {isAddingUser ? 'Creating...' : 'Create User'}
-                                    </button>
-                                </form>
+                        {/* Todos List Section */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Task Search Bar */}
+                            <div className="relative">
+                                <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <input 
+                                    type="text"
+                                    placeholder="Search tasks by title or description..."
+                                    className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 shadow-sm transition-all"
+                                    value={taskSearchTerm}
+                                    onChange={(e) => setTaskSearchTerm(e.target.value)}
+                                />
+                            </div>
 
-                                {/* User List */}
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-[var(--bg)] border-b border-[var(--border)]">
-                                            <tr>
-                                                <th className="px-6 py-3 text-xs font-bold text-[var(--text)] uppercase tracking-wider">Email</th>
-                                                <th className="px-6 py-3 text-xs font-bold text-[var(--text)] uppercase tracking-wider">Full Name</th>
-                                                <th className="px-6 py-3 text-xs font-bold text-[var(--text)] uppercase tracking-wider">Role</th>
-                                                <th className="px-6 py-3 text-xs font-bold text-[var(--text)] uppercase tracking-wider">Status</th>
-                                                <th className="px-6 py-3 text-xs font-bold text-[var(--text)] uppercase tracking-wider text-right">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-[var(--border)]">
-                                            {users.map((u) => (
-                                                <tr key={u.id} className="hover:bg-[var(--accent-bg)] transition-colors">
-                                                    <td className="px-6 py-4 text-sm text-[var(--text-h)]">{u.email}</td>
-                                                    <td className="px-6 py-4 text-sm text-[var(--text-h)]">
-                                                        {editingUserId === u.id ? (
-                                                            <input 
-                                                                type="text"
-                                                                className="bg-[var(--bg)] border border-[var(--border)] rounded px-2 py-1 text-sm focus:ring-1 focus:ring-[var(--accent)] outline-none w-full"
-                                                                value={editFullName}
-                                                                onChange={(e) => setEditFullName(e.target.value)}
-                                                                autoFocus
-                                                            />
-                                                        ) : (
-                                                            u.full_name || '-'
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-[var(--text)] capitalize">{u.role}</td>
-                                                    <td className="px-6 py-4 text-sm">
-                                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${u.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                            {u.is_active ? 'Active' : 'Inactive'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-right space-x-2">
-                                                        {editingUserId === u.id ? (
-                                                            <>
+                            {todos.filter(todo => 
+                                todo.title.toLowerCase().includes(taskSearchTerm.toLowerCase()) ||
+                                todo.description?.toLowerCase().includes(taskSearchTerm.toLowerCase())
+                            ).length === 0 ? (
+                                <div className="bg-[var(--card-bg)] rounded-2xl border-2 border-dashed border-[var(--border)] p-16 text-center shadow-inner">
+                                    <div className="bg-[var(--accent)]/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <svg className="w-10 h-10 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-[var(--text-h)] mb-2">
+                                        {taskSearchTerm ? 'No matching tasks found' : 'No active tasks'}
+                                    </h3>
+                                    <p className="text-[var(--text-dim)] max-w-sm mx-auto">
+                                        {taskSearchTerm ? 'Try a different search term or clear the search.' : "Get organized by adding your first task. It's time to be productive!"}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid gap-4">
+                                    {todos
+                                        .filter(todo => 
+                                            todo.title.toLowerCase().includes(taskSearchTerm.toLowerCase()) ||
+                                            todo.description?.toLowerCase().includes(taskSearchTerm.toLowerCase())
+                                        )
+                                        .map((todo) => (
+                                        <div 
+                                            key={todo.id} 
+                                            className={`group bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-6 transition-all hover:border-[var(--accent)]/50 hover:shadow-xl ${todo.status === 'completed' && editingTodoId !== todo.id ? 'opacity-70' : ''}`}
+                                        >
+                                            {editingTodoId === todo.id ? (
+                                                <form onSubmit={handleUpdateTodo} className="space-y-4">
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="flex-1 space-y-4">
+                                                            <div>
+                                                                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Title</label>
+                                                                <input 
+                                                                    type="text"
+                                                                    className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-bold"
+                                                                    value={editTodoTitle}
+                                                                    onChange={(e) => setEditTodoTitle(e.target.value)}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Description</label>
+                                                                <textarea
+                                                                    className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm min-h-[80px]"
+                                                                    value={editTodoDescription}
+                                                                    onChange={(e) => setEditTodoDescription(e.target.value)}
+                                                                ></textarea>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                <div>
+                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Priority</label>
+                                                                    <select
+                                                                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                                        value={editTodoPriority}
+                                                                        onChange={(e) => setEditTodoPriority(e.target.value as ToDoPriority)}
+                                                                    >
+                                                                        <option value="low">Low</option>
+                                                                        <option value="medium">Medium</option>
+                                                                        <option value="high">High</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Status</label>
+                                                                    <select
+                                                                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                                        value={editTodoStatus}
+                                                                        onChange={(e) => setEditTodoStatus(e.target.value as ToDoStatus)}
+                                                                    >
+                                                                        <option value="pending">Pending</option>
+                                                                        <option value="in progress">In Progress</option>
+                                                                        <option value="completed">Completed</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Due Date</label>
+                                                                    <input
+                                                                        type="datetime-local"
+                                                                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                                        value={editTodoDueDate}
+                                                                        onChange={(e) => setEditTodoDueDate(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex gap-3 pt-2">
                                                                 <button 
-                                                                    onClick={() => handleUpdateUser(u.id)}
-                                                                    disabled={isUpdatingUser}
-                                                                    className="text-green-500 hover:text-green-600 font-bold text-xs uppercase"
+                                                                    type="submit"
+                                                                    disabled={isUpdatingTodo}
+                                                                    className="flex-1 bg-[var(--accent)] text-white py-2.5 rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
                                                                 >
-                                                                    Save
+                                                                    {isUpdatingTodo ? 'Updating...' : 'Update Task'}
                                                                 </button>
                                                                 <button 
-                                                                    onClick={() => setEditingUserId(null)}
-                                                                    className="text-[var(--text)] hover:text-[var(--text-h)] font-bold text-xs uppercase"
+                                                                    type="button"
+                                                                    onClick={handleCancelEdit}
+                                                                    disabled={isUpdatingTodo}
+                                                                    className="flex-1 bg-[var(--bg)] border border-[var(--border)] text-[var(--text)] py-2.5 rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
                                                                 >
                                                                     Cancel
                                                                 </button>
-                                                            </>
-                                                        ) : (
-                                                            <>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            ) : (
+                                                <div className="flex items-start gap-5">
+                                                    <button 
+                                                        onClick={() => handleToggleTodoStatus(todo)}
+                                                        className={`mt-1 flex-shrink-0 w-7 h-7 rounded-xl border-2 transition-all flex items-center justify-center ${
+                                                            todo.status === 'completed' 
+                                                                ? 'bg-[var(--accent)] border-[var(--accent)] shadow-lg shadow-[var(--accent)]/30' 
+                                                                : 'border-[var(--border)] group-hover:border-[var(--accent)]'
+                                                        }`}
+                                                    >
+                                                        {todo.status === 'completed' && (
+                                                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                    
+                                                    <div className="flex-1">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div>
+                                                                <h3 className={`text-xl font-bold transition-all ${todo.status === 'completed' ? 'line-through text-[var(--text-dim)]' : 'text-[var(--text-h)]'}`}>
+                                                                    {todo.title}
+                                                                </h3>
+                                                                <div className="flex flex-wrap gap-3 mt-2">
+                                                                    <span className={`text-[10px] px-2 py-0.5 rounded-md uppercase font-black tracking-widest border ${
+                                                                        todo.priority === 'high' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                                        todo.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                                                        'bg-green-500/10 text-green-500 border-green-500/20'
+                                                                    }`}>
+                                                                        {todo.priority}
+                                                                    </span>
+                                                                    <span className="text-[10px] px-2 py-0.5 rounded-md uppercase font-black tracking-widest border bg-[var(--bg)] border-[var(--border)] text-[var(--text-dim)]">
+                                                                        {todo.status}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                                                                 <button 
-                                                                    onClick={() => startEditingUser(u)}
-                                                                    className="text-indigo-400 hover:text-indigo-600 p-1"
-                                                                    title="Edit User"
+                                                                    onClick={() => handleEditClick(todo)}
+                                                                    className="p-2 text-[var(--text-dim)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/10 rounded-lg transition-all"
+                                                                    title="Edit task"
                                                                 >
-                                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
                                                                     </svg>
                                                                 </button>
-                                                                {u.id !== user?.id && (
-                                                                    <button 
-                                                                        onClick={() => handleDeleteUser(u.id)}
-                                                                        className="text-red-400 hover:text-red-600 p-1"
-                                                                        title="Delete User"
-                                                                    >
-                                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                        </svg>
-                                                                    </button>
-                                                                )}
-                                                            </>
+                                                                <button 
+                                                                    onClick={() => handleDeleteTodo(todo.id)}
+                                                                    className="p-2 text-[var(--text-dim)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                                    title="Delete task"
+                                                                >
+                                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        {todo.description && (
+                                                            <p className={`text-[var(--text-dim)] leading-relaxed mb-4 ${todo.status === 'completed' ? 'line-through' : ''}`}>
+                                                                {todo.description}
+                                                            </p>
                                                         )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                        {todo.due_date_time && (
+                                                            <div className="flex items-center gap-2 text-sm font-medium text-[var(--text-dim)] bg-[var(--bg)] w-fit px-3 py-1.5 rounded-lg border border-[var(--border)]">
+                                                                <svg className="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <span>{new Date(todo.due_date_time).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Right Column: Profile Section */}
-                    <div className="space-y-6">
-                        <div className="bg-[var(--bg)] p-6 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
-                            <h2 className="text-xl font-bold text-[var(--text-h)] mb-4 border-b border-[var(--border)] pb-2">Profile Details</h2>
-                            <dl className="space-y-4">
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--text)] uppercase tracking-wider">Full Name</dt>
-                                    <dd className="mt-1 text-sm text-[var(--text-h)] font-medium">{user?.full_name || 'N/A'}</dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--text)] uppercase tracking-wider">Email Address</dt>
-                                    <dd className="mt-1 text-sm text-[var(--text-h)] font-medium">{user?.email}</dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--text)] uppercase tracking-wider">Account Role</dt>
-                                    <dd className="mt-1 text-sm text-[var(--text-h)] font-medium capitalize flex items-center gap-2">
-                                        {user?.role}
-                                        {isAdmin && (
-                                            <span className="bg-[var(--accent)] text-white text-[8px] px-1.5 py-0.5 rounded font-black uppercase">Admin</span>
-                                        )}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs font-medium text-[var(--text)] uppercase tracking-wider">Status</dt>
-                                    <dd className="mt-1">
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${user?.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>
-                                            {user?.is_active ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </dd>
-                                </div>
-                            </dl>
+                            )}
                         </div>
-
-                        {isAdmin ? (
-                            <div className="bg-[var(--accent-bg)] p-6 rounded-xl border border-[var(--accent-border)] border-dashed">
-                                <h3 className="text-sm font-bold text-[var(--accent)] mb-2 uppercase tracking-tighter">Admin Panel</h3>
-                                <ul className="text-xs text-[var(--text)] space-y-2">
-                                    <li>• Create new user accounts</li>
-                                    <li>• Monitor system-wide users</li>
-                                    <li>• Delete inactive or problematic users</li>
-                                    <li>• Security: You cannot delete your own account</li>
-                                </ul>
-                            </div>
-                        ) : (
-                            <div className="bg-[var(--accent-bg)] p-6 rounded-xl border border-[var(--accent-border)] border-dashed">
-                                <h3 className="text-sm font-bold text-[var(--accent)] mb-2 uppercase">Quick Tips</h3>
-                                <ul className="text-xs text-[var(--text)] space-y-2">
-                                    <li>• Click the circle to complete a task</li>
-                                    <li>• Hover over a task to see the delete icon</li>
-                                    <li>• Stats update automatically when you modify tasks</li>
-                                </ul>
-                            </div>
-                        )}
                     </div>
-                </div>
-            </main>
+                )}
+            </div>
         </div>
-    );
-};
+    )
+}
 
-export default Dashboard;
+export default Dashboard

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loginAccessTokenApiV1LoginAccessTokenPost } from '../client';
+import { loginAccessTokenApiV1LoginAccessTokenPost, createUserApiV1UsersPost } from '../client';
 import { auth } from '../lib/auth';
 
 interface LoginProps {
@@ -9,6 +9,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -17,37 +18,33 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         setError(null);
         setIsLoading(true);
         
-        // Clear any existing token before login attempt
         auth.clearToken();
 
         try {
-            const { data, error: apiError } = await loginAccessTokenApiV1LoginAccessTokenPost({
-                body: {
-                    username,
-                    password,
-                },
-            });
-
-            if (apiError) {
-                let message = 'Login failed. Please check your credentials.';
-                const err = apiError as any;
-                if (err.detail) {
-                    if (typeof err.detail === 'string') {
-                        message = err.detail;
-                    } else if (Array.isArray(err.detail)) {
-                        message = err.detail.map((d: any) => d.msg || JSON.stringify(d)).join(', ');
-                    }
+            if (isSignUp) {
+                const { error: apiError } = await createUserApiV1UsersPost({
+                    body: { email: username, password, role: 'user' }
+                });
+                if (apiError) {
+                    setError('Signup failed. Please try again.');
+                } else {
+                    alert('Signup successful! Please sign in.');
+                    setIsSignUp(false);
                 }
-                setError(message);
-                return;
-            }
+            } else {
+                const { data, error: apiError } = await loginAccessTokenApiV1LoginAccessTokenPost({
+                    body: { username, password },
+                });
 
-            if (data?.access_token) {
-                auth.setToken(data.access_token);
-                onLoginSuccess();
+                if (apiError) {
+                    setError('Login failed. Please check your credentials.');
+                } else if (data?.access_token) {
+                    auth.setToken(data.access_token);
+                    onLoginSuccess();
+                }
             }
         } catch (err) {
-            setError('A network error occurred. Please ensure the backend is running and CORS is enabled.');
+            setError('A network error occurred.');
         } finally {
             setIsLoading(false);
         }
@@ -58,11 +55,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             <div className="max-w-md w-full space-y-8 bg-[var(--bg)] p-10 rounded-xl border border-[var(--border)] shadow-[var(--shadow)]">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-[var(--text-h)]">
-                        Sign in to your account
+                        {isSignUp ? 'Create an account' : 'Sign in to your account'}
                     </h2>
-                    <p className="mt-2 text-center text-sm text-[var(--text)]">
-                        FastAPI + React Template
-                    </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     {error && (
@@ -114,8 +108,18 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                                     <path className="opacity-75" fill="currentColor" d="4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             ) : (
-                                'Sign in'
+                                isSignUp ? 'Sign up' : 'Sign in'
                             )}
+                        </button>
+                    </div>
+
+                    <div className="text-center text-sm">
+                        <button 
+                            type="button" 
+                            onClick={() => setIsSignUp(!isSignUp)}
+                            className="text-[var(--accent)] hover:underline"
+                        >
+                            {isSignUp ? 'Already have an account? Sign in' : 'Don\'t have an account? Sign up'}
                         </button>
                     </div>
                 </form>
