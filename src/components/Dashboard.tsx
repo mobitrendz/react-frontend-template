@@ -570,8 +570,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Priority</label>
+                                            <label htmlFor="task_priority" className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Priority</label>
                                             <select
+                                                id="task_priority"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={newTodoPriority}
                                                 onChange={(e) => setNewTodoPriority(e.target.value as ToDoPriority)}
@@ -582,8 +583,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Status</label>
+                                            <label htmlFor="task_status" className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Status</label>
                                             <select
+                                                id="task_status"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={newTodoStatus}
                                                 onChange={(e) => setNewTodoStatus(e.target.value as ToDoStatus)}
@@ -594,10 +596,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             </select>
                                         </div>
                                     </div>
-
                                     <div>
-                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Due Date</label>
+                                        <label htmlFor="task_due_date" className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Due Date</label>
                                         <input
+                                            id="task_due_date"
                                             type="datetime-local"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                             value={newTodoDueDate}
@@ -666,8 +668,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                     <div className="flex gap-4 items-start">
                                                         <div className="flex-1 space-y-4">
                                                             <div>
-                                                                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Title</label>
+                                                                <label htmlFor={`edit_title_${todo.id}`} className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Title</label>
                                                                 <input 
+                                                                    id={`edit_title_${todo.id}`}
                                                                     type="text"
                                                                     className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-bold"
                                                                     value={editTodoTitle}
@@ -676,8 +679,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Description</label>
+                                                                <label htmlFor={`edit_desc_${todo.id}`} className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Description</label>
                                                                 <textarea
+                                                                    id={`edit_desc_${todo.id}`}
                                                                     className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm min-h-[80px]"
                                                                     value={editTodoDescription}
                                                                     onChange={(e) => setEditTodoDescription(e.target.value)}
@@ -685,8 +689,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                             </div>
                                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                                 <div>
-                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Priority</label>
+                                                                    <label htmlFor={`edit_priority_${todo.id}`} className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Priority</label>
                                                                     <select
+                                                                        id={`edit_priority_${todo.id}`}
                                                                         className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
                                                                         value={editTodoPriority}
                                                                         onChange={(e) => setEditTodoPriority(e.target.value as ToDoPriority)}
@@ -697,8 +702,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                                     </select>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Status</label>
+                                                                    <label htmlFor={`edit_status_${todo.id}`} className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Status</label>
                                                                     <select
+                                                                        id={`edit_status_${todo.id}`}
                                                                         className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
                                                                         value={editTodoStatus}
                                                                         onChange={(e) => setEditTodoStatus(e.target.value as ToDoStatus)}
@@ -709,8 +715,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                                     </select>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Due Date</label>
+                                                                    <label htmlFor={`edit_due_date_${todo.id}`} className="block text-xs font-bold uppercase tracking-wider text-[var(--text-dim)] mb-1.5">Due Date</label>
                                                                     <input
+                                                                        id={`edit_due_date_${todo.id}`}
                                                                         type="datetime-local"
                                                                         className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
                                                                         value={editTodoDueDate}

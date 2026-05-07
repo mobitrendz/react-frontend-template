@@ -88,4 +88,57 @@ describe('Profile Component', () => {
             expect(onLogout).toHaveBeenCalled()
         })
     })
+
+    it('handles password update failure', async () => {
+        vi.mocked(sdk.updatePasswordApiV1UsersPasswordPatch).mockRejectedValue({ body: { detail: 'Incorrect password' } } as any)
+        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        
+        fireEvent.click(await screen.findByText('Change Password'))
+        fireEvent.change(await screen.findByLabelText(/Current Password/i), { target: { value: 'wrong' } })
+        fireEvent.change(screen.getByLabelText(/^New Password$/i), { target: { value: 'new' } })
+        fireEvent.change(screen.getByLabelText(/Confirm New Password/i), { target: { value: 'new' } })
+        fireEvent.click(screen.getByRole('button', { name: /^Update Password$/i }))
+        
+        expect(await screen.findByText(/Incorrect password/i)).toBeInTheDocument()
+    })
+
+    it('handles account deletion failure', async () => {
+        vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({ data: { access_token: 'v' } } as any)
+        vi.mocked(sdk.readTodosApiV1TodosGet).mockResolvedValue({ data: { data: [] } } as any)
+        vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockRejectedValue(new Error('API Error'))
+
+        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        fireEvent.click(await screen.findByText(/Delete My Account/i))
+        fireEvent.change(await screen.findByLabelText(/Confirm Password to Delete/i), { target: { value: 'pass' } })
+        fireEvent.click(screen.getByRole('button', { name: /Verify & Delete/i }))
+        
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('error occurred while deleting your account'))
+        })
+    })
+
+    it('handles cancelling profile edit', async () => {
+        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        fireEvent.click(await screen.findByText(/Edit Profile/i))
+        fireEvent.click(screen.getByRole('button', { name: /Cancel/i }))
+        expect(screen.queryByLabelText(/Full Name/i)).not.toBeInTheDocument()
+    })
+
+    it('handles cancelling password change', async () => {
+        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        fireEvent.click(await screen.findByText('Change Password'))
+        fireEvent.click(screen.getByRole('button', { name: /Cancel/i }))
+        expect(screen.queryByLabelText(/Current Password/i)).not.toBeInTheDocument()
+    })
+
+    it('handles failed password verification for deletion', async () => {
+        vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValue({ body: { detail: 'Invalid' } } as any)
+        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        
+        fireEvent.click(await screen.findByText(/Delete My Account/i))
+        fireEvent.change(await screen.findByLabelText(/Confirm Password to Delete/i), { target: { value: 'wrong' } })
+        fireEvent.click(screen.getByRole('button', { name: /Verify & Delete/i }))
+        
+        expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument()
+    })
 })
