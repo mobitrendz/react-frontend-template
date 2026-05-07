@@ -373,13 +373,19 @@ describe('Dashboard edge cases', () => {
     await screen.findByText(/Task Dashboard/i);
     
     fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'Dated Task' } });
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: 'Dated Desc' } });
     const dateInput = screen.getByLabelText(/Due Date/i);
     fireEvent.change(dateInput, { target: { value: '2026-12-31T23:59' } });
     
     fireEvent.click(screen.getByRole('button', { name: /Create Task/i }));
     
     await waitFor(() => expect(sdk.createTodoApiV1TodosPost).toHaveBeenCalledWith({
-      body: expect.objectContaining({ due_date_time: '2026-12-31T23:59' })
+      body: expect.objectContaining({ 
+        title: 'Dated Task',
+        description: 'Dated Desc',
+        due_date_time: '2026-12-31T23:59' 
+      })
     }));
   });
+
 });
