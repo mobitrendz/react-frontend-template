@@ -1,10 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import Dashboard from './Dashboard'
-import { getCurrentUserApiV1LoginCurrentUserGet, readTodosApiV1TodosGet, readUsersApiV1UsersGet } from '../client/sdk.gen'
+import * as sdk from '../client/sdk.gen'
 
-// Mock the SDK
+// Mock the entire SDK
 vi.mock('../client/sdk.gen', () => ({
     getCurrentUserApiV1LoginCurrentUserGet: vi.fn(),
     readTodosApiV1TodosGet: vi.fn(),
@@ -20,69 +20,61 @@ vi.mock('../client/sdk.gen', () => ({
 describe('Dashboard Component', () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        window.alert = vi.fn()
+        window.confirm = vi.fn(() => true)
     })
 
-    it('renders admin view with user management when user is admin', async () => {
-        const mockAdmin = { id: 'admin-1', email: 'admin@test.com', role: 'admin', full_name: 'Admin User' }
-        const mockUsersResponse = { 
-            data: [
-                mockAdmin, 
-                { id: 'user-1', email: 'user@test.com', role: 'user', full_name: 'Normal User', is_active: true }
-            ], 
-            count: 2 
-        }
+    const mockUser = { id: 'user-1', email: 'user@test.com', role: 'user', full_name: 'Normal User', is_active: true }
+    const mockAdmin = { id: 'admin-1', email: 'admin@test.com', role: 'admin', full_name: 'Admin User', is_active: true }
+
+    it('renders empty states and covers task creation', async () => {
+        vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockUser } as any)
+        vi.mocked(sdk.readTodosApiV1TodosGet).mockResolvedValue({ data: { data: [], count: 0 } } as any)
+        vi.mocked(sdk.createTodoApiV1TodosPost).mockResolvedValue({ data: {} } as any)
+
+        render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
         
-        vi.mocked(getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockAdmin } as any)
-        vi.mocked(readUsersApiV1UsersGet).mockResolvedValue({ data: mockUsersResponse } as any)
-
-        render(
-            <MemoryRouter>
-                <Dashboard onLogout={() => {}} />
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText(/Admin Control Center/i)).toBeInTheDocument()
-            expect(screen.getByText(/User Management/i)).toBeInTheDocument()
-            expect(screen.getByText('Normal User')).toBeInTheDocument()
-            expect(screen.getByText('user@test.com')).toBeInTheDocument()
-        })
-    })
-
-    it('renders task dashboard when user is a normal user', async () => {
-        const mockUser = { id: 'user-1', email: 'user@test.com', role: 'user', full_name: 'Normal User' }
-        const mockTodosResponse = { 
-            data: [
-                { id: 'todo-1', title: 'Complete Unit Tests', status: 'todo', priority: 'high', description: 'Important' }
-            ], 
-            count: 1 
-        }
+        await waitFor(() => expect(screen.getByText(/You don't have any tasks yet/i)).toBeInTheDocument())
         
-        vi.mocked(getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockUser } as any)
-        vi.mocked(readTodosApiV1TodosGet).mockResolvedValue({ data: mockTodosResponse } as any)
-
-        render(
-            <MemoryRouter>
-                <Dashboard onLogout={() => {}} />
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText(/My Task Dashboard/i)).toBeInTheDocument()
-            expect(screen.getByText('Complete Unit Tests')).toBeInTheDocument()
-            expect(screen.getByPlaceholderText(/What needs to be done\?/i)).toBeInTheDocument()
-        })
+        fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'New Task' } })
+        fireEvent.click(screen.getByRole('button', { name: /Create Task/i }))
+        await waitFor(() => expect(sdk.createTodoApiV1TodosPost).toHaveBeenCalled())
     })
 
-    it('shows loading spinner initially', () => {
-        vi.mocked(getCurrentUserApiV1LoginCurrentUserGet).mockReturnValue(new Promise(() => {})) // Never resolves
+    it('handles admin management workflow', async () => {
+        const users = [{ id: '1', email: 'a@test.com', role: 'user', is_active: true }]
+        vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockAdmin } as any)
+        vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { data: users, count: 1 } } as any)
+        vi.mocked(sdk.createUserApiV1UsersPost).mockResolvedValue({ data: {} } as any)
 
-        render(
-            <MemoryRouter>
-                <Dashboard onLogout={() => {}} />
-            </MemoryRouter>
-        )
+        render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
+        await screen.findByText('a@test.com')
 
-        expect(document.querySelector('.animate-spin')).toBeInTheDocument()
+        fireEvent.click(screen.getByText(/Create New Admin/i))
+        
+        fireEvent.change(await screen.findByLabelText(/Admin Email/i), { target: { value: 'new@admin.com' } })
+        fireEvent.change(screen.getByLabelText(/Admin Password/i), { target: { value: 'pass' } })
+        fireEvent.click(screen.getByRole('button', { name: /Register Admin/i }))
+        
+        await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalled())
+    })
+
+    it('handles task editing', async () => {
+        const mockTodo = { id: 'todo-1', title: 'Test Task', status: 'pending', priority: 'medium' }
+        vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockUser } as any)
+        vi.mocked(sdk.readTodosApiV1TodosGet).mockResolvedValue({ data: { data: [mockTodo], count: 1 } } as any)
+        vi.mocked(sdk.updateTodoApiV1TodosIdPatch).mockResolvedValue({ data: {} } as any)
+
+        render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
+        await screen.findByText('Test Task')
+        
+        fireEvent.click(screen.getByTitle(/Edit Task/i))
+        
+        // Find the input in the modal
+        const editTitleInput = await screen.findByDisplayValue('Test Task')
+        fireEvent.change(editTitleInput, { target: { value: 'Updated' } })
+        fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }))
+        
+        await waitFor(() => expect(sdk.updateTodoApiV1TodosIdPatch).toHaveBeenCalled())
     })
 })

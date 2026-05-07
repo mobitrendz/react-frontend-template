@@ -229,8 +229,9 @@ const Profile = ({ onLogout }: ProfileProps) => {
                             {isEditingProfile ? (
                                 <form onSubmit={handleUpdateProfile} className="space-y-6 max-w-md">
                                     <div>
-                                        <label className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Full Name</label>
+                                        <label htmlFor="full_name" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Full Name</label>
                                         <input 
+                                            id="full_name"
                                             type="text"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                             value={editFullName}
@@ -310,8 +311,9 @@ const Profile = ({ onLogout }: ProfileProps) => {
                             {isChangingPassword ? (
                                 <form onSubmit={handleUpdatePassword} className="space-y-6 max-w-md">
                                     <div>
-                                        <label className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Current Password</label>
+                                        <label htmlFor="current_password" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Current Password</label>
                                         <input 
+                                            id="current_password"
                                             type="password"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                             value={currentPassword}
@@ -321,8 +323,9 @@ const Profile = ({ onLogout }: ProfileProps) => {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-bold mb-2 text-[var(--text-dim)]">New Password</label>
+                                            <label htmlFor="new_password" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">New Password</label>
                                             <input 
+                                                id="new_password"
                                                 type="password"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={newPassword}
@@ -331,8 +334,9 @@ const Profile = ({ onLogout }: ProfileProps) => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Confirm New Password</label>
+                                            <label htmlFor="confirm_password" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Confirm New Password</label>
                                             <input 
+                                                id="confirm_password"
                                                 type="password"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={confirmPassword}
@@ -438,8 +442,9 @@ const Profile = ({ onLogout }: ProfileProps) => {
                                 ) : (
                                     <form onSubmit={handleConfirmPasswordForDelete} className="flex-1 max-w-sm space-y-4">
                                         <div>
-                                            <label className="block text-sm font-bold mb-2 text-red-500">Confirm Password to Delete</label>
+                                            <label htmlFor="delete_confirm_password" className="block text-sm font-bold mb-2 text-red-500">Confirm Password to Delete</label>
                                             <input 
+                                                id="delete_confirm_password"
                                                 type="password"
                                                 className="w-full bg-[var(--bg)] border border-red-500/30 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
                                                 placeholder="Enter your password"

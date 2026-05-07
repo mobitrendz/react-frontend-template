@@ -369,23 +369,25 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 onChange={(e) => setNewAdminFullName(e.target.value)}
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-[var(--text-dim)]">Email Address</label>
+                                        <div>
+                                            <label htmlFor="admin_email" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Admin Email</label>
                                             <input 
+                                                id="admin_email"
                                                 type="email"
-                                                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
-                                                placeholder="admin@example.com"
+                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                                placeholder="Admin Email"
                                                 value={newAdminEmail}
                                                 onChange={(e) => setNewAdminEmail(e.target.value)}
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-[var(--text-dim)]">Initial Password</label>
+                                        <div>
+                                            <label htmlFor="admin_password" className="block text-sm font-bold mb-2 text-[var(--text-dim)]">Admin Password</label>
                                             <input 
+                                                id="admin_password"
                                                 type="password"
-                                                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
-                                                placeholder="••••••••"
+                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                                                placeholder="Admin Password"
                                                 value={newAdminPassword}
                                                 onChange={(e) => setNewAdminPassword(e.target.value)}
                                                 required
@@ -543,8 +545,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 </div>
                                 <form onSubmit={handleAddTodo} className="p-6 flex flex-col gap-5">
                                     <div>
-                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Title</label>
+                                        <label htmlFor="task_title" className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Title</label>
                                         <input 
+                                            id="task_title"
                                             type="text"
                                             placeholder="What needs to be done?"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
@@ -555,8 +558,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Description</label>
+                                        <label htmlFor="task_description" className="block text-sm font-semibold mb-1.5 text-[var(--text-dim)]">Description</label>
                                         <textarea
+                                            id="task_description"
                                             placeholder="Add more details..."
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-3 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                             value={newTodoDescription}
