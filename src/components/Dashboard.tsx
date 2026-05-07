@@ -6,7 +6,9 @@ import {
     getCurrentUserApiV1LoginCurrentUserGet,
     readUsersApiV1UsersGet,
     deleteUserApiV1UsersIdDelete,
-    updateTodoApiV1TodosIdPatch
+    updateTodoApiV1TodosIdPatch,
+    updateUserApiV1UsersIdPatch,
+    createUserApiV1UsersPost
 } from '../client/sdk.gen'
 import { Link } from 'react-router-dom'
 import { 
@@ -28,6 +30,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     // User Dashboard State
     const [todos, setTodos] = useState<ToDoListPublic[]>([])
     const [isAddingTodo, setIsAddingTodo] = useState(false)
+
+    // Admin Action State
+    const [isCreatingAdmin, setIsCreatingAdmin] = useState(false)
+    const [newAdminEmail, setNewAdminEmail] = useState('')
+    const [newAdminPassword, setNewAdminPassword] = useState('')
+    const [newAdminFullName, setNewAdminFullName] = useState('')
+    const [isSubmittingAdmin, setIsSubmittingAdmin] = useState(false)
+    const [adminCreateError, setAdminCreateError] = useState<string | null>(null)
     const [newTodoTitle, setNewTodoTitle] = useState('')
     const [newTodoDescription, setNewTodoDescription] = useState('')
     const [newTodoDueDate, setNewTodoDueDate] = useState('')
@@ -203,6 +213,48 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         }
     }
 
+    const handleCreateAdmin = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setAdminCreateError(null)
+        try {
+            setIsSubmittingAdmin(true)
+            await createUserApiV1UsersPost({
+                body: {
+                    email: newAdminEmail,
+                    password: newAdminPassword,
+                    full_name: newAdminFullName,
+                    role: 'admin',
+                    is_active: true
+                }
+            })
+            await fetchUsers()
+            setIsCreatingAdmin(false)
+            setNewAdminEmail('')
+            setNewAdminPassword('')
+            setNewAdminFullName('')
+        } catch (error: any) {
+            console.error('Failed to create admin:', error)
+            setAdminCreateError(error.body?.detail || "Failed to create admin. Please check your inputs.")
+        } finally {
+            setIsSubmittingAdmin(false)
+        }
+    }
+
+    const handleToggleUserStatus = async (user: UserPublic) => {
+        if (user.id === currentUser?.id) return // Don't deactivate yourself
+        
+        try {
+            await updateUserApiV1UsersIdPatch({
+                path: { id: user.id },
+                // Cast to any because is_active might not be in the UserUpdate type
+                body: { is_active: !user.is_active } as any
+            })
+            await fetchUsers()
+        } catch (error) {
+            console.error('Failed to toggle user status:', error)
+        }
+    }
+
     const handleLogoutClick = () => {
         auth.clearToken()
         onLogout()
@@ -241,7 +293,18 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-lg overflow-hidden">
                         <div className="p-6 border-b border-[var(--border)] bg-[var(--accent-bg)] space-y-4">
                             <div className="flex justify-between items-center">
-                                <h2 className="text-xl font-bold">User Management</h2>
+                                <div className="flex items-center gap-4">
+                                    <h2 className="text-xl font-bold">User Management</h2>
+                                    <button 
+                                        onClick={() => setIsCreatingAdmin(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-[var(--accent)] text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Add New Admin
+                                    </button>
+                                </div>
                                 <div className="flex gap-4 items-center">
                                     <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-sm font-bold">
                                         {users.filter(u => u.is_active).length} Active
@@ -277,6 +340,84 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     </select>
                                 </div>
                             </div>
+
+                            {/* Create Admin Form */}
+                            {isCreatingAdmin && (
+                                <div className="mt-6 p-6 bg-[var(--bg)] rounded-2xl border border-[var(--border)] animate-in fade-in slide-in-from-top-4 duration-300">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="font-bold text-lg">Create New Administrator</h3>
+                                        <button 
+                                            onClick={() => {
+                                                setIsCreatingAdmin(false)
+                                                setAdminCreateError(null)
+                                            }}
+                                            className="text-[var(--text-dim)] hover:text-[var(--text)]"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <form onSubmit={handleCreateAdmin} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-[var(--text-dim)]">Full Name</label>
+                                            <input 
+                                                type="text"
+                                                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                placeholder="e.g. John Doe"
+                                                value={newAdminFullName}
+                                                onChange={(e) => setNewAdminFullName(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-[var(--text-dim)]">Email Address</label>
+                                            <input 
+                                                type="email"
+                                                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                placeholder="admin@example.com"
+                                                value={newAdminEmail}
+                                                onChange={(e) => setNewAdminEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-[var(--text-dim)]">Initial Password</label>
+                                            <input 
+                                                type="password"
+                                                className="w-full bg-[var(--card-bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+                                                placeholder="••••••••"
+                                                value={newAdminPassword}
+                                                onChange={(e) => setNewAdminPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        {adminCreateError && (
+                                            <div className="md:col-span-3 text-sm text-red-500 font-bold p-3 bg-red-500/10 rounded-xl border border-red-500/20">
+                                                {adminCreateError}
+                                            </div>
+                                        )}
+                                        <div className="md:col-span-3 flex justify-end gap-4 mt-2">
+                                            <button 
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsCreatingAdmin(false)
+                                                    setAdminCreateError(null)
+                                                }}
+                                                className="px-6 py-2.5 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                type="submit"
+                                                disabled={isSubmittingAdmin}
+                                                className="px-8 py-2.5 bg-[var(--accent)] text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
+                                            >
+                                                {isSubmittingAdmin ? 'Creating...' : 'Create Admin Account'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
@@ -336,10 +477,32 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                          </span>
                                                      </td>
                                                      <td className="px-6 py-4">
-                                                         <div className="flex items-center gap-2">
-                                                             <div className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                                             <span className="text-sm">{user.is_active ? 'Active' : 'Inactive'}</span>
-                                                         </div>
+                                                         <button 
+                                                             onClick={() => handleToggleUserStatus(user)}
+                                                             disabled={user.id === currentUser?.id}
+                                                             className={`flex items-center gap-2 group px-2 py-1 rounded-lg transition-all ${
+                                                                 user.id === currentUser?.id 
+                                                                     ? 'cursor-default' 
+                                                                     : 'hover:bg-[var(--bg)]'
+                                                             }`}
+                                                             title={user.id === currentUser?.id ? "You cannot deactivate your own account" : `Click to ${user.is_active ? 'deactivate' : 'activate'} user`}
+                                                         >
+                                                             <div className={`w-2 h-2 rounded-full transition-all ${
+                                                                 user.is_active 
+                                                                     ? 'bg-green-500 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.5)]' 
+                                                                     : 'bg-red-500 group-hover:shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+                                                             }`}></div>
+                                                             <span className={`text-sm font-medium transition-colors ${
+                                                                 user.is_active ? 'text-green-500' : 'text-red-500'
+                                                             }`}>
+                                                                 {user.is_active ? 'Active' : 'Inactive'}
+                                                             </span>
+                                                             {user.id !== currentUser?.id && (
+                                                                 <svg className="w-3 h-3 text-[var(--text-dim)] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                                                 </svg>
+                                                             )}
+                                                         </button>
                                                      </td>
                                                      <td className="px-6 py-4 text-sm text-[var(--text-dim)]">
                                                          {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}

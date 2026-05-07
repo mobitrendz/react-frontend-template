@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { CheckDatabaseConnectionApiV1CheckDbConnectionGetData, CheckDatabaseConnectionApiV1CheckDbConnectionGetResponses, CreateTodoApiV1TodosPostData, CreateTodoApiV1TodosPostErrors, CreateTodoApiV1TodosPostResponses, CreateUserApiV1UsersPostData, CreateUserApiV1UsersPostErrors, CreateUserApiV1UsersPostResponses, DeleteTodoApiV1TodosIdDeleteData, DeleteTodoApiV1TodosIdDeleteErrors, DeleteTodoApiV1TodosIdDeleteResponses, DeleteUserApiV1UsersIdDeleteData, DeleteUserApiV1UsersIdDeleteErrors, DeleteUserApiV1UsersIdDeleteResponses, GetCurrentUserApiV1LoginCurrentUserGetData, GetCurrentUserApiV1LoginCurrentUserGetResponses, GetCustomWelcomeMessageApiV1UserNameGetData, GetCustomWelcomeMessageApiV1UserNameGetErrors, GetCustomWelcomeMessageApiV1UserNameGetResponses, GetEnvSettingsApiV1GetEnvironmentGetData, GetEnvSettingsApiV1GetEnvironmentGetResponses, GetWelcomeMessageApiV1GetData, GetWelcomeMessageApiV1GetResponses, HealthHealthGetData, HealthHealthGetResponses, LoginAccessTokenApiV1LoginAccessTokenPostData, LoginAccessTokenApiV1LoginAccessTokenPostErrors, LoginAccessTokenApiV1LoginAccessTokenPostResponses, ReadSecureApiV1LoginSecureDataGetData, ReadSecureApiV1LoginSecureDataGetResponses, ReadTodoByIdApiV1TodosIdGetData, ReadTodoByIdApiV1TodosIdGetErrors, ReadTodoByIdApiV1TodosIdGetResponses, ReadTodosApiV1TodosGetData, ReadTodosApiV1TodosGetResponses, ReadUserByEmailApiV1UsersByEmailEmailGetData, ReadUserByEmailApiV1UsersByEmailEmailGetErrors, ReadUserByEmailApiV1UsersByEmailEmailGetResponses, ReadUserByIdApiV1UsersByIdIdGetData, ReadUserByIdApiV1UsersByIdIdGetErrors, ReadUserByIdApiV1UsersByIdIdGetResponses, ReadUsersApiV1UsersGetData, ReadUsersApiV1UsersGetResponses, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostData, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostErrors, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponses, TestEmailTestEmailPostData, TestEmailTestEmailPostErrors, TestEmailTestEmailPostResponses, UpdatePasswordApiV1UsersPasswordPatchData, UpdatePasswordApiV1UsersPasswordPatchErrors, UpdatePasswordApiV1UsersPasswordPatchResponses, UpdateTodoApiV1TodosIdPatchData, UpdateTodoApiV1TodosIdPatchErrors, UpdateTodoApiV1TodosIdPatchResponses, UpdateUserApiV1UsersIdPatchData, UpdateUserApiV1UsersIdPatchErrors, UpdateUserApiV1UsersIdPatchResponses } from './types.gen';
+import type { CheckDatabaseConnectionApiV1CheckDbConnectionGetData, CheckDatabaseConnectionApiV1CheckDbConnectionGetResponses, CreateTodoApiV1TodosPostData, CreateTodoApiV1TodosPostErrors, CreateTodoApiV1TodosPostResponses, CreateUserApiV1UsersPostData, CreateUserApiV1UsersPostErrors, CreateUserApiV1UsersPostResponses, DeleteTodoApiV1TodosIdDeleteData, DeleteTodoApiV1TodosIdDeleteErrors, DeleteTodoApiV1TodosIdDeleteResponses, DeleteUserApiV1UsersIdDeleteData, DeleteUserApiV1UsersIdDeleteErrors, DeleteUserApiV1UsersIdDeleteResponses, GetCurrentUserApiV1LoginCurrentUserGetData, GetCurrentUserApiV1LoginCurrentUserGetResponses, GetCustomWelcomeMessageApiV1UserNameGetData, GetCustomWelcomeMessageApiV1UserNameGetErrors, GetCustomWelcomeMessageApiV1UserNameGetResponses, GetEnvSettingsApiV1GetEnvironmentGetData, GetEnvSettingsApiV1GetEnvironmentGetResponses, GetWelcomeMessageApiV1GetData, GetWelcomeMessageApiV1GetResponses, HealthHealthGetData, HealthHealthGetResponses, LoginAccessTokenApiV1LoginAccessTokenPostData, LoginAccessTokenApiV1LoginAccessTokenPostErrors, LoginAccessTokenApiV1LoginAccessTokenPostResponses, ReadSecureApiV1LoginSecureDataGetData, ReadSecureApiV1LoginSecureDataGetResponses, ReadTodoByIdApiV1TodosIdGetData, ReadTodoByIdApiV1TodosIdGetErrors, ReadTodoByIdApiV1TodosIdGetResponses, ReadTodosApiV1TodosGetData, ReadTodosApiV1TodosGetResponses, ReadUserByEmailApiV1UsersByEmailEmailGetData, ReadUserByEmailApiV1UsersByEmailEmailGetErrors, ReadUserByEmailApiV1UsersByEmailEmailGetResponses, ReadUserByIdApiV1UsersByIdIdGetData, ReadUserByIdApiV1UsersByIdIdGetErrors, ReadUserByIdApiV1UsersByIdIdGetResponses, ReadUsersApiV1UsersGetData, ReadUsersApiV1UsersGetResponses, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostData, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostErrors, RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponses, RegisterUserApiV1LoginSignupPostData, RegisterUserApiV1LoginSignupPostErrors, RegisterUserApiV1LoginSignupPostResponses, TestEmailTestEmailPostData, TestEmailTestEmailPostErrors, TestEmailTestEmailPostResponses, UpdatePasswordApiV1UsersPasswordPatchData, UpdatePasswordApiV1UsersPasswordPatchErrors, UpdatePasswordApiV1UsersPasswordPatchResponses, UpdateTodoApiV1TodosIdPatchData, UpdateTodoApiV1TodosIdPatchErrors, UpdateTodoApiV1TodosIdPatchResponses, UpdateUserApiV1UsersIdPatchData, UpdateUserApiV1UsersIdPatchErrors, UpdateUserApiV1UsersIdPatchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -197,6 +197,20 @@ export const getCurrentUserApiV1LoginCurrentUserGet = <ThrowOnError extends bool
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/login/current-user',
     ...options
+});
+
+/**
+ * Register User
+ *
+ * Public signup endpoint for new users.
+ */
+export const registerUserApiV1LoginSignupPost = <ThrowOnError extends boolean = false>(options: Options<RegisterUserApiV1LoginSignupPostData, ThrowOnError>) => (options.client ?? client).post<RegisterUserApiV1LoginSignupPostResponses, RegisterUserApiV1LoginSignupPostErrors, ThrowOnError>({
+    url: '/api/v1/login/signup',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loginAccessTokenApiV1LoginAccessTokenPost, createUserApiV1UsersPost } from '../client';
+import { loginAccessTokenApiV1LoginAccessTokenPost, registerUserApiV1LoginSignupPost } from '../client';
 import { auth } from '../lib/auth';
 
 interface LoginProps {
@@ -22,11 +22,13 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
         try {
             if (isSignUp) {
-                const { error: apiError } = await createUserApiV1UsersPost({
-                    body: { email: username, password, role: 'user' }
+                const { error: apiError } = await registerUserApiV1LoginSignupPost({
+                    body: { email: username, password }
                 });
                 if (apiError) {
-                    setError('Signup failed. Please try again.');
+                    console.error('Signup API Error:', apiError);
+                    const detail = (apiError as any).body?.detail;
+                    setError(detail || 'Signup failed. Please try again.');
                 } else {
                     alert('Signup successful! Please sign in.');
                     setIsSignUp(false);
@@ -37,7 +39,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 });
 
                 if (apiError) {
-                    setError('Login failed. Please check your credentials.');
+                    const detail = (apiError as any).body?.detail;
+                    if (detail === "Inactive user") {
+                        setError('Your account is inactive. Please contact your Administrator.');
+                    } else {
+                        setError('Login failed. Please check your credentials.');
+                    }
                 } else if (data?.access_token) {
                     auth.setToken(data.access_token);
                     onLoginSuccess();
@@ -105,7 +112,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                             {isLoading ? (
                                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             ) : (
                                 isSignUp ? 'Sign up' : 'Sign in'

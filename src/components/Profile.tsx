@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom'
 import { 
     getCurrentUserApiV1LoginCurrentUserGet,
     updateUserApiV1UsersIdPatch,
+    deleteUserApiV1UsersIdDelete,
+    readTodosApiV1TodosGet,
+    deleteTodoApiV1TodosIdDelete,
+    loginAccessTokenApiV1LoginAccessTokenPost,
     updatePasswordApiV1UsersPasswordPatch
 } from '../client/sdk.gen'
 import { type UserPublic } from '../client/types.gen'
@@ -28,6 +32,13 @@ const Profile = ({ onLogout }: ProfileProps) => {
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
     const [passwordError, setPasswordError] = useState<string | null>(null)
     const [passwordSuccess, setPasswordSuccess] = useState(false)
+
+    // Account Deletion State
+    const [isDeletingAccount, setIsDeletingAccount] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [deletionPassword, setDeletionPassword] = useState('')
+    const [isVerifyingPassword, setIsVerifyingPassword] = useState(false)
+    const [deleteError, setDeleteError] = useState<string | null>(null)
 
     useEffect(() => {
         fetchUser()
@@ -100,6 +111,66 @@ const Profile = ({ onLogout }: ProfileProps) => {
             setPasswordError(error.body?.detail || "Failed to update password. Please check your current password.")
         } finally {
             setIsUpdatingPassword(false)
+        }
+    }
+
+    const handleDeleteAccount = async () => {
+        if (!currentUser) return
+        
+        if (!window.confirm("Are you absolutely sure? This will permanently delete your account and all your tasks. This action cannot be undone.")) {
+            return
+        }
+
+        try {
+            setIsDeletingAccount(true)
+            
+            // 1. Fetch all user tasks
+            const todosResponse = await readTodosApiV1TodosGet()
+            if (todosResponse.data && todosResponse.data.data) {
+                // 2. Delete all tasks
+                await Promise.all(todosResponse.data.data.map(todo => 
+                    deleteTodoApiV1TodosIdDelete({ path: { id: todo.id } })
+                ))
+            }
+
+            // 3. Delete the user account
+            await deleteUserApiV1UsersIdDelete({ path: { id: currentUser.id } })
+            
+            // 4. Logout and redirect
+            onLogout()
+        } catch (error) {
+            console.error('Failed to delete account:', error)
+            alert('An error occurred while deleting your account. Please try again.')
+        } finally {
+            setIsDeletingAccount(false)
+        }
+    }
+
+    const handleConfirmPasswordForDelete = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!currentUser) return
+        setDeleteError(null)
+
+        try {
+            setIsVerifyingPassword(true)
+            // Verify password by attempting to login
+            const response = await loginAccessTokenApiV1LoginAccessTokenPost({
+                body: { 
+                    username: currentUser.email, 
+                    password: deletionPassword 
+                }
+            })
+
+            if (response.data?.access_token) {
+                // Password verified, proceed to final confirmation
+                handleDeleteAccount()
+            } else {
+                setDeleteError("Invalid password. Please try again.")
+            }
+        } catch (error) {
+            setDeleteError("Invalid password. Please try again.")
+        } finally {
+            setIsVerifyingPassword(false)
         }
     }
 
@@ -336,6 +407,71 @@ const Profile = ({ onLogout }: ProfileProps) => {
                                     </button>
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Danger Zone Section */}
+                    <div className="bg-[var(--card-bg)] rounded-2xl shadow-lg border border-red-500/20 overflow-hidden">
+                        <div className="p-6 border-b border-red-500/20 bg-red-500/5 flex justify-between items-center">
+                            <h2 className="text-xl font-bold flex items-center gap-2 text-red-500">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Danger Zone
+                            </h2>
+                        </div>
+                        <div className="p-8">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="max-w-md">
+                                    <p className="font-semibold text-red-500">Delete Account</p>
+                                    <p className="text-[var(--text-dim)] text-sm mt-1">
+                                        Once you delete your account, there is no going back. All your personal data and tasks will be permanently removed.
+                                    </p>
+                                </div>
+                                {!showDeleteConfirm ? (
+                                    <button 
+                                        onClick={() => setShowDeleteConfirm(true)}
+                                        className="py-3 px-8 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/20 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        Delete My Account
+                                    </button>
+                                ) : (
+                                    <form onSubmit={handleConfirmPasswordForDelete} className="flex-1 max-w-sm space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-bold mb-2 text-red-500">Confirm Password to Delete</label>
+                                            <input 
+                                                type="password"
+                                                className="w-full bg-[var(--bg)] border border-red-500/30 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+                                                placeholder="Enter your password"
+                                                value={deletionPassword}
+                                                onChange={(e) => setDeletionPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        {deleteError && <p className="text-sm text-red-500 font-bold">{deleteError}</p>}
+                                        <div className="flex gap-3">
+                                            <button 
+                                                type="submit"
+                                                disabled={isVerifyingPassword || isDeletingAccount}
+                                                className="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all disabled:opacity-50"
+                                            >
+                                                {isVerifyingPassword || isDeletingAccount ? 'Processing...' : 'Verify & Delete'}
+                                            </button>
+                                            <button 
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowDeleteConfirm(false)
+                                                    setDeletionPassword('')
+                                                    setDeleteError(null)
+                                                }}
+                                                className="flex-1 bg-[var(--bg)] border border-[var(--border)] text-[var(--text)] py-3 rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

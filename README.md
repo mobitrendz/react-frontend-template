@@ -1,61 +1,70 @@
-# FastAPI + React Frontend Template
+# FastAPI + React Full-Stack Template
 
-A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a custom design system, authentication, and comprehensive dashboard features.
+A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **🔒 Authentication**: Secure login/logout flow with persistent JWT token management.
-- **📊 Unified Dashboard**: A single-page, responsive dashboard for managing your account and data.
-- **✅ Task Management**: Full CRUD functionality (Create, Read, Update, Delete) for managing ToDo lists.
-- **🛠 Admin Management**: Advanced user management panel for admins (List, Create, Edit, Delete users).
-- **🌓 Dark Mode Support**: Custom-built design system using CSS variables that respects system preferences.
-- **🧬 Auto-generated SDK**: Type-safe API client generated automatically from the FastAPI OpenAPI schema.
-- **🎨 Modern Styling**: Built with Tailwind CSS 4 for a fast and flexible UI.
+### 💻 Frontend & User Experience
+- **🔒 Secure Authentication**: Robust login/signup flow with JWT persistence and public registration support.
+- **🛣 Multi-Page Architecture**: Seamless navigation between Dashboard and Profile using React Router.
+- **✅ Advanced Task Management**: Inline editing, priority filtering, and real-time search for tasks.
+- **👤 Account Lifecycle**: Secure account deletion with password verification and automated task cleanup (Cascading Delete).
+- **🌓 Adaptive Design**: Premium design system with dark mode support, glassmorphism, and micro-animations.
+
+### 🛠 Administrative Controls
+- **👥 User Management**: Powerful admin dashboard to manage all system users.
+- **⚡ Status Control**: Instant activation/deactivation of user accounts with visual feedback.
+- **➕ Admin Creation**: Create new administrative accounts directly from the control center.
+- **🔍 Search & Filter**: Sophisticated user searching and role-based filtering.
+
+### ⚙️ Developer Experience
+- **🧪 Unit Testing**: Pre-configured testing environment with **Vitest** and **React Testing Library**.
+- **🧬 Type-Safe SDK**: Automatically generated API client from FastAPI OpenAPI schema.
+- **🌐 Network Ready**: Dynamically configured base URL for easy access from mobile devices or other computers on the local network.
+- **🎨 Tailwind CSS 4**: Leveraging the latest CSS-in-JS features for lightning-fast styling.
 
 ## 🛠 Tech Stack
 
 - **Frontend**: React 19 (TypeScript)
+- **Routing**: React Router 7
+- **Testing**: Vitest + JSDOM
 - **Build Tool**: Vite 8
-- **Styling**: Tailwind CSS 4
-- **API Client**: @hey-api/openapi-ts (Fetch-based)
-- **Icons**: Custom SVG system
+- **Styling**: Tailwind CSS 4 (Vanilla CSS variables)
+- **API Client**: @hey-api/openapi-ts
 
-## ⚙️ Setup & Installation
+## 🏁 Getting Started
 
 ### Prerequisites
+1.  **Node.js**: v18+ recommended.
+2.  **Backend**: FastAPI backend running (default: `http://localhost:8000`).
 
-1.  **Node.js**: Ensure you have Node.js (v18+) installed.
-2.  **Backend**: The FastAPI backend should be running at `http://127.0.0.1:8000`.
-
-### Getting Started
-
-1.  **Clone the repository** (or copy this template).
-2.  **Install dependencies**:
+### Installation
+1.  **Install dependencies**:
     ```bash
     npm install
     ```
-3.  **Generate the API Client** (Run this if the backend schema changes):
+2.  **Generate the API Client** (Sync with backend schema):
     ```bash
     npm run generate-client
     ```
-4.  **Start the development server**:
+3.  **Start the development server**:
     ```bash
     npm run dev
     ```
 
+### Running Tests
+Execute the unit test suite:
+```bash
+npm test          # Watch mode
+npm test -- --run # Single run
+```
+
 ## 📂 Project Structure
-
-- `src/client/`: Auto-generated API client and types.
-- `src/components/`: Reusable UI components (Dashboard, Login, etc.).
-- `src/lib/`: Core utilities like authentication logic.
-- `src/index.css`: Global styles and custom design system variables.
-- `src/main.tsx`: Application entry point.
-
-## 🔑 Default Credentials
-
-If you are using the default backend configuration:
-- **Username**: `sreeraj.dev@icloud.com`
-- **Password**: `admin123`
+- `src/client/`: Auto-generated API client and type definitions.
+- `src/components/`: Core features (Login, Dashboard, Profile).
+- `src/lib/`: Shared utilities (Auth logic, state management).
+- `src/test/`: Testing setup and configuration.
+- `src/index.css`: Design system and global variables.
 
 ---
-Built with ❤️ using FastAPI and React.
+Built with ❤️ for rapid full-stack development.

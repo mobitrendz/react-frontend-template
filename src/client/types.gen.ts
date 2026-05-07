@@ -229,6 +229,24 @@ export type UserPublic = {
 };
 
 /**
+ * UserRegister
+ */
+export type UserRegister = {
+    /**
+     * Full Name
+     */
+    full_name?: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Password
+     */
+    password: string;
+};
+
+/**
  * UserRole
  */
 export type UserRole = 'admin' | 'user' | 'guest';
@@ -241,6 +259,11 @@ export type UserUpdate = {
      * Full Name
      */
     full_name?: string | null;
+    /**
+     * Is Active
+     */
+    is_active?: boolean | null;
+    role?: UserRole | null;
 };
 
 /**
@@ -756,6 +779,31 @@ export type GetCurrentUserApiV1LoginCurrentUserGetResponses = {
 };
 
 export type GetCurrentUserApiV1LoginCurrentUserGetResponse = GetCurrentUserApiV1LoginCurrentUserGetResponses[keyof GetCurrentUserApiV1LoginCurrentUserGetResponses];
+
+export type RegisterUserApiV1LoginSignupPostData = {
+    body: UserRegister;
+    path?: never;
+    query?: never;
+    url: '/api/v1/login/signup';
+};
+
+export type RegisterUserApiV1LoginSignupPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RegisterUserApiV1LoginSignupPostError = RegisterUserApiV1LoginSignupPostErrors[keyof RegisterUserApiV1LoginSignupPostErrors];
+
+export type RegisterUserApiV1LoginSignupPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserPublic;
+};
+
+export type RegisterUserApiV1LoginSignupPostResponse = RegisterUserApiV1LoginSignupPostResponses[keyof RegisterUserApiV1LoginSignupPostResponses];
 
 export type RecoverPasswordApiV1LoginPasswordRecoveryEmailPostData = {
     body?: never;
