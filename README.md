@@ -1,10 +1,28 @@
 # FastAPI + React Full-Stack Template
 
 ![CI Status](https://github.com/mobitrendz/react-frontend-template/actions/workflows/ci.yml/badge.svg)
-![Coverage](https://img.shields.io/badge/coverage-36%25-yellow)
+![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
+
+## 🧪 Unit Testing & Coverage
+
+The project maintains high standards for reliability with a comprehensive test suite.
+
+| Category | Coverage |
+| :--- | :--- |
+| **Statements** | **88.72%** |
+| **Lines** | **90.56%** |
+| **Functions** | **87.65%** |
+| **Branches** | **75.22%** |
+
+### Execution Commands
+```bash
+npm test          # Watch mode
+npm test -- --run # Single run
+npm run test:coverage # Generate coverage report
+```
 
 ## 🚀 Key Features
 
@@ -55,13 +73,6 @@ A modern, high-performance full-stack template featuring a React 19 frontend and
     ```bash
     npm run dev
     ```
-
-### Running Tests
-Execute the unit test suite:
-```bash
-npm test          # Watch mode
-npm test -- --run # Single run
-```
 
 ### Docker Usage
 
