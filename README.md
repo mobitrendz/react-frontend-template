@@ -59,6 +59,25 @@ npm test          # Watch mode
 npm test -- --run # Single run
 ```
 
+### Docker Usage
+
+You can also run the application using Docker:
+
+1.  **Build the image**:
+    ```bash
+    docker build -t react-frontend .
+    ```
+2.  **Run the container**:
+    ```bash
+    docker run -p 8080:80 react-frontend
+    ```
+    The application will be available at `http://localhost:8080`.
+
+Alternatively, use **Docker Compose**:
+```bash
+docker-compose up -d
+```
+
 ## 📂 Project Structure
 - `src/client/`: Auto-generated API client and type definitions.
 - `src/components/`: Core features (Login, Dashboard, Profile).
