@@ -34,7 +34,7 @@ describe('Dashboard Component', () => {
 
         render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
         
-        await waitFor(() => expect(screen.getByText(/You don't have any tasks yet/i)).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText(/No active tasks/i)).toBeInTheDocument())
         
         fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'New Task' } })
         fireEvent.click(screen.getByRole('button', { name: /Create Task/i }))
@@ -50,11 +50,11 @@ describe('Dashboard Component', () => {
         render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
         await screen.findByText('a@test.com')
 
-        fireEvent.click(screen.getByText(/Create New Admin/i))
+        fireEvent.click(screen.getByText(/Add New Admin/i))
         
         fireEvent.change(await screen.findByLabelText(/Admin Email/i), { target: { value: 'new@admin.com' } })
         fireEvent.change(screen.getByLabelText(/Admin Password/i), { target: { value: 'pass' } })
-        fireEvent.click(screen.getByRole('button', { name: /Register Admin/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Create Admin Account/i }))
         
         await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalled())
     })
@@ -73,7 +73,7 @@ describe('Dashboard Component', () => {
         // Find the input in the modal
         const editTitleInput = await screen.findByDisplayValue('Test Task')
         fireEvent.change(editTitleInput, { target: { value: 'Updated' } })
-        fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Update Task/i }))
         
         await waitFor(() => expect(sdk.updateTodoApiV1TodosIdPatch).toHaveBeenCalled())
     })

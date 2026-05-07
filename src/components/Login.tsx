@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                     if (detail === "Inactive user") {
                         setError('Your account is inactive. Please contact your Administrator.');
                     } else {
-                        setError('Login failed. Please check your credentials.');
+                        setError(detail || 'Login failed. Please check your credentials.');
                     }
                 } else if (data?.access_token) {
                     auth.setToken(data.access_token);
