@@ -2,7 +2,7 @@
 
 ![CI Status](https://github.com/mobitrendz/react-frontend-template/actions/workflows/ci.yml/badge.svg?branch=develop&job=test)
 ![Docker Build](https://github.com/mobitrendz/react-frontend-template/actions/workflows/ci.yml/badge.svg?branch=develop&job=docker-build)
-![Coverage](https://img.shields.io/badge/coverage-88.72%25-green)
+![Coverage](https://img.shields.io/badge/coverage-80%25-green)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
