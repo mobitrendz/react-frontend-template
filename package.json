@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "generate-client": "openapi-ts",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "posttest:coverage": "node scripts/update-readme.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",
