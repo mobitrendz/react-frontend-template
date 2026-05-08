@@ -1,4 +1,4 @@
-name: React Frontend Code Quality
+name: Frontend Code Quality
 
 on:
   push:
