@@ -31,5 +31,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "docs: auto-update test coverage [skip ci]"
-          git push
+          if [ -n "$(git status --porcelain README.md)" ]; then
+            git commit -m "docs: auto-update test coverage [skip ci]"
+            git push
+          fi
