@@ -32,8 +32,8 @@ else if (mainPct >= 50) color = 'orange';
 let readmeContent = fs.readFileSync(readmeFile, 'utf8');
 
 // 1. Update Badge
-const badgeRegex = /!\[Coverage\]\(https:\/\/img\.shields\.io\/badge\/coverage-.*-.*\)/;
-const newBadge = `![Coverage](https://img.shields.io/badge/coverage-${mainPct}%25-${color})`;
+const badgeRegex = /!\[Coverage Percentage\]\(https:\/\/img\.shields\.io\/badge\/coverage-.*-.*\)/;
+const newBadge = `![Coverage Percentage](https://img.shields.io/badge/coverage-${mainPct}%25-${color})`;
 readmeContent = readmeContent.replace(badgeRegex, newBadge);
 
 // 2. Update Table (if exists)
