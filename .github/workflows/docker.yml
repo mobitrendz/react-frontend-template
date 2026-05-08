@@ -1,0 +1,20 @@
+name: Docker Validation
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  docker:
+    name: Docker Build & Compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: docker build -t react-frontend-template .
+        
+      - name: Verify Docker Compose
+        run: docker compose config

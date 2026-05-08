@@ -1,4 +1,4 @@
-name: CI
+name: Test Coverage
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, master, develop ]
 
 jobs:
-  test:
+  coverage:
     name: Unit Tests & Coverage
     runs-on: ubuntu-latest
     steps:
@@ -25,23 +25,11 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
         
-      - name: Commit changes
+      - name: Commit coverage changes
         if: github.event_name == 'push'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "docs: update test coverage [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: auto-update test coverage [skip ci]"
           git push
-
-  docker-build:
-    name: Docker Build Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Build Docker image
-        run: docker build -t react-frontend-template .
-        
-      - name: Verify Docker Compose
-        run: docker compose config

@@ -1,8 +1,8 @@
 # FastAPI + React Full-Stack Template
 
-![CI Status](https://github.com/mobitrendz/react-frontend-template/actions/workflows/ci.yml/badge.svg?branch=develop&job=test)
-![Docker Build](https://github.com/mobitrendz/react-frontend-template/actions/workflows/ci.yml/badge.svg?branch=develop&job=docker-build)
-![Coverage](https://img.shields.io/badge/coverage-80%25-green)
+![Frontend Quality](https://github.com/mobitrendz/react-frontend-template/actions/workflows/frontend.yml/badge.svg?branch=develop)
+![Test Coverage](https://github.com/mobitrendz/react-frontend-template/actions/workflows/coverage.yml/badge.svg?branch=develop)
+![Docker Validation](https://github.com/mobitrendz/react-frontend-template/actions/workflows/docker.yml/badge.svg?branch=develop)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
