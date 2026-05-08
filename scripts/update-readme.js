@@ -37,11 +37,6 @@ const newBadge = `![Coverage](https://img.shields.io/badge/coverage-${mainPct}%2
 readmeContent = readmeContent.replace(badgeRegex, newBadge);
 
 // 2. Update Table (if exists)
-const tableRegex = /\| \*\*Statements\*\* \| \*\*.*\*\* \|\n\| \*\*Lines\*\* \| \*\*.*\*\* \|\n\| \*\*Functions\*\* \| \*\*.*\*\* \|\n\| \*\*Branches\*\* \| \*\*.*\*\* \|/;
-const newTable = `| **Statements** | **${stmts}%** |
-| **Lines** | **${lines}%** |
-| **Functions** | **${funcs}%** |
-| **Branches** | **${branches}%** |`;
 
 // Since the regex above is tricky with markdown formatting, let's use a simpler marker-based replacement if possible, 
 // or just replace the specific lines.
