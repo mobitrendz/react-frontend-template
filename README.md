@@ -1,7 +1,7 @@
 # FastAPI + React Full-Stack Template
 
-![Docker Validation](https://github.com/mobitrendz/react-frontend-template/actions/workflows/docker.yml/badge.svg?branch=develop)
 ![Frontend Code Quality](https://github.com/mobitrendz/react-frontend-template/actions/workflows/frontend.yml/badge.svg?branch=develop)
+![Test Coverage](https://github.com/mobitrendz/react-frontend-template/actions/workflows/coverage.yml/badge.svg?branch=develop)
 ![Coverage Percentage](https://img.shields.io/badge/coverage-88.72%25-green)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
@@ -73,25 +73,6 @@ npm run test:coverage # Generate coverage report
     ```bash
     npm run dev
     ```
-
-### Docker Usage
-
-You can also run the application using Docker:
-
-1.  **Build the image**:
-    ```bash
-    docker build -t react-frontend .
-    ```
-2.  **Run the container**:
-    ```bash
-    docker run -p 8080:80 react-frontend
-    ```
-    The application will be available at `http://localhost:8080`.
-
-Alternatively, use **Docker Compose**:
-```bash
-docker-compose up -d
-```
 
 ## 📂 Project Structure
 - `src/client/`: Auto-generated API client and type definitions.
