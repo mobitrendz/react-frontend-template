@@ -37,16 +37,20 @@ const Sidebar = ({
 
   const navItems = [
     {
-      name: "Dashboard",
+      name:
+        userRole?.toUpperCase() === Role.SUPER
+          ? "Super User Control Center"
+          : "Dashboard",
       icon: LayoutDashboard,
       path: "/",
-      view: (userRole === Role.SUPER || userRole === Role.ADMIN
+      view: (userRole?.toUpperCase() === Role.SUPER ||
+      userRole?.toUpperCase() === Role.ADMIN
         ? "admin"
         : "user") as "admin" | "user",
       roles: [Role.USER, Role.ADMIN, Role.SUPER],
     },
     {
-      name: "User Management",
+      name: "Identity & Access",
       icon: Users,
       path: "/users",
       view: "admin" as const,
@@ -91,7 +95,7 @@ const Sidebar = ({
             </div>
             {(!isCollapsed || isOpen) && (
               <span className="font-bold text-lg text-[var(--text-h)] whitespace-nowrap">
-                TaskForce<span className="text-[var(--accent)]">.</span>
+                MobiTrendz<span className="text-[var(--accent)]">.</span>
               </span>
             )}
           </div>

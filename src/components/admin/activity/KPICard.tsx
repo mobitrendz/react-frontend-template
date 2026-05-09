@@ -42,7 +42,7 @@ const KPICard: React.FC<KPICardProps> = ({
           {title}
         </p>
         <p className="text-3xl font-black text-[var(--text-h)] tracking-tight">
-          {typeof value === "number" ? value.toLocaleString() : value}
+          {typeof value === "number" ? value.toLocaleString() : (value ?? 0)}
         </p>
       </div>
     </motion.div>

@@ -456,20 +456,43 @@ const Profile = () => {
 
         {/* Right Column: Sidebar Actions/Info */}
         <div className="space-y-8">
-          <section className="bg-red-500/5 rounded-3xl border border-red-500/10 shadow-sm overflow-hidden">
+          <section
+            className={`${
+              currentUserRole === Role.SUPER
+                ? "bg-slate-500/5 border-slate-500/10"
+                : "bg-red-500/5 border-red-500/10"
+            } rounded-3xl border shadow-sm overflow-hidden`}
+          >
             <div className="p-8 space-y-6">
-              <div className="flex items-center gap-3 text-red-500">
-                <Trash2 className="w-6 h-6" />
-                <h2 className="text-xl font-bold">Danger Zone</h2>
+              <div
+                className={`flex items-center gap-3 ${
+                  currentUserRole === Role.SUPER ? "text-slate-500" : "text-red-500"
+                }`}
+              >
+                {currentUserRole === Role.SUPER ? (
+                  <Shield className="w-6 h-6" />
+                ) : (
+                  <Trash2 className="w-6 h-6" />
+                )}
+                <h2 className="text-xl font-bold">
+                  {currentUserRole === Role.SUPER ? "Account Protection" : "Danger Zone"}
+                </h2>
               </div>
 
               <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                Deleting your account is a permanent action. All your tasks,
-                settings, and profile information will be wiped from our systems
-                instantly.
+                {currentUserRole === Role.SUPER
+                  ? "As a Super User, your account is protected from self-deletion to maintain system stability and prevent accidental loss of administrative access. Please contact support or another administrator for account removal."
+                  : "Deleting your account is a permanent action. All your tasks, settings, and profile information will be wiped from our systems instantly."}
               </p>
 
-              {!showDeleteConfirm ? (
+              {currentUserRole === Role.SUPER ? (
+                <button
+                  disabled
+                  className="w-full py-4 bg-slate-500/20 text-slate-500 rounded-2xl font-bold cursor-not-allowed transition-all"
+                >
+                  Delete My Account (Disabled)
+                </button>
+              ) : !showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   className="w-full py-4 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/20 active:scale-[0.98] transition-all"

@@ -254,11 +254,10 @@ describe("Dashboard edge cases", () => {
 
     render(
       <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
+        <Dashboard onLogout={() => {}} initialTab="users" />
       </MemoryRouter>,
     );
 
-    await screen.findByText(/Identity & Access/i);
     await screen.findByText("delete@x.com");
     fireEvent.click(screen.getByTitle(/Delete User/i));
 
@@ -397,11 +396,11 @@ describe("Dashboard edge cases", () => {
 
     render(
       <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
+        <Dashboard onLogout={() => {}} initialTab="users" />
       </MemoryRouter>,
     );
 
-    await screen.findByText(/Identity & Access/i);
+    await screen.findByText(/Provision User/i);
     fireEvent.click(screen.getByRole("button", { name: /Provision User/i }));
 
     fireEvent.change(screen.getByPlaceholderText(/user@example\.com/i), {
@@ -464,7 +463,8 @@ describe("Dashboard edge cases", () => {
       </MemoryRouter>,
     );
 
-    await screen.findByText(/Identity & Access/i);
+    fireEvent.click(await screen.findByText("Users"));
+    await screen.findByText("user2@x.com");
     const toggleButton = await screen.findByRole("button", { name: /Active/i });
     fireEvent.click(toggleButton);
 

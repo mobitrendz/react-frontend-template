@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { UserPlus, ShieldAlert } from "lucide-react";
 import AdminUserTable from "./AdminUserTable";
 import CreateAdminForm from "./CreateAdminForm";
@@ -23,6 +24,8 @@ const AdminDashboardView = ({
   initialTab,
 }: AdminDashboardViewProps) => {
   const { role: currentUserRole, user: authUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserPublic | null>(null);
   const [newAdminEmail, setNewAdminEmail] = useState("");
@@ -44,8 +47,11 @@ const AdminDashboardView = ({
   useEffect(() => {
     if (initialTab) {
       setActiveTab(initialTab);
+    } else if (currentUserRole && !location.state?.fromTabClick) {
+      // Reset to default when initialTab is missing (e.g. navigating back to root Dashboard from Sidebar)
+      setActiveTab(currentUserRole === Role.SUPER ? "intelligence" : "activity");
     }
-  }, [initialTab]);
+  }, [initialTab, currentUserRole, location.state]);
 
   const handleToggleStatus = async (user: UserPublic) => {
     try {
@@ -120,7 +126,10 @@ const AdminDashboardView = ({
           <div className="flex items-center gap-4 mt-2">
             {currentUserRole === Role.SUPER && (
               <button
-                onClick={() => setActiveTab("intelligence")}
+                onClick={() => {
+                  setActiveTab("intelligence");
+                  navigate("/", { state: { fromTabClick: true } });
+                }}
                 className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                   activeTab === "intelligence"
                     ? "text-indigo-400 border-indigo-400"
@@ -131,7 +140,10 @@ const AdminDashboardView = ({
               </button>
             )}
             <button
-              onClick={() => setActiveTab("activity")}
+              onClick={() => {
+                setActiveTab("activity");
+                navigate("/", { state: { fromTabClick: true } });
+              }}
               className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                 activeTab === "activity"
                   ? "text-indigo-400 border-indigo-400"
@@ -141,7 +153,10 @@ const AdminDashboardView = ({
               Activity
             </button>
             <button
-              onClick={() => setActiveTab("users")}
+              onClick={() => {
+                setActiveTab("users");
+                navigate("/users", { state: { fromTabClick: true } });
+              }}
               className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                 activeTab === "users"
                   ? "text-indigo-400 border-indigo-400"

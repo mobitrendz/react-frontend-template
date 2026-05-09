@@ -155,6 +155,8 @@ describe("Dashboard Component", () => {
       </MemoryRouter>,
     );
 
+    fireEvent.click(await screen.findByText("Users"));
+
     // Wait for the table to load
     await screen.findByText("a@test.com");
 

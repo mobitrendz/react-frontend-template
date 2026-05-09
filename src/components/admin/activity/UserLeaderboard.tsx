@@ -74,7 +74,7 @@ const UserLeaderboard: React.FC<UserLeaderboardProps> = ({
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-[var(--text-h)] truncate">
-                        {u.name}
+                        {u.full_name || "Anonymous"}
                       </p>
                       <p className="text-xs text-[var(--text-dim)] truncate">
                         {u.email}
@@ -84,7 +84,7 @@ const UserLeaderboard: React.FC<UserLeaderboardProps> = ({
                 </td>
                 <td className="px-8 py-4 text-right">
                   <span className="text-lg font-black text-indigo-400 tabular-nums">
-                    {u.count.toLocaleString()}
+                    {u.count?.toLocaleString() ?? 0}
                   </span>
                 </td>
               </tr>

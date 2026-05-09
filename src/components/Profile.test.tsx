@@ -270,4 +270,29 @@ describe("Profile Component", () => {
 
     expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument();
   });
+
+  it("handles account protection for super users", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { ...mockUser, role: "super" } as any,
+      role: Role.SUPER,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn((r) => r === Role.SUPER),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: "fake-token",
+    });
+
+    render(
+      <MemoryRouter>
+        <Profile />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText(/Account Protection/i)).toBeInTheDocument();
+    expect(screen.getByText(/Delete My Account \(Disabled\)/i)).toBeDisabled();
+    expect(screen.queryByText("Danger Zone")).not.toBeInTheDocument();
+  });
 });

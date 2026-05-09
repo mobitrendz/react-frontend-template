@@ -6,6 +6,7 @@ import Profile from "./components/Profile";
 import { AuthProvider, Role, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const AccessDeniedOverlay = () => {
   const { setAccessDenied } = useAuth();
@@ -109,9 +110,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

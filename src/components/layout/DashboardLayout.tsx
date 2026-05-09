@@ -41,7 +41,7 @@ const DashboardLayout = ({
             <Menu className="w-6 h-6" />
           </button>
           <div className="ml-4 font-bold text-lg text-[var(--text-h)]">
-            TaskForce<span className="text-[var(--accent)]">.</span>
+            MobiTrendz<span className="text-[var(--accent)]">.</span>
           </div>
         </header>
 

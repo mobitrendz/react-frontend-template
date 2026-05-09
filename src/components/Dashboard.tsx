@@ -35,8 +35,6 @@ const Dashboard = ({ defaultView, initialTab, onLogout }: DashboardProps) => {
     }
   };
 
-  const isSuper = role === Role.SUPER;
-
   return (
     <DashboardLayout
       currentUser={user}
@@ -45,7 +43,7 @@ const Dashboard = ({ defaultView, initialTab, onLogout }: DashboardProps) => {
       onViewChange={setActiveView}
     >
       {activeView === "admin" && hasPermission(Role.ADMIN) ? (
-        <AdminDashboardView currentUser={user} initialTab={initialTab} />
+        <AdminDashboardView currentUser={user} initialTab={initialTab as any} />
       ) : (
         <UserTaskView />
       )}

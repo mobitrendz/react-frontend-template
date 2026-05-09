@@ -117,7 +117,7 @@ const ActivityTable: React.FC<ActivityTableProps> = ({
                     {ep.path}
                   </td>
                   <td className="py-4 text-sm font-bold text-[var(--text-h)] text-right">
-                    {ep.hits.toLocaleString()}
+                    {ep.count?.toLocaleString() ?? 0}
                   </td>
                 </tr>
               ))}

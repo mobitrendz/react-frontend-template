@@ -44,7 +44,7 @@ describe("AdminActivityDashboard", () => {
         { date: "May 02", count: 150 },
       ],
       top_active_users: [
-        { email: "user1@example.com", name: "User One", count: 45 },
+        { email: "user1@example.com", full_name: "User One", count: 45 },
       ],
     };
 

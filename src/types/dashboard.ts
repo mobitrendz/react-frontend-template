@@ -1,8 +1,8 @@
 export interface UserStats {
   total_users: number;
-  active_24h: number;
+  active_users_24h: number;
   new_registrations_24h: number;
-  growth_pct?: number; // Added for trend indicators
+  growth_pct?: number;
 }
 
 export interface ServerMetrics {
@@ -15,7 +15,7 @@ export interface ServerMetrics {
 export interface EndpointStats {
   method: string;
   path: string;
-  hits: number;
+  count: number;
 }
 
 export interface ActivityAnalytics {
@@ -25,9 +25,9 @@ export interface ActivityAnalytics {
 }
 
 export interface DashboardReport {
-  user_stats: UserStats;
-  server_metrics: ServerMetrics;
-  activity_analytics: ActivityAnalytics;
+  users: UserStats;
+  server: ServerMetrics;
+  activity: ActivityAnalytics;
 }
 
 export interface DailyTrend {
@@ -37,7 +37,7 @@ export interface DailyTrend {
 
 export interface TopUser {
   email: string;
-  name: string;
+  full_name: string | null;
   count: number;
 }
 

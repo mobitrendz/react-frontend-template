@@ -59,7 +59,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
       <div className="flex items-end justify-between">
         <div className="text-3xl font-bold text-[var(--text-h)]">
-          {typeof value === "number" ? value.toLocaleString() : value}
+          {typeof value === "number" ? value.toLocaleString() : (value ?? 0)}
         </div>
         {trend !== undefined && (
           <div

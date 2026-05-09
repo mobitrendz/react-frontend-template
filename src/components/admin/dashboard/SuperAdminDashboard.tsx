@@ -124,20 +124,20 @@ const SuperAdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MetricCard
           title="Total Users"
-          value={data?.user_stats.total_users || 0}
+          value={data?.users?.total_users || 0}
           icon="users"
           loading={isLoading && !data}
         />
         <MetricCard
           title="Active (24h)"
-          value={data?.user_stats.active_24h || 0}
+          value={data?.users?.active_users_24h || 0}
           icon="active"
-          trend={data?.user_stats.growth_pct || 12.5}
+          trend={12.5}
           loading={isLoading && !data}
         />
         <MetricCard
           title="New Registrations"
-          value={data?.user_stats.new_registrations_24h || 0}
+          value={data?.users?.new_registrations_24h || 0}
           icon="new"
           loading={isLoading && !data}
         />
@@ -154,9 +154,9 @@ const SuperAdminDashboard: React.FC = () => {
               Real-time resource utilization metrics
             </p>
           </div>
-          {data && (
+          {data?.server && (
             <div className="px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-full text-xs font-bold text-indigo-400">
-              UPTIME: {formatUptime(data.server_metrics.uptime_seconds)}
+              UPTIME: {formatUptime(data.server.uptime_seconds)}
             </div>
           )}
         </div>
@@ -164,19 +164,19 @@ const SuperAdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
           <ServerGauge
             label="CPU Load"
-            value={data?.server_metrics.cpu_usage || 0}
+            value={data?.server?.cpu_usage || 0}
             color="#6366f1"
             loading={isLoading && !data}
           />
           <ServerGauge
             label="Memory Usage"
-            value={data?.server_metrics.memory_usage || 0}
+            value={data?.server?.memory_usage || 0}
             color="#a855f7"
             loading={isLoading && !data}
           />
           <ServerGauge
             label="Disk Storage"
-            value={data?.server_metrics.disk_usage || 0}
+            value={data?.server?.disk_usage || 0}
             color="#ec4899"
             loading={isLoading && !data}
           />
@@ -185,9 +185,9 @@ const SuperAdminDashboard: React.FC = () => {
 
       {/* Analytics Section */}
       <ActivityTable
-        endpoints={data?.activity_analytics.top_endpoints || []}
-        successRate={data?.activity_analytics.success_rate || 0}
-        failureRate={data?.activity_analytics.failure_rate || 0}
+        endpoints={data?.activity?.top_endpoints || []}
+        successRate={data?.activity?.success_rate || 0}
+        failureRate={data?.activity?.failure_rate || 0}
         loading={isLoading && !data}
       />
     </div>
