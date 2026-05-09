@@ -74,6 +74,27 @@ npm run test:coverage # Generate coverage report
     npm run dev
     ```
 
+## 🧬 API Client Generation (@hey-api/openapi-ts)
+
+This project uses `@hey-api/openapi-ts` to automatically generate a type-safe SDK from the FastAPI OpenAPI schema.
+
+### Implementation Steps
+1.  **Backend Requirement**: Ensure your FastAPI backend is running (defaults to `http://localhost:8000`).
+2.  **Configuration**: The generator is configured in `openapi-ts.config.ts` to fetch `openapi.json` and output the SDK to `src/client/`.
+3.  **Generation**: Run the following command whenever your backend endpoints or data models change:
+    ```bash
+    npm run generate-client
+    ```
+4.  **Usage**: Import the generated SDK or types in your components:
+    ```typescript
+    import { readTodosApiV1TodosGet } from './client/sdk.gen';
+    
+    const fetchData = async () => {
+        const { data, error } = await readTodosApiV1TodosGet();
+        if (data) console.log(data);
+    };
+    ```
+
 ## 📂 Project Structure
 - `src/client/`: Auto-generated API client and type definitions.
 - `src/components/`: Core features (Login, Dashboard, Profile).
