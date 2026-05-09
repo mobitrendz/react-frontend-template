@@ -466,7 +466,9 @@ const Profile = () => {
             <div className="p-8 space-y-6">
               <div
                 className={`flex items-center gap-3 ${
-                  currentUserRole === Role.SUPER ? "text-slate-500" : "text-red-500"
+                  currentUserRole === Role.SUPER
+                    ? "text-slate-500"
+                    : "text-red-500"
                 }`}
               >
                 {currentUserRole === Role.SUPER ? (
@@ -475,7 +477,9 @@ const Profile = () => {
                   <Trash2 className="w-6 h-6" />
                 )}
                 <h2 className="text-xl font-bold">
-                  {currentUserRole === Role.SUPER ? "Account Protection" : "Danger Zone"}
+                  {currentUserRole === Role.SUPER
+                    ? "Account Protection"
+                    : "Danger Zone"}
                 </h2>
               </div>
 

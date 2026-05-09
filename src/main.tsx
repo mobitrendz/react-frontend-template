@@ -13,6 +13,4 @@ const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 console.log("Main.tsx: Root element found, starting render...");
 
-createRoot(rootElement).render(
-  <App />
-);
+createRoot(rootElement).render(<App />);

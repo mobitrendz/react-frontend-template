@@ -36,8 +36,17 @@ describe("SuperAdminDashboard", () => {
 
   it("fetches and displays data for super users", async () => {
     const mockData = {
-      users: { total_users: 1000, active_users_24h: 150, new_registrations_24h: 10 },
-      server: { cpu_usage: 45, memory_usage: 60, disk_usage: 30, uptime_seconds: 3600 },
+      users: {
+        total_users: 1000,
+        active_users_24h: 150,
+        new_registrations_24h: 10,
+      },
+      server: {
+        cpu_usage: 45,
+        memory_usage: 60,
+        disk_usage: 30,
+        uptime_seconds: 3600,
+      },
       activity: {
         success_rate: 98,
         failure_rate: 2,

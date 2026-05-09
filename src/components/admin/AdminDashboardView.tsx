@@ -49,7 +49,9 @@ const AdminDashboardView = ({
       setActiveTab(initialTab);
     } else if (currentUserRole && !location.state?.fromTabClick) {
       // Reset to default when initialTab is missing (e.g. navigating back to root Dashboard from Sidebar)
-      setActiveTab(currentUserRole === Role.SUPER ? "intelligence" : "activity");
+      setActiveTab(
+        currentUserRole === Role.SUPER ? "intelligence" : "activity",
+      );
     }
   }, [initialTab, currentUserRole, location.state]);
 
