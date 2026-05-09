@@ -2,7 +2,7 @@
 
 ![Frontend Code Quality](https://github.com/mobitrendz/react-frontend-template/actions/workflows/frontend.yml/badge.svg?branch=develop)
 ![Test Coverage](https://github.com/mobitrendz/react-frontend-template/actions/workflows/coverage.yml/badge.svg?branch=develop)
-![Coverage Percentage](https://img.shields.io/badge/coverage-70.98%25-yellowgreen)
+![Coverage Percentage](https://img.shields.io/badge/coverage-74.18%25-yellowgreen)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
@@ -14,10 +14,10 @@ The project maintains high standards for reliability with a comprehensive test s
 
 | Category       | Coverage   |
 | :------------- | :--------- |
-| **Statements** | **70.98%** |
-| **Lines**      | **72.89%** |
-| **Functions**  | **65.04%** |
-| **Branches**   | **64.67%** |
+| **Statements** | **74.18%** |
+| **Lines** | **76.13%** |
+| **Functions** | **68.24%** |
+| **Branches** | **69.68%** |
 
 ### Testing Stack
 
