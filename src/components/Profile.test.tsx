@@ -142,7 +142,7 @@ describe("Profile Component", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /^Update Password$/i }));
     expect(
-      await screen.findByText(/Password updated successfully!/i),
+      await screen.findByText(/Password successfully updated!/i),
     ).toBeInTheDocument();
   });
 
@@ -165,7 +165,7 @@ describe("Profile Component", () => {
     fireEvent.click(await screen.findByText(/Delete My Account/i));
 
     const confirmInput = await screen.findByLabelText(
-      /Confirm Password to Delete/i,
+      /Verify Password/i,
     );
     fireEvent.change(confirmInput, { target: { value: "pass" } });
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));
@@ -178,7 +178,7 @@ describe("Profile Component", () => {
 
   it("handles password update failure", async () => {
     vi.mocked(sdk.updatePasswordApiV1UsersPasswordPatch).mockRejectedValue({
-      body: { detail: "Incorrect password" },
+      detail: "Incorrect password",
     } as any);
     render(
       <MemoryRouter>
@@ -219,7 +219,7 @@ describe("Profile Component", () => {
     );
     fireEvent.click(await screen.findByText(/Delete My Account/i));
     fireEvent.change(
-      await screen.findByLabelText(/Confirm Password to Delete/i),
+      await screen.findByLabelText(/Verify Password/i),
       { target: { value: "pass" } },
     );
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));
@@ -267,7 +267,7 @@ describe("Profile Component", () => {
 
     fireEvent.click(await screen.findByText(/Delete My Account/i));
     fireEvent.change(
-      await screen.findByLabelText(/Confirm Password to Delete/i),
+      await screen.findByLabelText(/Verify Password/i),
       { target: { value: "wrong" } },
     );
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));

@@ -221,11 +221,12 @@ const Profile = () => {
                             {isEditingProfile ? (
                                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
+                                        <label htmlFor="full_name" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
                                             <User className="w-3.5 h-3.5 text-[var(--text-dim)]" />
                                             Full Name
                                         </label>
                                         <input 
+                                            id="full_name"
                                             type="text"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
                                             value={editFullName}
@@ -310,8 +311,9 @@ const Profile = () => {
                             {isChangingPassword ? (
                                 <form onSubmit={handleUpdatePassword} className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-[var(--text-h)]">Current Password</label>
+                                        <label htmlFor="current_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">Current Password</label>
                                         <input 
+                                            id="current_password"
                                             type="password"
                                             className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                             value={currentPassword}
@@ -321,8 +323,9 @@ const Profile = () => {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-[var(--text-h)]">New Password</label>
+                                            <label htmlFor="new_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">New Password</label>
                                             <input 
+                                                id="new_password"
                                                 type="password"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={newPassword}
@@ -331,8 +334,9 @@ const Profile = () => {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-[var(--text-h)]">Confirm New Password</label>
+                                            <label htmlFor="confirm_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">Confirm New Password</label>
                                             <input 
+                                                id="confirm_password"
                                                 type="password"
                                                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
                                                 value={confirmPassword}
@@ -416,8 +420,9 @@ const Profile = () => {
                             ) : (
                                 <form onSubmit={handleConfirmPasswordForDelete} className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black uppercase tracking-widest text-red-500">Verify Password</label>
+                                        <label htmlFor="deletion_password" className="text-xs font-black uppercase tracking-widest text-red-500">Verify Password</label>
                                         <input 
+                                            id="deletion_password"
                                             type="password"
                                             className="w-full bg-[var(--bg)] border border-red-500/30 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium"
                                             placeholder="Current Password"

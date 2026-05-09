@@ -63,28 +63,49 @@ vi.mock("./components/Profile", () => ({
 }));
 
 describe("App Component", () => {
-  const mockLogin = vi.fn();
-  const mockLogout = vi.fn();
+  let authState = {
+    isAuthenticated: false,
+    user: null as any,
+    role: null as any,
+  };
+
+  const mockLogin = vi.fn((token: string) => {
+    authState.isAuthenticated = true;
+    authState.user = { id: "1", email: "t@t.com", role: "USER", is_active: true };
+    authState.role = Role.USER;
+  });
+
+  const mockLogout = vi.fn(() => {
+    authState.isAuthenticated = false;
+    authState.user = null;
+    authState.role = null;
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAuth).mockReturnValue({
+    authState = {
       isAuthenticated: false,
-      isLoading: false,
       user: null,
       role: null,
+    };
+    
+    vi.mocked(useAuth).mockImplementation(() => ({
+      isAuthenticated: authState.isAuthenticated,
+      isLoading: false,
+      user: authState.user,
+      role: authState.role,
       login: mockLogin,
       logout: mockLogout,
-      hasPermission: vi.fn(),
+      hasPermission: vi.fn((r) => !authState.role || r === authState.role || authState.role === Role.SUPER || authState.role === Role.ADMIN),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: null,
-    });
+      token: authState.isAuthenticated ? "fake-token" : null,
+    }));
   });
 
   it("renders login page when not authenticated", () => {
     render(
-      <MemoryRouter initialEntries={["/"]}>
+      <MemoryRouter initialEntries={["/login"]}>
         <App />
       </MemoryRouter>,
     );
@@ -92,18 +113,9 @@ describe("App Component", () => {
   });
 
   it("renders dashboard when authenticated", async () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: "1", email: "t@t.com", role: "USER", is_active: true } as any,
-      role: Role.USER,
-      login: mockLogin,
-      logout: mockLogout,
-      hasPermission: vi.fn(() => true),
-      accessDenied: false,
-      setAccessDenied: vi.fn(),
-      token: "t",
-    });
+    authState.isAuthenticated = true;
+    authState.user = { id: "1", email: "t@t.com", role: "USER", is_active: true };
+    authState.role = Role.USER;
 
     render(
       <MemoryRouter initialEntries={["/"]}>
@@ -115,33 +127,24 @@ describe("App Component", () => {
   });
 
   it("handles login and logout cycle", async () => {
-    const { rerender } = render(
-      <MemoryRouter initialEntries={["/"]}>
+    render(
+      <MemoryRouter initialEntries={["/login"]}>
         <App />
       </MemoryRouter>,
     );
 
     expect(screen.getByText("Login Page")).toBeInTheDocument();
 
-    // Mock login transition
+    // Click login - this updates authState via mockLogin
     fireEvent.click(screen.getByText("Mock Login"));
     expect(mockLogin).toHaveBeenCalledWith("token");
 
-    // Update mock for "authenticated" state
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { id: "1", email: "t@t.com", role: "USER", is_active: true } as any,
-      role: Role.USER,
-      login: mockLogin,
-      logout: mockLogout,
-      hasPermission: vi.fn(() => true),
-      accessDenied: false,
-      setAccessDenied: vi.fn(),
-      token: "t",
-    });
-
-    rerender(
+    // Since AppContent is inside App, and we updated authState, 
+    // but the component won't re-render automatically because authState is not a React state.
+    // However, in a real app, AuthProvider would update.
+    // In this test, we can just re-render to pick up the new mock values.
+    
+    const { rerender } = render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
       </MemoryRouter>,

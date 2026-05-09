@@ -108,12 +108,13 @@ describe("Dashboard Component", () => {
       expect(screen.getByText(/No tasks found/i)).toBeInTheDocument(),
     );
 
-    // Open the creation form
-    fireEvent.click(screen.getByRole("button", { name: /Create Task/i }));
+    // Open the creation form - clicking the main dashboard button
+    fireEvent.click(screen.getAllByText(/Create Task/i, { selector: 'button' })[0]);
 
     const titleInput = await screen.findByLabelText(/Title/i);
     fireEvent.change(titleInput, { target: { value: "New Task" } });
-    fireEvent.click(screen.getByRole("button", { name: /Create Task/i }));
+    // Click the submit button inside the form (should be the second one)
+    fireEvent.click(screen.getAllByRole("button", { name: /Create Task/i })[1]);
     await waitFor(() =>
       expect(sdk.createTodoApiV1TodosPost).toHaveBeenCalled(),
     );
@@ -160,11 +161,15 @@ describe("Dashboard Component", () => {
 
     const emailInput = await screen.findByLabelText(/Email Address/i);
     fireEvent.change(emailInput, { target: { value: "new@admin.com" } });
-    fireEvent.change(screen.getByLabelText(/Temporary Password/i), {
-      target: { value: "pass" },
+    fireEvent.change(await screen.findByLabelText(/Full Name/i), {
+      target: { value: "New User" },
     });
+    fireEvent.change(
+      await screen.findByLabelText(/Temporary Password/i),
+      { target: { value: "pass" } },
+    );
     fireEvent.click(
-      screen.getByRole("button", { name: /Create User Account/i }),
+      await screen.findByRole("button", { name: /Create User Account/i }),
     );
 
     await waitFor(() =>
@@ -204,7 +209,6 @@ describe("Dashboard Component", () => {
     const editTitleInput = await screen.findByDisplayValue("Test Task");
     fireEvent.change(editTitleInput, { target: { value: "Updated" } });
     fireEvent.click(screen.getByRole("button", { name: /Update Task/i }));
-
     await waitFor(() =>
       expect(sdk.updateTodoApiV1TodosIdPatch).toHaveBeenCalled(),
     );

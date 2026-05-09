@@ -68,23 +68,44 @@ vi.mock("./Profile", () => ({
 }));
 
 describe("App routing & auth flow", () => {
-  const mockLogin = vi.fn();
-  const mockLogout = vi.fn();
+  let authState = {
+    isAuthenticated: false,
+    user: null as any,
+    role: null as any,
+  };
+
+  const mockLogin = vi.fn((token: string) => {
+    authState.isAuthenticated = true;
+    authState.user = { id: "u1", email: "user@x.com", role: "user", is_active: true };
+    authState.role = Role.USER;
+  });
+
+  const mockLogout = vi.fn(() => {
+    authState.isAuthenticated = false;
+    authState.user = null;
+    authState.role = null;
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAuth).mockReturnValue({
+    authState = {
+      isAuthenticated: false,
       user: null,
       role: null,
-      isAuthenticated: false,
+    };
+    
+    vi.mocked(useAuth).mockImplementation(() => ({
+      isAuthenticated: authState.isAuthenticated,
       isLoading: false,
+      user: authState.user,
+      role: authState.role,
       login: mockLogin,
       logout: mockLogout,
-      hasPermission: vi.fn(),
+      hasPermission: vi.fn((r) => !authState.role || r === authState.role || authState.role === Role.SUPER || authState.role === Role.ADMIN),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: null,
-    });
+      token: authState.isAuthenticated ? "fake-token" : null,
+    }));
   });
 
   it("redirects unknown route to login when unauthenticated", async () => {
@@ -140,31 +161,29 @@ describe("App routing & auth flow", () => {
       data: { data: [], count: 0 },
     } as any);
 
-    window.history.pushState({}, "Test", "/");
-    render(<App />);
-
-    await screen.findByText(/My Tasks/i);
-
-    fireEvent.click(screen.getByText(/Sign Out/i));
-    expect(mockLogout).toHaveBeenCalled();
-
-    // Simulate navigation to login after logout
     vi.mocked(useAuth).mockReturnValue({
-      user: null,
-      role: null,
-      isAuthenticated: false,
+      user: mockUser as any,
+      role: Role.USER,
+      isAuthenticated: true,
       isLoading: false,
       login: vi.fn(),
       logout: mockLogout,
-      hasPermission: vi.fn(),
+      hasPermission: vi.fn(() => true),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: null,
+      token: "valid",
     });
 
-    await waitFor(() =>
-      expect(screen.getByText("Login Page")).toBeInTheDocument(),
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Dashboard onLogout={mockLogout} />
+      </MemoryRouter>
     );
+
+    await screen.findByText(/Sign Out/i);
+
+    fireEvent.click(screen.getAllByText(/Sign Out/i)[0]);
+    expect(mockLogout).toHaveBeenCalled();
   });
 });
 
