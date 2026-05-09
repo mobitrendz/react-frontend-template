@@ -21,7 +21,8 @@ const AdminActivityDashboard: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await readAdminDashboardStatsApiV1AdminDashboardStatsGet();
+      const response =
+        await readAdminDashboardStatsApiV1AdminDashboardStatsGet();
 
       if (response.error) {
         if ((response.error as any).status === 403) {
@@ -32,7 +33,7 @@ const AdminActivityDashboard: React.FC = () => {
 
       const result = response.data;
       if (!result) throw new Error("No data received from server.");
-      
+
       setData(result as any);
     } catch (err: any) {
       setError(err.message);

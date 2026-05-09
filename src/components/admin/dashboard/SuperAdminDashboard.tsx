@@ -32,7 +32,7 @@ const SuperAdminDashboard: React.FC = () => {
 
       const result = response.data;
       if (!result) throw new Error("No data received from server.");
-      
+
       setData(result as any);
       setLastRefreshed(new Date());
     } catch (err: any) {

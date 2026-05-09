@@ -35,7 +35,10 @@ const AdminDashboardView = ({
   const [tableKey, setTableKey] = useState(0);
   const [activeTab, setActiveTab] = useState<
     "intelligence" | "activity" | "users"
-  >(initialTab || (currentUserRole === Role.SUPER ? "intelligence" : "activity"));
+  >(
+    initialTab ||
+      (currentUserRole === Role.SUPER ? "intelligence" : "activity"),
+  );
 
   // Sync tab with initialTab prop when it changes (route navigation)
   useEffect(() => {

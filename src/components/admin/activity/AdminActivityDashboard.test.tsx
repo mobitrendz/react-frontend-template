@@ -48,7 +48,9 @@ describe("AdminActivityDashboard", () => {
       ],
     };
 
-    vi.mocked(sdk.readAdminDashboardStatsApiV1AdminDashboardStatsGet).mockResolvedValueOnce({
+    vi.mocked(
+      sdk.readAdminDashboardStatsApiV1AdminDashboardStatsGet,
+    ).mockResolvedValueOnce({
       data: mockData,
       error: null,
     } as any);
@@ -75,7 +77,9 @@ describe("AdminActivityDashboard", () => {
       top_active_users: [],
     };
 
-    vi.mocked(sdk.readAdminDashboardStatsApiV1AdminDashboardStatsGet).mockResolvedValueOnce({
+    vi.mocked(
+      sdk.readAdminDashboardStatsApiV1AdminDashboardStatsGet,
+    ).mockResolvedValueOnce({
       data: mockData,
       error: null,
     } as any);

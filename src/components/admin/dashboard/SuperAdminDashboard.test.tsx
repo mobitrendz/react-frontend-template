@@ -55,7 +55,9 @@ describe("SuperAdminDashboard", () => {
       },
     };
 
-    vi.mocked(sdk.readDashboardStatsApiV1DashboardStatsGet).mockResolvedValueOnce({
+    vi.mocked(
+      sdk.readDashboardStatsApiV1DashboardStatsGet,
+    ).mockResolvedValueOnce({
       data: mockData,
       error: null,
     } as any);
@@ -74,7 +76,9 @@ describe("SuperAdminDashboard", () => {
   });
 
   it("displays error message on fetch failure", async () => {
-    vi.mocked(sdk.readDashboardStatsApiV1DashboardStatsGet).mockResolvedValueOnce({
+    vi.mocked(
+      sdk.readDashboardStatsApiV1DashboardStatsGet,
+    ).mockResolvedValueOnce({
       data: null,
       error: { status: 500 },
     } as any);
