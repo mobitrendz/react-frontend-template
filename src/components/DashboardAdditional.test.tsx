@@ -76,7 +76,12 @@ describe("App routing & auth flow", () => {
 
   const mockLogin = vi.fn((token: string) => {
     authState.isAuthenticated = true;
-    authState.user = { id: "u1", email: "user@x.com", role: "user", is_active: true };
+    authState.user = {
+      id: "u1",
+      email: "user@x.com",
+      role: "user",
+      is_active: true,
+    };
     authState.role = Role.USER;
   });
 
@@ -93,7 +98,7 @@ describe("App routing & auth flow", () => {
       user: null,
       role: null,
     };
-    
+
     vi.mocked(useAuth).mockImplementation(() => ({
       isAuthenticated: authState.isAuthenticated,
       isLoading: false,
@@ -101,7 +106,13 @@ describe("App routing & auth flow", () => {
       role: authState.role,
       login: mockLogin,
       logout: mockLogout,
-      hasPermission: vi.fn((r) => !authState.role || r === authState.role || authState.role === Role.SUPER || authState.role === Role.ADMIN),
+      hasPermission: vi.fn(
+        (r) =>
+          !authState.role ||
+          r === authState.role ||
+          authState.role === Role.SUPER ||
+          authState.role === Role.ADMIN,
+      ),
       accessDenied: false,
       setAccessDenied: vi.fn(),
       token: authState.isAuthenticated ? "fake-token" : null,
@@ -177,7 +188,7 @@ describe("App routing & auth flow", () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Dashboard onLogout={mockLogout} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/Sign Out/i);

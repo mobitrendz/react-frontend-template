@@ -71,7 +71,12 @@ describe("App Component", () => {
 
   const mockLogin = vi.fn((token: string) => {
     authState.isAuthenticated = true;
-    authState.user = { id: "1", email: "t@t.com", role: "USER", is_active: true };
+    authState.user = {
+      id: "1",
+      email: "t@t.com",
+      role: "USER",
+      is_active: true,
+    };
     authState.role = Role.USER;
   });
 
@@ -88,7 +93,7 @@ describe("App Component", () => {
       user: null,
       role: null,
     };
-    
+
     vi.mocked(useAuth).mockImplementation(() => ({
       isAuthenticated: authState.isAuthenticated,
       isLoading: false,
@@ -96,7 +101,13 @@ describe("App Component", () => {
       role: authState.role,
       login: mockLogin,
       logout: mockLogout,
-      hasPermission: vi.fn((r) => !authState.role || r === authState.role || authState.role === Role.SUPER || authState.role === Role.ADMIN),
+      hasPermission: vi.fn(
+        (r) =>
+          !authState.role ||
+          r === authState.role ||
+          authState.role === Role.SUPER ||
+          authState.role === Role.ADMIN,
+      ),
       accessDenied: false,
       setAccessDenied: vi.fn(),
       token: authState.isAuthenticated ? "fake-token" : null,
@@ -114,7 +125,12 @@ describe("App Component", () => {
 
   it("renders dashboard when authenticated", async () => {
     authState.isAuthenticated = true;
-    authState.user = { id: "1", email: "t@t.com", role: "USER", is_active: true };
+    authState.user = {
+      id: "1",
+      email: "t@t.com",
+      role: "USER",
+      is_active: true,
+    };
     authState.role = Role.USER;
 
     render(
@@ -139,11 +155,11 @@ describe("App Component", () => {
     fireEvent.click(screen.getByText("Mock Login"));
     expect(mockLogin).toHaveBeenCalledWith("token");
 
-    // Since AppContent is inside App, and we updated authState, 
+    // Since AppContent is inside App, and we updated authState,
     // but the component won't re-render automatically because authState is not a React state.
     // However, in a real app, AuthProvider would update.
     // In this test, we can just re-render to pick up the new mock values.
-    
+
     const { rerender } = render(
       <MemoryRouter initialEntries={["/"]}>
         <App />

@@ -164,9 +164,7 @@ describe("Profile Component", () => {
     );
     fireEvent.click(await screen.findByText(/Delete My Account/i));
 
-    const confirmInput = await screen.findByLabelText(
-      /Verify Password/i,
-    );
+    const confirmInput = await screen.findByLabelText(/Verify Password/i);
     fireEvent.change(confirmInput, { target: { value: "pass" } });
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));
 
@@ -218,10 +216,9 @@ describe("Profile Component", () => {
       </MemoryRouter>,
     );
     fireEvent.click(await screen.findByText(/Delete My Account/i));
-    fireEvent.change(
-      await screen.findByLabelText(/Verify Password/i),
-      { target: { value: "pass" } },
-    );
+    fireEvent.change(await screen.findByLabelText(/Verify Password/i), {
+      target: { value: "pass" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));
 
     await waitFor(() => {
@@ -266,10 +263,9 @@ describe("Profile Component", () => {
     );
 
     fireEvent.click(await screen.findByText(/Delete My Account/i));
-    fireEvent.change(
-      await screen.findByLabelText(/Verify Password/i),
-      { target: { value: "wrong" } },
-    );
+    fireEvent.change(await screen.findByLabelText(/Verify Password/i), {
+      target: { value: "wrong" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /Confirm Deletion/i }));
 
     expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument();

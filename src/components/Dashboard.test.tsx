@@ -109,7 +109,9 @@ describe("Dashboard Component", () => {
     );
 
     // Open the creation form - clicking the main dashboard button
-    fireEvent.click(screen.getAllByText(/Create Task/i, { selector: 'button' })[0]);
+    fireEvent.click(
+      screen.getAllByText(/Create Task/i, { selector: "button" })[0],
+    );
 
     const titleInput = await screen.findByLabelText(/Title/i);
     fireEvent.change(titleInput, { target: { value: "New Task" } });
@@ -164,10 +166,9 @@ describe("Dashboard Component", () => {
     fireEvent.change(await screen.findByLabelText(/Full Name/i), {
       target: { value: "New User" },
     });
-    fireEvent.change(
-      await screen.findByLabelText(/Temporary Password/i),
-      { target: { value: "pass" } },
-    );
+    fireEvent.change(await screen.findByLabelText(/Temporary Password/i), {
+      target: { value: "pass" },
+    });
     fireEvent.click(
       await screen.findByRole("button", { name: /Create User Account/i }),
     );

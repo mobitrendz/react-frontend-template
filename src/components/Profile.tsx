@@ -1,469 +1,538 @@
-import { useState, useEffect } from 'react'
-import { 
-    getCurrentUserApiV1LoginCurrentUserGet,
-    updateUserApiV1UsersIdPatch,
-    deleteUserApiV1UsersIdDelete,
-    readTodosApiV1TodosGet,
-    deleteTodoApiV1TodosIdDelete,
-    loginAccessTokenApiV1LoginAccessTokenPost,
-    updatePasswordApiV1UsersPasswordPatch
-} from '../client/sdk.gen'
-import { type UserPublic } from '../client/types.gen'
-import { useAuth, Role } from '../contexts/AuthContext'
-import { 
-    User, 
-    Mail, 
-    Shield, 
-    Lock, 
-    Trash2, 
-    CheckCircle2, 
-    AlertCircle,
-    UserCircle,
-    Key,
-    Activity
-} from 'lucide-react'
+import { useState, useEffect } from "react";
+import {
+  getCurrentUserApiV1LoginCurrentUserGet,
+  updateUserApiV1UsersIdPatch,
+  deleteUserApiV1UsersIdDelete,
+  readTodosApiV1TodosGet,
+  deleteTodoApiV1TodosIdDelete,
+  loginAccessTokenApiV1LoginAccessTokenPost,
+  updatePasswordApiV1UsersPasswordPatch,
+} from "../client/sdk.gen";
+import { type UserPublic } from "../client/types.gen";
+import { useAuth, Role } from "../contexts/AuthContext";
+import {
+  User,
+  Mail,
+  Shield,
+  Lock,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  UserCircle,
+  Key,
+  Activity,
+} from "lucide-react";
 
 const Profile = () => {
-    const { logout, role: currentUserRole } = useAuth()
-    const [currentUser, setCurrentUser] = useState<UserPublic | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-    
-    // User Profile Edit State
-    const [isEditingProfile, setIsEditingProfile] = useState(false)
-    const [editFullName, setEditFullName] = useState('')
-    const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
-    
-    // Password Change State
-    const [isChangingPassword, setIsChangingPassword] = useState(false)
-    const [currentPassword, setCurrentPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
-    const [passwordError, setPasswordError] = useState<string | null>(null)
-    const [passwordSuccess, setPasswordSuccess] = useState(false)
+  const { logout, role: currentUserRole } = useAuth();
+  const [currentUser, setCurrentUser] = useState<UserPublic | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-    // Account Deletion State
-    const [isDeletingAccount, setIsDeletingAccount] = useState(false)
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-    const [deletionPassword, setDeletionPassword] = useState('')
-    const [isVerifyingPassword, setIsVerifyingPassword] = useState(false)
-    const [deleteError, setDeleteError] = useState<string | null>(null)
+  // User Profile Edit State
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editFullName, setEditFullName] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
-    useEffect(() => {
-        fetchUser()
-    }, [])
+  // Password Change State
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
-    const fetchUser = async () => {
-        try {
-            setIsLoading(true)
-            const response = await getCurrentUserApiV1LoginCurrentUserGet()
-            if (response.data) {
-                setCurrentUser(response.data)
-                setEditFullName(response.data.full_name || '')
-            }
-        } catch (error) {
-            console.error('Failed to fetch user:', error)
-        } finally {
-            setIsLoading(false)
-        }
+  // Account Deletion State
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletionPassword, setDeletionPassword] = useState("");
+  const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getCurrentUserApiV1LoginCurrentUserGet();
+      if (response.data) {
+        setCurrentUser(response.data);
+        setEditFullName(response.data.full_name || "");
+      }
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    try {
+      setIsUpdatingProfile(true);
+      const response = await updateUserApiV1UsersIdPatch({
+        path: { id: currentUser.id },
+        body: { full_name: editFullName },
+      });
+      if (response.data) {
+        setCurrentUser(response.data);
+        setIsEditingProfile(false);
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(false);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
     }
 
-    const handleUpdateProfile = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!currentUser) return
-
-        try {
-            setIsUpdatingProfile(true)
-            const response = await updateUserApiV1UsersIdPatch({
-                path: { id: currentUser.id },
-                body: { full_name: editFullName }
-            })
-            if (response.data) {
-                setCurrentUser(response.data)
-                setIsEditingProfile(false)
-            }
-        } catch (error) {
-            console.error('Failed to update profile:', error)
-        } finally {
-            setIsUpdatingProfile(false)
-        }
+    try {
+      setIsUpdatingPassword(true);
+      await updatePasswordApiV1UsersPasswordPatch({
+        body: {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+      });
+      setPasswordSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => {
+        setIsChangingPassword(false);
+        setPasswordSuccess(false);
+      }, 2000);
+    } catch (error: any) {
+      console.error("Failed to update password:", error);
+      setPasswordError(
+        error.detail ||
+          "Failed to update password. Please check your current password.",
+      );
+    } finally {
+      setIsUpdatingPassword(false);
     }
+  };
 
-    const handleUpdatePassword = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setPasswordError(null)
-        setPasswordSuccess(false)
+  const handleDeleteAccount = async () => {
+    if (!currentUser) return;
 
-        if (newPassword !== confirmPassword) {
-            setPasswordError("New passwords do not match")
-            return
-        }
+    try {
+      setIsDeletingAccount(true);
 
-        try {
-            setIsUpdatingPassword(true)
-            await updatePasswordApiV1UsersPasswordPatch({
-                body: {
-                    current_password: currentPassword,
-                    new_password: newPassword
-                }
-            })
-            setPasswordSuccess(true)
-            setCurrentPassword('')
-            setNewPassword('')
-            setConfirmPassword('')
-            setTimeout(() => {
-                setIsChangingPassword(false)
-                setPasswordSuccess(false)
-            }, 2000)
-        } catch (error: any) {
-            console.error('Failed to update password:', error)
-            setPasswordError(error.detail || "Failed to update password. Please check your current password.")
-        } finally {
-            setIsUpdatingPassword(false)
-        }
+      // 1. Fetch all user tasks
+      const todosResponse = await readTodosApiV1TodosGet();
+      if (todosResponse.data && todosResponse.data.data) {
+        // 2. Delete all tasks
+        await Promise.all(
+          todosResponse.data.data.map((todo) =>
+            deleteTodoApiV1TodosIdDelete({ path: { id: todo.id } }),
+          ),
+        );
+      }
+
+      // 3. Delete the user account
+      await deleteUserApiV1UsersIdDelete({ path: { id: currentUser.id } });
+
+      // 4. Logout and redirect
+      logout();
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      alert("An error occurred while deleting your account. Please try again.");
+    } finally {
+      setIsDeletingAccount(false);
     }
+  };
 
-    const handleDeleteAccount = async () => {
-        if (!currentUser) return
-        
-        try {
-            setIsDeletingAccount(true)
-            
-            // 1. Fetch all user tasks
-            const todosResponse = await readTodosApiV1TodosGet()
-            if (todosResponse.data && todosResponse.data.data) {
-                // 2. Delete all tasks
-                await Promise.all(todosResponse.data.data.map(todo => 
-                    deleteTodoApiV1TodosIdDelete({ path: { id: todo.id } })
-                ))
-            }
+  const handleConfirmPasswordForDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    setDeleteError(null);
 
-            // 3. Delete the user account
-            await deleteUserApiV1UsersIdDelete({ path: { id: currentUser.id } })
-            
-            // 4. Logout and redirect
-            logout()
-        } catch (error) {
-            console.error('Failed to delete account:', error)
-            alert('An error occurred while deleting your account. Please try again.')
-        } finally {
-            setIsDeletingAccount(false)
+    try {
+      setIsVerifyingPassword(true);
+      // Verify password by attempting to login
+      const response = await loginAccessTokenApiV1LoginAccessTokenPost({
+        body: {
+          username: currentUser.email,
+          password: deletionPassword,
+        },
+      });
+
+      if (response.data?.access_token) {
+        // Password verified, proceed to final confirmation
+        if (
+          window.confirm(
+            "FINAL CONFIRMATION: This will permanently erase your entire account. Continue?",
+          )
+        ) {
+          handleDeleteAccount();
         }
+      } else {
+        setDeleteError("Invalid password. Please try again.");
+      }
+    } catch (error) {
+      setDeleteError("Invalid password. Please try again.");
+    } finally {
+      setIsVerifyingPassword(false);
     }
+  };
 
-    const handleConfirmPasswordForDelete = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!currentUser) return
-        setDeleteError(null)
-
-        try {
-            setIsVerifyingPassword(true)
-            // Verify password by attempting to login
-            const response = await loginAccessTokenApiV1LoginAccessTokenPost({
-                body: { 
-                    username: currentUser.email, 
-                    password: deletionPassword 
-                }
-            })
-
-            if (response.data?.access_token) {
-                // Password verified, proceed to final confirmation
-                if (window.confirm("FINAL CONFIRMATION: This will permanently erase your entire account. Continue?")) {
-                    handleDeleteAccount()
-                }
-            } else {
-                setDeleteError("Invalid password. Please try again.")
-            }
-        } catch (error) {
-            setDeleteError("Invalid password. Please try again.")
-        } finally {
-            setIsVerifyingPassword(false)
-        }
-    }
-
-    if (isLoading) {
-        return (
-            <div className="min-h-[400px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)]"></div>
-            </div>
-        )
-    }
-
+  if (isLoading) {
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <header>
-                <h1 className="text-3xl font-bold text-[var(--text-h)]">Account Settings</h1>
-                <p className="text-[var(--text-dim)] mt-1">Manage your personal information and security preferences</p>
-            </header>
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)]"></div>
+      </div>
+    );
+  }
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Personal Info */}
-                <div className="lg:col-span-2 space-y-8">
-                    <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
-                        <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] rounded-xl">
-                                    <UserCircle className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-xl font-bold text-[var(--text-h)]">Personal Profile</h2>
-                            </div>
-                            {!isEditingProfile && (
-                                <button 
-                                    onClick={() => setIsEditingProfile(true)}
-                                    className="text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/10 px-4 py-2 rounded-xl transition-all"
-                                >
-                                    Edit Profile
-                                </button>
-                            )}
-                        </div>
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <header>
+        <h1 className="text-3xl font-bold text-[var(--text-h)]">
+          Account Settings
+        </h1>
+        <p className="text-[var(--text-dim)] mt-1">
+          Manage your personal information and security preferences
+        </p>
+      </header>
 
-                        <div className="p-8">
-                            {isEditingProfile ? (
-                                <form onSubmit={handleUpdateProfile} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label htmlFor="full_name" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
-                                            <User className="w-3.5 h-3.5 text-[var(--text-dim)]" />
-                                            Full Name
-                                        </label>
-                                        <input 
-                                            id="full_name"
-                                            type="text"
-                                            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
-                                            value={editFullName}
-                                            onChange={(e) => setEditFullName(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="flex gap-4">
-                                        <button 
-                                            type="submit"
-                                            disabled={isUpdatingProfile}
-                                            className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
-                                        >
-                                            {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => setIsEditingProfile(false)}
-                                            className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-[var(--text-dim)]">
-                                            <Mail className="w-4 h-4" />
-                                            <span className="text-xs font-black uppercase tracking-widest">Email Address</span>
-                                        </div>
-                                        <p className="text-lg text-[var(--text-h)] font-medium">{currentUser?.email}</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-[var(--text-dim)]">
-                                            <User className="w-4 h-4" />
-                                            <span className="text-xs font-black uppercase tracking-widest">Full Name</span>
-                                        </div>
-                                        <p className="text-lg text-[var(--text-h)] font-medium">{currentUser?.full_name || 'Not set'}</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-[var(--text-dim)]">
-                                            <Shield className="w-4 h-4" />
-                                            <span className="text-xs font-black uppercase tracking-widest">Account Role</span>
-                                        </div>
-                                        <div className={`mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                                            currentUser?.role === 'super'
-                                                ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                                                : currentUser?.role === 'admin' 
-                                                ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' 
-                                                : 'bg-slate-500/10 text-slate-500 border border-slate-500/20'
-                                        }`}>
-                                            {currentUser?.role}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-[var(--text-dim)]">
-                                            <Activity className="w-4 h-4" />
-                                            <span className="text-xs font-black uppercase tracking-widest">System Status</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
-                                            <span className="text-sm font-bold text-green-500">Active Session</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </section>
-
-                    <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
-                        <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
-                                    <Key className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-xl font-bold text-[var(--text-h)]">Security Credentials</h2>
-                            </div>
-                        </div>
-                        
-                        <div className="p-8">
-                            {isChangingPassword ? (
-                                <form onSubmit={handleUpdatePassword} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label htmlFor="current_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">Current Password</label>
-                                        <input 
-                                            id="current_password"
-                                            type="password"
-                                            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
-                                            value={currentPassword}
-                                            onChange={(e) => setCurrentPassword(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label htmlFor="new_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">New Password</label>
-                                            <input 
-                                                id="new_password"
-                                                type="password"
-                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
-                                                value={newPassword}
-                                                onChange={(e) => setNewPassword(e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="confirm_password" style={{ display: 'block' }} className="text-sm font-bold text-[var(--text-h)]">Confirm New Password</label>
-                                            <input 
-                                                id="confirm_password"
-                                                type="password"
-                                                className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {passwordError && (
-                                        <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold">
-                                            <AlertCircle className="w-5 h-5" />
-                                            {passwordError}
-                                        </div>
-                                    )}
-                                    {passwordSuccess && (
-                                        <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 text-sm font-bold">
-                                            <CheckCircle2 className="w-5 h-5" />
-                                            Password successfully updated!
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-4">
-                                        <button 
-                                            type="submit"
-                                            disabled={isUpdatingPassword}
-                                            className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
-                                        >
-                                            {isUpdatingPassword ? 'Updating...' : 'Update Password'}
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => setIsChangingPassword(false)}
-                                            className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            ) : (
-                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                                    <div className="max-w-md">
-                                        <p className="font-bold text-[var(--text-h)]">Account Password</p>
-                                        <p className="text-[var(--text-dim)] text-sm mt-1">
-                                            Protect your account by ensuring your password is complex and updated regularly.
-                                        </p>
-                                    </div>
-                                    <button 
-                                        onClick={() => setIsChangingPassword(true)}
-                                        className="px-8 py-3.5 bg-[var(--bg)] border border-[var(--border)] text-[var(--text-h)] rounded-2xl font-bold hover:bg-[var(--accent-bg)] hover:text-[var(--accent)] transition-all flex items-center gap-2"
-                                    >
-                                        <Lock className="w-4 h-4" />
-                                        Change Password
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </section>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Personal Info */}
+        <div className="lg:col-span-2 space-y-8">
+          <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] rounded-xl">
+                  <UserCircle className="w-6 h-6" />
                 </div>
-
-                {/* Right Column: Sidebar Actions/Info */}
-                <div className="space-y-8">
-                    <section className="bg-red-500/5 rounded-3xl border border-red-500/10 shadow-sm overflow-hidden">
-                        <div className="p-8 space-y-6">
-                            <div className="flex items-center gap-3 text-red-500">
-                                <Trash2 className="w-6 h-6" />
-                                <h2 className="text-xl font-bold">Danger Zone</h2>
-                            </div>
-                            
-                            <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                                Deleting your account is a permanent action. All your tasks, settings, and profile information will be wiped from our systems instantly.
-                            </p>
-
-                            {!showDeleteConfirm ? (
-                                <button 
-                                    onClick={() => setShowDeleteConfirm(true)}
-                                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/20 active:scale-[0.98] transition-all"
-                                >
-                                    Delete My Account
-                                </button>
-                            ) : (
-                                <form onSubmit={handleConfirmPasswordForDelete} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="deletion_password" className="text-xs font-black uppercase tracking-widest text-red-500">Verify Password</label>
-                                        <input 
-                                            id="deletion_password"
-                                            type="password"
-                                            className="w-full bg-[var(--bg)] border border-red-500/30 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium"
-                                            placeholder="Current Password"
-                                            value={deletionPassword}
-                                            onChange={(e) => setDeletionPassword(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    {deleteError && (
-                                        <div className="p-3 bg-red-500/10 rounded-xl text-[10px] font-bold text-red-500 border border-red-500/20">
-                                            {deleteError}
-                                        </div>
-                                    )}
-                                    <div className="flex flex-col gap-2">
-                                        <button 
-                                            type="submit"
-                                            disabled={isVerifyingPassword || isDeletingAccount}
-                                            className="w-full py-3.5 bg-red-600 text-white rounded-2xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
-                                        >
-                                            {isVerifyingPassword || isDeletingAccount ? 'Processing...' : 'Confirm Deletion'}
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            onClick={() => {
-                                                setShowDeleteConfirm(false)
-                                                setDeletionPassword('')
-                                                setDeleteError(null)
-                                            }}
-                                            className="w-full py-3 bg-transparent text-[var(--text-dim)] hover:text-[var(--text-h)] font-bold transition-all"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-                        </div>
-                    </section>
-                </div>
+                <h2 className="text-xl font-bold text-[var(--text-h)]">
+                  Personal Profile
+                </h2>
+              </div>
+              {!isEditingProfile && (
+                <button
+                  onClick={() => setIsEditingProfile(true)}
+                  className="text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/10 px-4 py-2 rounded-xl transition-all"
+                >
+                  Edit Profile
+                </button>
+              )}
             </div>
-        </div>
-    )
-}
 
-export default Profile
+            <div className="p-8">
+              {isEditingProfile ? (
+                <form onSubmit={handleUpdateProfile} className="space-y-6">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="full_name"
+                      className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+                    >
+                      <User className="w-3.5 h-3.5 text-[var(--text-dim)]" />
+                      Full Name
+                    </label>
+                    <input
+                      id="full_name"
+                      type="text"
+                      className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      disabled={isUpdatingProfile}
+                      className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingProfile(false)}
+                      className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                      <Mail className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-widest">
+                        Email Address
+                      </span>
+                    </div>
+                    <p className="text-lg text-[var(--text-h)] font-medium">
+                      {currentUser?.email}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                      <User className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-widest">
+                        Full Name
+                      </span>
+                    </div>
+                    <p className="text-lg text-[var(--text-h)] font-medium">
+                      {currentUser?.full_name || "Not set"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-widest">
+                        Account Role
+                      </span>
+                    </div>
+                    <div
+                      className={`mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                        currentUser?.role === "super"
+                          ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                          : currentUser?.role === "admin"
+                            ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
+                            : "bg-slate-500/10 text-slate-500 border border-slate-500/20"
+                      }`}
+                    >
+                      {currentUser?.role}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                      <Activity className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-widest">
+                        System Status
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-sm font-bold text-green-500">
+                        Active Session
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
+                  <Key className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-bold text-[var(--text-h)]">
+                  Security Credentials
+                </h2>
+              </div>
+            </div>
+
+            <div className="p-8">
+              {isChangingPassword ? (
+                <form onSubmit={handleUpdatePassword} className="space-y-6">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="current_password"
+                      style={{ display: "block" }}
+                      className="text-sm font-bold text-[var(--text-h)]"
+                    >
+                      Current Password
+                    </label>
+                    <input
+                      id="current_password"
+                      type="password"
+                      className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="new_password"
+                        style={{ display: "block" }}
+                        className="text-sm font-bold text-[var(--text-h)]"
+                      >
+                        New Password
+                      </label>
+                      <input
+                        id="new_password"
+                        type="password"
+                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="confirm_password"
+                        style={{ display: "block" }}
+                        className="text-sm font-bold text-[var(--text-h)]"
+                      >
+                        Confirm New Password
+                      </label>
+                      <input
+                        id="confirm_password"
+                        type="password"
+                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {passwordError && (
+                    <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold">
+                      <AlertCircle className="w-5 h-5" />
+                      {passwordError}
+                    </div>
+                  )}
+                  {passwordSuccess && (
+                    <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 text-sm font-bold">
+                      <CheckCircle2 className="w-5 h-5" />
+                      Password successfully updated!
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      disabled={isUpdatingPassword}
+                      className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {isUpdatingPassword ? "Updating..." : "Update Password"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsChangingPassword(false)}
+                      className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="max-w-md">
+                    <p className="font-bold text-[var(--text-h)]">
+                      Account Password
+                    </p>
+                    <p className="text-[var(--text-dim)] text-sm mt-1">
+                      Protect your account by ensuring your password is complex
+                      and updated regularly.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsChangingPassword(true)}
+                    className="px-8 py-3.5 bg-[var(--bg)] border border-[var(--border)] text-[var(--text-h)] rounded-2xl font-bold hover:bg-[var(--accent-bg)] hover:text-[var(--accent)] transition-all flex items-center gap-2"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Change Password
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Sidebar Actions/Info */}
+        <div className="space-y-8">
+          <section className="bg-red-500/5 rounded-3xl border border-red-500/10 shadow-sm overflow-hidden">
+            <div className="p-8 space-y-6">
+              <div className="flex items-center gap-3 text-red-500">
+                <Trash2 className="w-6 h-6" />
+                <h2 className="text-xl font-bold">Danger Zone</h2>
+              </div>
+
+              <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                Deleting your account is a permanent action. All your tasks,
+                settings, and profile information will be wiped from our systems
+                instantly.
+              </p>
+
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="w-full py-4 bg-red-500 text-white rounded-2xl font-bold hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/20 active:scale-[0.98] transition-all"
+                >
+                  Delete My Account
+                </button>
+              ) : (
+                <form
+                  onSubmit={handleConfirmPasswordForDelete}
+                  className="space-y-4"
+                >
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="deletion_password"
+                      className="text-xs font-black uppercase tracking-widest text-red-500"
+                    >
+                      Verify Password
+                    </label>
+                    <input
+                      id="deletion_password"
+                      type="password"
+                      className="w-full bg-[var(--bg)] border border-red-500/30 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium"
+                      placeholder="Current Password"
+                      value={deletionPassword}
+                      onChange={(e) => setDeletionPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  {deleteError && (
+                    <div className="p-3 bg-red-500/10 rounded-xl text-[10px] font-bold text-red-500 border border-red-500/20">
+                      {deleteError}
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="submit"
+                      disabled={isVerifyingPassword || isDeletingAccount}
+                      className="w-full py-3.5 bg-red-600 text-white rounded-2xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {isVerifyingPassword || isDeletingAccount
+                        ? "Processing..."
+                        : "Confirm Deletion"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        setDeletionPassword("");
+                        setDeleteError(null);
+                      }}
+                      className="w-full py-3 bg-transparent text-[var(--text-dim)] hover:text-[var(--text-h)] font-bold transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
