@@ -5,6 +5,50 @@ export type ClientOptions = {
 };
 
 /**
+ * ActivitySummary
+ */
+export type ActivitySummary = {
+  /**
+   * Total Hits
+   */
+  total_hits: number;
+  /**
+   * Success Rate
+   */
+  success_rate: number;
+  /**
+   * Failure Rate
+   */
+  failure_rate: number;
+  /**
+   * Top Endpoints
+   */
+  top_endpoints: Array<HotEndpoint>;
+};
+
+/**
+ * AdminDashboardReport
+ */
+export type AdminDashboardReport = {
+  /**
+   * Total Regular Users
+   */
+  total_regular_users: number;
+  /**
+   * Total Activities 24H
+   */
+  total_activities_24h: number;
+  /**
+   * Daily Trends
+   */
+  daily_trends: Array<DailyActivity>;
+  /**
+   * Top Active Users
+   */
+  top_active_users: Array<UserActivityStat>;
+};
+
+/**
  * Body_login_access_token_api_v1_login_access_token_post
  */
 export type BodyLoginAccessTokenApiV1LoginAccessTokenPost = {
@@ -35,6 +79,29 @@ export type BodyLoginAccessTokenApiV1LoginAccessTokenPost = {
 };
 
 /**
+ * DailyActivity
+ */
+export type DailyActivity = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
+ * DashboardReport
+ */
+export type DashboardReport = {
+  server: ServerMetrics;
+  users: UserStats;
+  activity: ActivitySummary;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -45,6 +112,24 @@ export type HttpValidationError = {
 };
 
 /**
+ * HotEndpoint
+ */
+export type HotEndpoint = {
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Method
+   */
+  method: string;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
  * Message
  */
 export type Message = {
@@ -52,6 +137,32 @@ export type Message = {
    * Message
    */
   message: string;
+};
+
+/**
+ * Page[UserActivityPublic]
+ */
+export type PageUserActivityPublic = {
+  /**
+   * Items
+   */
+  items: Array<UserActivityPublic>;
+  /**
+   * Total
+   */
+  total: number;
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Size
+   */
+  size: number;
+  /**
+   * Pages
+   */
+  pages: number;
 };
 
 /**
@@ -78,6 +189,56 @@ export type PageUserPublic = {
    * Pages
    */
   pages: number;
+};
+
+/**
+ * PasswordHistoriesPublic
+ */
+export type PasswordHistoriesPublic = {
+  /**
+   * Data
+   */
+  data: Array<PasswordHistoryPublic>;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
+ * PasswordHistoryPublic
+ */
+export type PasswordHistoryPublic = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Created At
+   */
+  created_at: string;
+};
+
+/**
+ * ServerMetrics
+ */
+export type ServerMetrics = {
+  /**
+   * Cpu Usage
+   */
+  cpu_usage: number;
+  /**
+   * Memory Usage
+   */
+  memory_usage: number;
+  /**
+   * Disk Usage
+   */
+  disk_usage: number;
+  /**
+   * Uptime Seconds
+   */
+  uptime_seconds: number;
 };
 
 /**
@@ -205,6 +366,76 @@ export type UpdatePassword = {
 };
 
 /**
+ * UserActivitiesPublic
+ */
+export type UserActivitiesPublic = {
+  /**
+   * Data
+   */
+  data: Array<UserActivityPublic>;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
+ * UserActivityPublic
+ */
+export type UserActivityPublic = {
+  /**
+   * Method
+   */
+  method: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Status Code
+   */
+  status_code: number;
+  /**
+   * Ip Address
+   */
+  ip_address?: string | null;
+  /**
+   * User Agent
+   */
+  user_agent?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * User Id
+   */
+  user_id: string | null;
+  /**
+   * Created At
+   */
+  created_at: string;
+};
+
+/**
+ * UserActivityStat
+ */
+export type UserActivityStat = {
+  /**
+   * Email
+   */
+  email: string;
+  /**
+   * Full Name
+   */
+  full_name: string | null;
+  /**
+   * Count
+   */
+  count: number;
+};
+
+/**
  * UserCreate
  */
 export type UserCreate = {
@@ -276,6 +507,24 @@ export type UserRegister = {
  * UserRole
  */
 export type UserRole = "super" | "admin" | "user";
+
+/**
+ * UserStats
+ */
+export type UserStats = {
+  /**
+   * Total Users
+   */
+  total_users: number;
+  /**
+   * Active Users 24H
+   */
+  active_users_24h: number;
+  /**
+   * New Registrations 24H
+   */
+  new_registrations_24h: number;
+};
 
 /**
  * UserUpdate
@@ -563,6 +812,23 @@ export type ReadUserByEmailApiV1UsersByEmailEmailGetResponses = {
 
 export type ReadUserByEmailApiV1UsersByEmailEmailGetResponse =
   ReadUserByEmailApiV1UsersByEmailEmailGetResponses[keyof ReadUserByEmailApiV1UsersByEmailEmailGetResponses];
+
+export type ReadPasswordHistoryApiV1UsersMePasswordHistoryGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/users/me/password-history";
+};
+
+export type ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: PasswordHistoriesPublic;
+};
+
+export type ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponse =
+  ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponses[keyof ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponses];
 
 export type UpdatePasswordApiV1UsersPasswordPatchData = {
   body: UpdatePassword;
@@ -918,6 +1184,97 @@ export type RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponses = {
 
 export type RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponse =
   RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponses[keyof RecoverPasswordApiV1LoginPasswordRecoveryEmailPostResponses];
+
+export type ReadMyActivitiesApiV1ActivitiesMeGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/activities/me";
+};
+
+export type ReadMyActivitiesApiV1ActivitiesMeGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: UserActivitiesPublic;
+};
+
+export type ReadMyActivitiesApiV1ActivitiesMeGetResponse =
+  ReadMyActivitiesApiV1ActivitiesMeGetResponses[keyof ReadMyActivitiesApiV1ActivitiesMeGetResponses];
+
+export type ReadAllActivitiesApiV1ActivitiesGetData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Page
+     *
+     * Page number
+     */
+    page?: number;
+    /**
+     * Size
+     *
+     * Page size
+     */
+    size?: number;
+  };
+  url: "/api/v1/activities/";
+};
+
+export type ReadAllActivitiesApiV1ActivitiesGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReadAllActivitiesApiV1ActivitiesGetError =
+  ReadAllActivitiesApiV1ActivitiesGetErrors[keyof ReadAllActivitiesApiV1ActivitiesGetErrors];
+
+export type ReadAllActivitiesApiV1ActivitiesGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: PageUserActivityPublic;
+};
+
+export type ReadAllActivitiesApiV1ActivitiesGetResponse =
+  ReadAllActivitiesApiV1ActivitiesGetResponses[keyof ReadAllActivitiesApiV1ActivitiesGetResponses];
+
+export type ReadDashboardStatsApiV1DashboardStatsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/dashboard/stats";
+};
+
+export type ReadDashboardStatsApiV1DashboardStatsGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: DashboardReport;
+};
+
+export type ReadDashboardStatsApiV1DashboardStatsGetResponse =
+  ReadDashboardStatsApiV1DashboardStatsGetResponses[keyof ReadDashboardStatsApiV1DashboardStatsGetResponses];
+
+export type ReadAdminDashboardStatsApiV1AdminDashboardStatsGetData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/admin/dashboard/stats";
+};
+
+export type ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponses = {
+  /**
+   * Successful Response
+   */
+  200: AdminDashboardReport;
+};
+
+export type ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponse =
+  ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponses[keyof ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponses];
 
 export type HealthHealthGetData = {
   body?: never;

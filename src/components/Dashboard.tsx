@@ -6,10 +6,11 @@ import UserTaskView from "./tasks/UserTaskView";
 
 interface DashboardProps {
   defaultView?: "admin" | "user";
+  initialTab?: "intelligence" | "activity" | "users";
   onLogout?: () => void;
 }
 
-const Dashboard = ({ defaultView, onLogout }: DashboardProps) => {
+const Dashboard = ({ defaultView, initialTab, onLogout }: DashboardProps) => {
   const { user, role, logout, hasPermission } = useAuth();
   const [activeView, setActiveView] = useState<"admin" | "user">(
     defaultView || "user",
@@ -44,7 +45,7 @@ const Dashboard = ({ defaultView, onLogout }: DashboardProps) => {
       onViewChange={setActiveView}
     >
       {activeView === "admin" && hasPermission(Role.ADMIN) ? (
-        <AdminDashboardView currentUser={user} />
+        <AdminDashboardView currentUser={user} initialTab={initialTab} />
       ) : (
         <UserTaskView />
       )}

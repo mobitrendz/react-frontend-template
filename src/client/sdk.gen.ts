@@ -38,6 +38,17 @@ import type {
   LoginAccessTokenApiV1LoginAccessTokenPostResponses,
   MetricsMetricsGetData,
   MetricsMetricsGetResponses,
+  ReadAdminDashboardStatsApiV1AdminDashboardStatsGetData,
+  ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponses,
+  ReadAllActivitiesApiV1ActivitiesGetData,
+  ReadAllActivitiesApiV1ActivitiesGetErrors,
+  ReadAllActivitiesApiV1ActivitiesGetResponses,
+  ReadDashboardStatsApiV1DashboardStatsGetData,
+  ReadDashboardStatsApiV1DashboardStatsGetResponses,
+  ReadMyActivitiesApiV1ActivitiesMeGetData,
+  ReadMyActivitiesApiV1ActivitiesMeGetResponses,
+  ReadPasswordHistoryApiV1UsersMePasswordHistoryGetData,
+  ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponses,
   ReadSecureApiV1LoginSecureDataGetData,
   ReadSecureApiV1LoginSecureDataGetResponses,
   ReadTodoByIdApiV1TodosIdGetData,
@@ -232,6 +243,29 @@ export const readUserByEmailApiV1UsersByEmailEmailGet = <
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/api/v1/users/byEmail/{email}",
+    ...options,
+  });
+
+/**
+ * Read Password History
+ *
+ * Retrieve the last 5 password changes for the authenticated user.
+ */
+export const readPasswordHistoryApiV1UsersMePasswordHistoryGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<
+    ReadPasswordHistoryApiV1UsersMePasswordHistoryGetData,
+    ThrowOnError
+  >,
+) =>
+  (options?.client ?? client).get<
+    ReadPasswordHistoryApiV1UsersMePasswordHistoryGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/users/me/password-history",
     ...options,
   });
 
@@ -490,6 +524,90 @@ export const recoverPasswordApiV1LoginPasswordRecoveryEmailPost = <
     RecoverPasswordApiV1LoginPasswordRecoveryEmailPostErrors,
     ThrowOnError
   >({ url: "/api/v1/login/password-recovery/{email}", ...options });
+
+/**
+ * Read My Activities
+ *
+ * Retrieve the last 20 activities for the authenticated user.
+ */
+export const readMyActivitiesApiV1ActivitiesMeGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReadMyActivitiesApiV1ActivitiesMeGetData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    ReadMyActivitiesApiV1ActivitiesMeGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/activities/me",
+    ...options,
+  });
+
+/**
+ * Read All Activities
+ *
+ * Retrieve all system-wide activities (SUPER users only).
+ */
+export const readAllActivitiesApiV1ActivitiesGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReadAllActivitiesApiV1ActivitiesGetData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    ReadAllActivitiesApiV1ActivitiesGetResponses,
+    ReadAllActivitiesApiV1ActivitiesGetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/activities/",
+    ...options,
+  });
+
+/**
+ * Read Dashboard Stats
+ *
+ * Retrieve comprehensive system and application metrics (SUPER users only).
+ */
+export const readDashboardStatsApiV1DashboardStatsGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReadDashboardStatsApiV1DashboardStatsGetData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    ReadDashboardStatsApiV1DashboardStatsGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/dashboard/stats",
+    ...options,
+  });
+
+/**
+ * Read Admin Dashboard Stats
+ *
+ * Retrieve user activity metrics and trends (SUPER and ADMIN users only).
+ * Filters out activities from non-regular users.
+ */
+export const readAdminDashboardStatsApiV1AdminDashboardStatsGet = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<
+    ReadAdminDashboardStatsApiV1AdminDashboardStatsGetData,
+    ThrowOnError
+  >,
+) =>
+  (options?.client ?? client).get<
+    ReadAdminDashboardStatsApiV1AdminDashboardStatsGetResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/admin/dashboard/stats",
+    ...options,
+  });
 
 /**
  * Health

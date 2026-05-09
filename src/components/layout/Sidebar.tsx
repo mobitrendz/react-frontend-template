@@ -40,7 +40,9 @@ const Sidebar = ({
       name: "Dashboard",
       icon: LayoutDashboard,
       path: "/",
-      view: "user" as const,
+      view: ((userRole === Role.SUPER || userRole === Role.ADMIN)
+        ? "admin"
+        : "user") as "admin" | "user",
       roles: [Role.USER, Role.ADMIN, Role.SUPER],
     },
     {

@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserPlus, ShieldAlert } from "lucide-react";
 import AdminUserTable from "./AdminUserTable";
 import CreateAdminForm from "./CreateAdminForm";
 import DeleteUserConfirmModal from "./DeleteUserConfirmModal";
 import { UserPublic } from "../../client/types.gen";
+import SuperAdminDashboard from "./dashboard/SuperAdminDashboard";
+import AdminActivityDashboard from "./activity/AdminActivityDashboard";
 import {
   updateUserApiV1UsersIdPatch,
   deleteUserApiV1UsersIdDelete,
@@ -13,9 +15,13 @@ import { Role, useAuth } from "../../contexts/AuthContext";
 
 interface AdminDashboardViewProps {
   currentUser: UserPublic | null;
+  initialTab?: "intelligence" | "activity" | "users";
 }
 
-const AdminDashboardView = ({ currentUser }: AdminDashboardViewProps) => {
+const AdminDashboardView = ({
+  currentUser,
+  initialTab,
+}: AdminDashboardViewProps) => {
   const { role: currentUserRole, user: authUser } = useAuth();
   const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserPublic | null>(null);
@@ -27,6 +33,16 @@ const AdminDashboardView = ({ currentUser }: AdminDashboardViewProps) => {
 
   // Key for forcing refresh of the table
   const [tableKey, setTableKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<
+    "intelligence" | "activity" | "users"
+  >(initialTab || (currentUserRole === Role.SUPER ? "intelligence" : "activity"));
+
+  // Sync tab with initialTab prop when it changes (route navigation)
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const handleToggleStatus = async (user: UserPublic) => {
     try {
@@ -98,11 +114,40 @@ const AdminDashboardView = ({ currentUser }: AdminDashboardViewProps) => {
               ? "Super User Control Center"
               : "Identity & Access"}
           </h2>
-          <p className="text-sm text-[var(--text-dim)]">
-            {currentUserRole === Role.SUPER
-              ? "Global system administration and security"
-              : "Manage system users and access levels"}
-          </p>
+          <div className="flex items-center gap-4 mt-2">
+            {currentUserRole === Role.SUPER && (
+              <button
+                onClick={() => setActiveTab("intelligence")}
+                className={`text-sm font-bold pb-1 transition-all border-b-2 ${
+                  activeTab === "intelligence"
+                    ? "text-indigo-400 border-indigo-400"
+                    : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+                }`}
+              >
+                Intelligence
+              </button>
+            )}
+            <button
+              onClick={() => setActiveTab("activity")}
+              className={`text-sm font-bold pb-1 transition-all border-b-2 ${
+                activeTab === "activity"
+                  ? "text-indigo-400 border-indigo-400"
+                  : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+              }`}
+            >
+              Activity
+            </button>
+            <button
+              onClick={() => setActiveTab("users")}
+              className={`text-sm font-bold pb-1 transition-all border-b-2 ${
+                activeTab === "users"
+                  ? "text-indigo-400 border-indigo-400"
+                  : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+              }`}
+            >
+              Users
+            </button>
+          </div>
         </div>
         <button
           onClick={() => setIsCreatingAdmin(true)}
@@ -140,12 +185,18 @@ const AdminDashboardView = ({ currentUser }: AdminDashboardViewProps) => {
         />
       )}
 
-      <AdminUserTable
-        key={tableKey}
-        currentUser={currentUser}
-        onToggleStatus={handleToggleStatus}
-        onDeleteUser={handleDeleteUser}
-      />
+      {activeTab === "intelligence" ? (
+        <SuperAdminDashboard />
+      ) : activeTab === "activity" ? (
+        <AdminActivityDashboard />
+      ) : (
+        <AdminUserTable
+          key={tableKey}
+          currentUser={currentUser}
+          onToggleStatus={handleToggleStatus}
+          onDeleteUser={handleDeleteUser}
+        />
+      )}
 
       <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4">
         <ShieldAlert className="w-6 h-6 text-amber-500 shrink-0" />

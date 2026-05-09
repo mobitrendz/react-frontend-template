@@ -95,7 +95,7 @@ const AppContent = () => {
             path="/users"
             element={
               <ProtectedRoute requiredRole={Role.ADMIN}>
-                <Dashboard defaultView="admin" />
+                <Dashboard defaultView="admin" initialTab="users" />
               </ProtectedRoute>
             }
           />
