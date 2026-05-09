@@ -53,14 +53,14 @@ describe('Login Component', () => {
 
         // 1. Generic failure
         vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({ 
-            error: { body: { detail: 'Invalid credentials' } } 
+            error: { detail: 'Invalid credentials' } 
         } as any)
         fireEvent.click(submitButton)
         expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument()
 
         // 2. Inactive user
         vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({ 
-            error: { body: { detail: 'Inactive user' } } 
+            error: { detail: 'Inactive user' } 
         } as any)
         fireEvent.click(submitButton)
         expect(await screen.findByText(/Your account is inactive/i)).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('Login Component', () => {
         // Switches back to Login mode. Switch to Signup again.
         fireEvent.click(await screen.findByText(/Don't have an account\? Sign up/i))
         
-        vi.mocked(registerUserApiV1LoginSignupPost).mockResolvedValueOnce({ error: { body: { detail: 'Already exists' } } } as any)
+        vi.mocked(registerUserApiV1LoginSignupPost).mockResolvedValueOnce({ error: { detail: 'Already exists' } } as any)
         fireEvent.change(screen.getByPlaceholderText(/Username \/ Email/i), { target: { value: 'exists@test.com' } })
         fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: 'pass123' } })
         

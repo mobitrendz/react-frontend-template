@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginAccessTokenApiV1LoginAccessTokenPost, registerUserApiV1LoginSignupPost } from '../client';
-import { auth } from '../lib/auth';
+import { useAuth } from '../contexts/AuthContext';
 
-interface LoginProps {
-    onLoginSuccess: () => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const from = (location.state as any)?.from?.pathname || '/';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setIsLoading(true);
         
-        auth.clearToken();
-
         try {
             if (isSignUp) {
                 const { error: apiError } = await registerUserApiV1LoginSignupPost({
@@ -27,8 +27,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 });
                 if (apiError) {
                     console.error('Signup API Error:', apiError);
-                    const detail = (apiError as any).body?.detail;
-                    setError(detail || 'Signup failed. Please try again.');
+                    const detail = (apiError as any).detail;
+                    if (Array.isArray(detail)) {
+                        setError(detail.map(d => d.msg).join(', '));
+                    } else {
+                        setError(detail || 'Signup failed. Please try again.');
+                    }
                 } else {
                     alert('Signup successful! Please sign in.');
                     setIsSignUp(false);
@@ -39,19 +43,28 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 });
 
                 if (apiError) {
-                    const detail = (apiError as any).body?.detail;
+                    console.error('Login Error Object:', apiError);
+                    const detail = (apiError as any).detail;
+                    const status = (apiError as any).status;
+                    
                     if (detail === "Inactive user") {
                         setError('Your account is inactive. Please contact your Administrator.');
+                    } else if (Array.isArray(detail)) {
+                        setError(detail.map(d => d.msg).join(', '));
+                    } else if (typeof detail === 'string') {
+                        setError(detail);
                     } else {
-                        setError(detail || 'Login failed. Please check your credentials.');
+                        const statusMsg = status ? ` (Status: ${status})` : '';
+                        setError(`Login failed. Please check your credentials.${statusMsg}`);
                     }
                 } else if (data?.access_token) {
-                    auth.setToken(data.access_token);
-                    onLoginSuccess();
+                    login(data.access_token);
+                    navigate(from, { replace: true });
                 }
             }
         } catch (err) {
-            setError('A network error occurred.');
+            console.error('Login Catch Error:', err);
+            setError('A network error occurred. Please check if the backend is running.');
         } finally {
             setIsLoading(false);
         }

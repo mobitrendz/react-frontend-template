@@ -34,9 +34,13 @@ describe('Dashboard Component', () => {
 
         render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
         
-        await waitFor(() => expect(screen.getByText(/No active tasks/i)).toBeInTheDocument())
+        await waitFor(() => expect(screen.getByText(/No tasks found/i)).toBeInTheDocument())
         
-        fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'New Task' } })
+        // Open the creation form
+        fireEvent.click(screen.getByRole('button', { name: /Create Task/i }))
+        
+        const titleInput = await screen.findByLabelText(/Title/i)
+        fireEvent.change(titleInput, { target: { value: 'New Task' } })
         fireEvent.click(screen.getByRole('button', { name: /Create Task/i }))
         await waitFor(() => expect(sdk.createTodoApiV1TodosPost).toHaveBeenCalled())
     })
@@ -44,16 +48,20 @@ describe('Dashboard Component', () => {
     it('handles admin management workflow', async () => {
         const users = [{ id: '1', email: 'a@test.com', role: 'user', is_active: true }]
         vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockAdmin } as any)
-        vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { data: users, count: 1 } } as any)
+        vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: users, total: 1 } } as any)
         vi.mocked(sdk.createUserApiV1UsersPost).mockResolvedValue({ data: {} } as any)
 
         render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
+        
+        // Wait for the table to load
         await screen.findByText('a@test.com')
 
-        fireEvent.click(screen.getByText(/Add New Admin/i))
+        // Click Provision Admin
+        fireEvent.click(screen.getByText(/Provision Admin/i))
         
-        fireEvent.change(await screen.findByLabelText(/Admin Email/i), { target: { value: 'new@admin.com' } })
-        fireEvent.change(screen.getByLabelText(/Admin Password/i), { target: { value: 'pass' } })
+        const emailInput = await screen.findByLabelText(/Email Address/i)
+        fireEvent.change(emailInput, { target: { value: 'new@admin.com' } })
+        fireEvent.change(screen.getByLabelText(/Temporary Password/i), { target: { value: 'pass' } })
         fireEvent.click(screen.getByRole('button', { name: /Create Admin Account/i }))
         
         await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalled())
@@ -68,7 +76,9 @@ describe('Dashboard Component', () => {
         render(<MemoryRouter><Dashboard onLogout={() => {}} /></MemoryRouter>)
         await screen.findByText('Test Task')
         
-        fireEvent.click(screen.getByTitle(/Edit Task/i))
+        // Wait for the button to be ready
+        const editButton = await screen.findByTitle(/Edit Task/i)
+        fireEvent.click(editButton)
         
         // Find the input in the modal
         const editTitleInput = await screen.findByDisplayValue('Test Task')

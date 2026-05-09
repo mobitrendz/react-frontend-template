@@ -55,6 +55,32 @@ export type Message = {
 };
 
 /**
+ * Page[UserPublic]
+ */
+export type PageUserPublic = {
+    /**
+     * Items
+     */
+    items: Array<UserPublic>;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Page
+     */
+    page: number;
+    /**
+     * Size
+     */
+    size: number;
+    /**
+     * Pages
+     */
+    pages: number;
+};
+
+/**
  * ToDoListCreate
  */
 export type ToDoListCreate = {
@@ -249,7 +275,7 @@ export type UserRegister = {
 /**
  * UserRole
  */
-export type UserRole = 'admin' | 'user' | 'guest';
+export type UserRole = 'super' | 'admin' | 'user';
 
 /**
  * UserUpdate
@@ -264,20 +290,6 @@ export type UserUpdate = {
      */
     is_active?: boolean | null;
     role?: UserRole | null;
-};
-
-/**
- * UsersPublic
- */
-export type UsersPublic = {
-    /**
-     * Data
-     */
-    data: Array<UserPublic>;
-    /**
-     * Count
-     */
-    count: number;
 };
 
 /**
@@ -306,6 +318,20 @@ export type ValidationError = {
     ctx?: {
         [key: string]: unknown;
     };
+};
+
+export type MetricsMetricsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/metrics';
+};
+
+export type MetricsMetricsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
 };
 
 export type CheckDatabaseConnectionApiV1CheckDbConnectionGetData = {
@@ -405,15 +431,37 @@ export type GetWelcomeMessageApiV1GetResponse = GetWelcomeMessageApiV1GetRespons
 export type ReadUsersApiV1UsersGetData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Page
+         *
+         * Page number
+         */
+        page?: number;
+        /**
+         * Size
+         *
+         * Page size
+         */
+        size?: number;
+    };
     url: '/api/v1/users/';
 };
+
+export type ReadUsersApiV1UsersGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReadUsersApiV1UsersGetError = ReadUsersApiV1UsersGetErrors[keyof ReadUsersApiV1UsersGetErrors];
 
 export type ReadUsersApiV1UsersGetResponses = {
     /**
      * Successful Response
      */
-    200: UsersPublic;
+    200: PageUserPublic;
 };
 
 export type ReadUsersApiV1UsersGetResponse = ReadUsersApiV1UsersGetResponses[keyof ReadUsersApiV1UsersGetResponses];

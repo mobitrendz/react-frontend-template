@@ -1,0 +1,154 @@
+import { useState } from 'react'
+import { UserPlus, ShieldAlert } from 'lucide-react'
+import AdminUserTable from './AdminUserTable'
+import CreateAdminForm from './CreateAdminForm'
+import DeleteUserConfirmModal from './DeleteUserConfirmModal'
+import { UserPublic } from '../../client/types.gen'
+import { updateUserApiV1UsersIdPatch, deleteUserApiV1UsersIdDelete, createUserApiV1UsersPost } from '../../client/sdk.gen'
+import { Role, useAuth } from '../../contexts/AuthContext'
+
+interface AdminDashboardViewProps {
+  currentUser: UserPublic | null
+}
+
+const AdminDashboardView = ({ currentUser }: AdminDashboardViewProps) => {
+  const { role: currentUserRole, user: authUser } = useAuth()
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<UserPublic | null>(null)
+  const [newAdminEmail, setNewAdminEmail] = useState('')
+  const [newAdminPassword, setNewAdminPassword] = useState('')
+  const [newAdminFullName, setNewAdminFullName] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  // Key for forcing refresh of the table
+  const [tableKey, setTableKey] = useState(0)
+
+  const handleToggleStatus = async (user: UserPublic) => {
+    try {
+      await updateUserApiV1UsersIdPatch({
+        path: { id: user.id },
+        body: { is_active: !user.is_active } as any
+      })
+      setTableKey(prev => prev + 1)
+    } catch (err) {
+      console.error('Failed to toggle status:', err)
+    }
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
+    try {
+      setIsSubmitting(true)
+      await deleteUserApiV1UsersIdDelete({ path: { id: userToDelete.id } })
+      setUserToDelete(null)
+      setTableKey(prev => prev + 1)
+    } catch (err) {
+      console.error('Failed to delete user:', err)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteUser = (user: UserPublic) => {
+    setUserToDelete(user)
+  }
+
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    try {
+      setIsSubmitting(true)
+      
+      // Determination of role based on creator's permission
+      // SUPER can create Admins, ADMIN can only create regular Users
+      const targetRole = currentUserRole === Role.SUPER ? 'admin' : 'user'
+      
+      await createUserApiV1UsersPost({
+        body: {
+          email: newAdminEmail,
+          password: newAdminPassword,
+          full_name: newAdminFullName,
+          role: targetRole as any,
+          is_active: true
+        }
+      })
+      setIsCreatingAdmin(false)
+      setNewAdminEmail('')
+      setNewAdminPassword('')
+      setNewAdminFullName('')
+      setTableKey(prev => prev + 1)
+    } catch (err: any) {
+      setError(err.body?.detail || 'Failed to create user.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-[var(--text-h)]">
+            {currentUserRole === Role.SUPER ? 'Super User Control Center' : 'Identity & Access'}
+          </h2>
+          <p className="text-sm text-[var(--text-dim)]">
+            {currentUserRole === Role.SUPER ? 'Global system administration and security' : 'Manage system users and access levels'}
+          </p>
+        </div>
+        <button 
+          onClick={() => setIsCreatingAdmin(true)}
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all active:scale-95"
+        >
+          <UserPlus className="w-5 h-5" />
+          {currentUserRole === Role.SUPER ? 'Provision Admin' : 'Provision User'}
+        </button>
+      </div>
+
+      {isCreatingAdmin && (
+        <CreateAdminForm 
+          email={newAdminEmail}
+          fullName={newAdminFullName}
+          isSubmitting={isSubmitting}
+          isSuper={currentUserRole === Role.SUPER}
+          error={error}
+          onClose={() => setIsCreatingAdmin(false)}
+          onSubmit={handleCreateAdmin}
+          onEmailChange={setNewAdminEmail}
+          onPasswordChange={setNewAdminPassword}
+          onFullNameChange={setNewAdminFullName}
+        />
+      )}
+
+      {userToDelete && (
+        <DeleteUserConfirmModal 
+          userToDelete={userToDelete}
+          currentUserEmail={authUser?.email || ''}
+          isDeleting={isSubmitting}
+          onClose={() => setUserToDelete(null)}
+          onConfirm={confirmDeleteUser}
+        />
+      )}
+
+      <AdminUserTable 
+        key={tableKey}
+        currentUser={currentUser}
+        onToggleStatus={handleToggleStatus}
+        onDeleteUser={handleDeleteUser}
+      />
+
+      <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4">
+        <ShieldAlert className="w-6 h-6 text-amber-500 shrink-0" />
+        <div>
+          <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wider">Security Notice</h4>
+          <p className="text-xs text-[var(--text)] mt-1">
+            Administrative actions are logged. Changes to user status or role take effect upon their next session. 
+            Ensure you follow internal security protocols before provisioning new admin accounts.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default AdminDashboardView

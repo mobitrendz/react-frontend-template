@@ -132,7 +132,7 @@ describe('Profile Component', () => {
     })
 
     it('handles failed password verification for deletion', async () => {
-        vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValue({ body: { detail: 'Invalid' } } as any)
+        vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValue({ detail: 'Invalid' } as any)
         render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText(/Delete My Account/i))
