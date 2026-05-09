@@ -5,13 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run type-check && vite build",
     "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview",
     "generate-client": "openapi-ts",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "posttest:coverage": "node scripts/update-readme.js"
+    "posttest:coverage": "node scripts/update-readme.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{css,scss,md,json}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",
@@ -36,7 +48,11 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.3",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
     "vite": "^8.0.10",
     "vitest": "^4.1.5"
   }
