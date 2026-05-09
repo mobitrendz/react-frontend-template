@@ -6,10 +6,11 @@
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
-## 🧪 Unit Testing & Coverage
+## 🧪 Unit Testing & Quality Assurance
 
-The project maintains high standards for reliability with a comprehensive test suite.
+The project maintains high standards for reliability with a comprehensive test suite and automated quality gates.
 
+### Test Coverage Status
 | Category | Coverage |
 | :--- | :--- |
 | **Statements** | **88.72%** |
@@ -17,12 +18,34 @@ The project maintains high standards for reliability with a comprehensive test s
 | **Functions** | **87.65%** |
 | **Branches** | **75.22%** |
 
+### Testing Stack
+- **Vitest**: A blazing fast unit test framework powered by Vite.
+- **React Testing Library**: Light-weight library for testing React components.
+- **JSDOM**: A pure-JavaScript implementation of various web standards for use with Node.js.
+- **MSW (Mock Service Worker)**: (Optional) Used for intercepting network requests at the service worker level.
+
 ### Execution Commands
 ```bash
-npm test          # Watch mode
-npm test -- --run # Single run
-npm run test:coverage # Generate coverage report
+npm test              # Run vitest in interactive watch mode
+npm run test:run      # Single run (useful for CI)
+npm run test:coverage # Generate comprehensive coverage report in /coverage
 ```
+
+## 🛡️ Automated Quality Checks
+
+To ensure code consistency and prevent regressions, we use a multi-layered validation system.
+
+### Local Git Hooks (Husky & lint-staged)
+Before every commit, the following checks are performed automatically:
+1.  **ESLint**: Validates code quality and identifies potential bugs.
+2.  **Prettier**: Ensures consistent code formatting across the project.
+3.  **Type-Check**: Runs `tsc --noEmit` to verify type safety.
+
+### Pre-commit Framework
+We integrate the `pre-commit` framework to mirror the backend's validation philosophy. This ensures that only high-quality, valid code enters the repository.
+
+### CI/CD Synchronization
+Our **GitHub Actions** workflow (`frontend.yml`) is pinned to the same Node.js version and uses the exact same `pre-commit` hooks. This eliminates the "it works on my machine" problem by enforcing identical rules in local and CI environments.
 
 ## 🚀 Key Features
 
