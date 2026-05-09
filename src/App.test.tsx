@@ -1,33 +1,61 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import App from './App'
-import { auth } from './lib/auth'
+import { useAuth, Role } from './contexts/AuthContext'
 
 vi.mock('./lib/auth', () => ({
     auth: {
         initialize: vi.fn(),
         isAuthenticated: vi.fn(),
-        clearToken: vi.fn()
+        clearToken: vi.fn(),
+        getToken: vi.fn(),
+        setToken: vi.fn()
     }
 }))
 
+vi.mock('./contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+    Role: {
+        SUPER: 'SUPER',
+        ADMIN: 'ADMIN',
+        USER: 'USER'
+    },
+    AuthProvider: ({ children }: any) => <div>{children}</div>
+}))
+
+// Mock BrowserRouter to use MemoryRouter internally for tests
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom')
+    return {
+        ...actual,
+        BrowserRouter: ({ children }: any) => <div>{children}</div>
+    }
+})
+
 // Mock components to simplify
 vi.mock('./components/Login', () => ({
-    default: ({ onLoginSuccess }: any) => (
-        <div>
-            Login Page
-            <button onClick={onLoginSuccess}>Mock Login</button>
-        </div>
-    )
+    default: () => {
+        const { login } = useAuth()
+        return (
+            <div>
+                Login Page
+                <button onClick={() => login('token')}>Mock Login</button>
+            </div>
+        )
+    }
 }))
 
 vi.mock('./components/Dashboard', () => ({
-    default: ({ onLogout }: any) => (
-        <div>
-            Dashboard Page
-            <button onClick={onLogout}>Mock Logout</button>
-        </div>
-    )
+    default: () => {
+        const { logout } = useAuth()
+        return (
+            <div>
+                Dashboard Page
+                <button onClick={logout}>Mock Logout</button>
+            </div>
+        )
+    }
 }))
 
 vi.mock('./components/Profile', () => ({
@@ -35,38 +63,93 @@ vi.mock('./components/Profile', () => ({
 }))
 
 describe('App Component', () => {
+    const mockLogin = vi.fn()
+    const mockLogout = vi.fn()
+
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(useAuth).mockReturnValue({
+            isAuthenticated: false,
+            isLoading: false,
+            user: null,
+            role: null,
+            login: mockLogin,
+            logout: mockLogout,
+            hasPermission: vi.fn(),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: null
+        })
     })
 
     it('renders login page when not authenticated', () => {
-        vi.mocked(auth.isAuthenticated).mockReturnValue(false)
-        render(<App />)
-        
+        render(
+            <MemoryRouter initialEntries={['/']}>
+                <App />
+            </MemoryRouter>
+        )
         expect(screen.getByText('Login Page')).toBeInTheDocument()
     })
 
-    it('renders dashboard when authenticated', () => {
-        vi.mocked(auth.isAuthenticated).mockReturnValue(true)
-        render(<App />)
+    it('renders dashboard when authenticated', async () => {
+        vi.mocked(useAuth).mockReturnValue({
+            isAuthenticated: true,
+            isLoading: false,
+            user: { id: '1', email: 't@t.com', role: 'USER', is_active: true } as any,
+            role: Role.USER,
+            login: mockLogin,
+            logout: mockLogout,
+            hasPermission: vi.fn(() => true),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: 't'
+        })
         
-        expect(screen.getByText('Dashboard Page')).toBeInTheDocument()
+        render(
+            <MemoryRouter initialEntries={['/']}>
+                <App />
+            </MemoryRouter>
+        )
+        
+        expect(await screen.findByText('Dashboard Page')).toBeInTheDocument()
     })
 
-    it('handles login and logout cycle', () => {
-        vi.mocked(auth.isAuthenticated).mockReturnValue(false)
-        render(<App />)
+    it('handles login and logout cycle', async () => {
+        const { rerender } = render(
+            <MemoryRouter initialEntries={['/']}>
+                <App />
+            </MemoryRouter>
+        )
         
-        // Initial state: Login
         expect(screen.getByText('Login Page')).toBeInTheDocument()
         
-        // Mock login
+        // Mock login transition
         fireEvent.click(screen.getByText('Mock Login'))
-        expect(screen.getByText('Dashboard Page')).toBeInTheDocument()
+        expect(mockLogin).toHaveBeenCalledWith('token')
+
+        // Update mock for "authenticated" state
+        vi.mocked(useAuth).mockReturnValue({
+            isAuthenticated: true,
+            isLoading: false,
+            user: { id: '1', email: 't@t.com', role: 'USER', is_active: true } as any,
+            role: Role.USER,
+            login: mockLogin,
+            logout: mockLogout,
+            hasPermission: vi.fn(() => true),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: 't'
+        })
         
-        // Mock logout
+        rerender(
+            <MemoryRouter initialEntries={['/']}>
+                <App />
+            </MemoryRouter>
+        )
+        
+        expect(await screen.findByText('Dashboard Page')).toBeInTheDocument()
+        
         fireEvent.click(screen.getByText('Mock Logout'))
-        expect(auth.clearToken).toHaveBeenCalled()
-        expect(screen.getByText('Login Page')).toBeInTheDocument()
+        expect(mockLogout).toHaveBeenCalled()
     })
 })

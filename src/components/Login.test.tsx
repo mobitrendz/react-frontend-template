@@ -1,8 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import Login from './Login'
 import { loginAccessTokenApiV1LoginAccessTokenPost, registerUserApiV1LoginSignupPost } from '../client'
-import { auth } from '../lib/auth'
+import { useAuth, Role } from '../contexts/AuthContext'
 
 // Mock the SDK and auth
 vi.mock('../client', () => ({
@@ -13,36 +14,61 @@ vi.mock('../client', () => ({
 vi.mock('../lib/auth', () => ({
     auth: {
         setToken: vi.fn(),
-        clearToken: vi.fn()
+        clearToken: vi.fn(),
+        getToken: vi.fn(),
+        isAuthenticated: vi.fn(),
+        initialize: vi.fn()
     }
 }))
 
+vi.mock('../contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+    Role: {
+        SUPER: 'SUPER',
+        ADMIN: 'ADMIN',
+        USER: 'USER'
+    },
+    AuthProvider: ({ children }: any) => <div>{children}</div>
+}))
+
 describe('Login Component', () => {
+    const mockLogin = vi.fn()
+
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(useAuth).mockReturnValue({
+            login: mockLogin,
+            logout: vi.fn(),
+            user: null,
+            role: null,
+            isAuthenticated: false,
+            isLoading: false,
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            hasPermission: vi.fn(),
+            token: null
+        })
         window.alert = vi.fn()
     })
 
     it('handles successful login', async () => {
-        const onLoginSuccess = vi.fn()
         vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({ 
             data: { access_token: 'fake-token' } 
         } as any)
 
-        render(<Login onLoginSuccess={onLoginSuccess} />)
+        render(<MemoryRouter><Login /></MemoryRouter>)
         
         fireEvent.change(screen.getByPlaceholderText(/Username \/ Email/i), { target: { value: 'test@example.com' } })
         fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: 'password123' } })
         fireEvent.click(screen.getByRole('button', { name: /Sign in/i }))
 
         await waitFor(() => {
-            expect(auth.setToken).toHaveBeenCalledWith('fake-token')
-            expect(onLoginSuccess).toHaveBeenCalled()
+            expect(mockLogin).toHaveBeenCalledWith('fake-token')
         })
     })
 
     it('handles login failure and inactive user', async () => {
-        render(<Login onLoginSuccess={() => {}} />)
+        render(<MemoryRouter><Login /></MemoryRouter>)
         
         const usernameInput = screen.getByPlaceholderText(/Username \/ Email/i)
         const passwordInput = screen.getByPlaceholderText(/Password/i)
@@ -67,7 +93,7 @@ describe('Login Component', () => {
     })
 
     it('handles signup workflow and errors', async () => {
-        render(<Login onLoginSuccess={() => {}} />)
+        render(<MemoryRouter><Login /></MemoryRouter>)
         
         // 1. Success path
         vi.mocked(registerUserApiV1LoginSignupPost).mockResolvedValueOnce({ data: {} } as any)

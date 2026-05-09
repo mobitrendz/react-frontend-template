@@ -3,23 +3,57 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import Profile from './Profile'
 import * as sdk from '../client/sdk.gen'
+import { useAuth, Role } from '../contexts/AuthContext'
 
 // Mock the entire SDK
 vi.mock('../client/sdk.gen', () => ({
-    getCurrentUserApiV1LoginCurrentUserGet: vi.fn(),
-    updateUserApiV1UsersIdPatch: vi.fn(),
-    deleteUserApiV1UsersIdDelete: vi.fn(),
-    readTodosApiV1TodosGet: vi.fn(),
-    deleteTodoApiV1TodosIdDelete: vi.fn(),
-    loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(),
-    updatePasswordApiV1UsersPasswordPatch: vi.fn()
+    getCurrentUserApiV1LoginCurrentUserGet: vi.fn(() => Promise.resolve({ data: {} })),
+    updateUserApiV1UsersIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
+    deleteUserApiV1UsersIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+    readTodosApiV1TodosGet: vi.fn(() => Promise.resolve({ data: { data: [], count: 0 } })),
+    deleteTodoApiV1TodosIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+    loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() => Promise.resolve({ data: {} })),
+    updatePasswordApiV1UsersPasswordPatch: vi.fn(() => Promise.resolve({ data: {} }))
+}))
+
+vi.mock('../lib/auth', () => ({
+    auth: {
+        initialize: vi.fn(),
+        isAuthenticated: vi.fn(),
+        clearToken: vi.fn(),
+        getToken: vi.fn(),
+        setToken: vi.fn()
+    }
+}))
+
+vi.mock('../contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+    Role: {
+        SUPER: 'SUPER',
+        ADMIN: 'ADMIN',
+        USER: 'USER'
+    },
+    AuthProvider: ({ children }: any) => <div>{children}</div>
 }))
 
 describe('Profile Component', () => {
     const mockUser = { id: 'user-123', email: 'john@example.com', full_name: 'John Doe', role: 'user', is_active: true }
+    const mockLogout = vi.fn()
 
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(useAuth).mockReturnValue({
+            user: mockUser as any,
+            role: Role.USER,
+            isAuthenticated: true,
+            isLoading: false,
+            login: vi.fn(),
+            logout: mockLogout,
+            hasPermission: vi.fn((r) => r === Role.USER),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: 'fake-token'
+        })
         vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockUser } as any)
         window.alert = vi.fn()
         window.confirm = vi.fn(() => true)
@@ -27,7 +61,7 @@ describe('Profile Component', () => {
 
     it('handles profile update', async () => {
         vi.mocked(sdk.updateUserApiV1UsersIdPatch).mockResolvedValue({ data: { ...mockUser, full_name: 'John Updated' } } as any)
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText(/Edit Profile/i))
         const nameInput = await screen.findByLabelText(/Full Name/i)
@@ -40,7 +74,7 @@ describe('Profile Component', () => {
     })
 
     it('handles password validation mismatch', async () => {
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText('Change Password'))
         
@@ -58,7 +92,7 @@ describe('Profile Component', () => {
 
     it('handles successful password update', async () => {
         vi.mocked(sdk.updatePasswordApiV1UsersPasswordPatch).mockResolvedValue({ data: {} } as any)
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText('Change Password'))
         
@@ -71,27 +105,26 @@ describe('Profile Component', () => {
     })
 
     it('handles deletion process', async () => {
-        const onLogout = vi.fn()
         vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({ data: { access_token: 'v' } } as any)
         vi.mocked(sdk.readTodosApiV1TodosGet).mockResolvedValue({ data: { data: [] } } as any)
         vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockResolvedValue({ data: {} } as any)
 
-        render(<MemoryRouter><Profile onLogout={onLogout} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         fireEvent.click(await screen.findByText(/Delete My Account/i))
         
         const confirmInput = await screen.findByLabelText(/Confirm Password to Delete/i)
         fireEvent.change(confirmInput, { target: { value: 'pass' } })
-        fireEvent.click(screen.getByRole('button', { name: /Verify & Delete/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Confirm Deletion/i }))
         
         await waitFor(() => {
             expect(sdk.deleteUserApiV1UsersIdDelete).toHaveBeenCalled()
-            expect(onLogout).toHaveBeenCalled()
+            expect(mockLogout).toHaveBeenCalled()
         })
     })
 
     it('handles password update failure', async () => {
         vi.mocked(sdk.updatePasswordApiV1UsersPasswordPatch).mockRejectedValue({ body: { detail: 'Incorrect password' } } as any)
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText('Change Password'))
         fireEvent.change(await screen.findByLabelText(/Current Password/i), { target: { value: 'wrong' } })
@@ -107,10 +140,10 @@ describe('Profile Component', () => {
         vi.mocked(sdk.readTodosApiV1TodosGet).mockResolvedValue({ data: { data: [] } } as any)
         vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockRejectedValue(new Error('API Error'))
 
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         fireEvent.click(await screen.findByText(/Delete My Account/i))
         fireEvent.change(await screen.findByLabelText(/Confirm Password to Delete/i), { target: { value: 'pass' } })
-        fireEvent.click(screen.getByRole('button', { name: /Verify & Delete/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Confirm Deletion/i }))
         
         await waitFor(() => {
             expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('error occurred while deleting your account'))
@@ -118,14 +151,14 @@ describe('Profile Component', () => {
     })
 
     it('handles cancelling profile edit', async () => {
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         fireEvent.click(await screen.findByText(/Edit Profile/i))
         fireEvent.click(screen.getByRole('button', { name: /Cancel/i }))
         expect(screen.queryByLabelText(/Full Name/i)).not.toBeInTheDocument()
     })
 
     it('handles cancelling password change', async () => {
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         fireEvent.click(await screen.findByText('Change Password'))
         fireEvent.click(screen.getByRole('button', { name: /Cancel/i }))
         expect(screen.queryByLabelText(/Current Password/i)).not.toBeInTheDocument()
@@ -133,11 +166,11 @@ describe('Profile Component', () => {
 
     it('handles failed password verification for deletion', async () => {
         vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValue({ detail: 'Invalid' } as any)
-        render(<MemoryRouter><Profile onLogout={() => {}} /></MemoryRouter>)
+        render(<MemoryRouter><Profile /></MemoryRouter>)
         
         fireEvent.click(await screen.findByText(/Delete My Account/i))
         fireEvent.change(await screen.findByLabelText(/Confirm Password to Delete/i), { target: { value: 'wrong' } })
-        fireEvent.click(screen.getByRole('button', { name: /Verify & Delete/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Confirm Deletion/i }))
         
         expect(await screen.findByText(/Invalid password/i)).toBeInTheDocument()
     })

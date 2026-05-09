@@ -5,16 +5,19 @@ import App from '../App';
 import Dashboard from './Dashboard';
 import * as sdk from '../client/sdk.gen';
 
+import { useAuth, Role } from '../contexts/AuthContext';
+
 vi.mock('../client/sdk.gen', () => ({
-  getCurrentUserApiV1LoginCurrentUserGet: vi.fn(),
-  readTodosApiV1TodosGet: vi.fn(),
-  createTodoApiV1TodosPost: vi.fn(),
-  readUsersApiV1UsersGet: vi.fn(),
-  deleteUserApiV1UsersIdDelete: vi.fn(),
-  updateTodoApiV1TodosIdPatch: vi.fn(),
-  createUserApiV1UsersPost: vi.fn(),
-  updateUserApiV1UsersIdPatch: vi.fn(),
-  deleteTodoApiV1TodosIdDelete: vi.fn(),
+  getCurrentUserApiV1LoginCurrentUserGet: vi.fn(() => Promise.resolve({ data: {} })),
+  readTodosApiV1TodosGet: vi.fn(() => Promise.resolve({ data: { data: [], count: 0 } })),
+  createTodoApiV1TodosPost: vi.fn(() => Promise.resolve({ data: {} })),
+  readUsersApiV1UsersGet: vi.fn(() => Promise.resolve({ data: { items: [], total: 0 } })),
+  deleteUserApiV1UsersIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+  updateTodoApiV1TodosIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
+  createUserApiV1UsersPost: vi.fn(() => Promise.resolve({ data: {} })),
+  updateUserApiV1UsersIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
+  deleteTodoApiV1TodosIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+  loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() => Promise.resolve({ data: {} }))
 }));
 
 vi.mock('../lib/auth', () => ({
@@ -22,7 +25,19 @@ vi.mock('../lib/auth', () => ({
     initialize: vi.fn(),
     isAuthenticated: vi.fn(),
     clearToken: vi.fn(),
+    getToken: vi.fn(),
+    setToken: vi.fn()
   },
+}));
+
+vi.mock('../contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
+  Role: {
+    SUPER: 'SUPER',
+    ADMIN: 'ADMIN',
+    USER: 'USER'
+  },
+  AuthProvider: ({ children }: any) => <div>{children}</div>
 }));
 
 vi.mock('./Login', () => ({
@@ -39,8 +54,23 @@ vi.mock('./Profile', () => ({
 }));
 
 describe('App routing & auth flow', () => {
+  const mockLogin = vi.fn();
+  const mockLogout = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      role: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: mockLogin,
+      logout: mockLogout,
+      hasPermission: vi.fn(),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: null
+    });
   });
 
   it('redirects unknown route to login when unauthenticated', async () => {
@@ -52,17 +82,37 @@ describe('App routing & auth flow', () => {
   });
 
   it('allows access to profile when authenticated', async () => {
-    const { auth } = await import('../lib/auth');
-    vi.mocked(auth.isAuthenticated).mockReturnValue(true);
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 'u1', email: 'u@x.com', role: 'user', is_active: true },
+      role: Role.USER,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: mockLogout,
+      hasPermission: vi.fn(() => true),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     window.history.pushState({}, 'Test', '/profile');
     render(<App />);
     expect(screen.getByText('Profile Page')).toBeInTheDocument();
   });
 
   it('handles logout from dashboard and returns to login', async () => {
-    const { auth } = await import('../lib/auth');
-    vi.mocked(auth.isAuthenticated).mockReturnValue(true);
     const mockUser = { id: 'u1', email: 'user@x.com', role: 'user', full_name: 'User One', is_active: true };
+    vi.mocked(useAuth).mockReturnValue({
+      user: mockUser as any,
+      role: Role.USER,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: mockLogout,
+      hasPermission: vi.fn(() => true),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({ data: mockUser } as any);
     (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({ data: { data: [], count: 0 } } as any);
 
@@ -72,7 +122,22 @@ describe('App routing & auth flow', () => {
     await screen.findByText(/My Tasks/i);
     
     fireEvent.click(screen.getByText(/Sign Out/i));
-    expect(auth.clearToken).toHaveBeenCalled();
+    expect(mockLogout).toHaveBeenCalled();
+    
+    // Simulate navigation to login after logout
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      role: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: vi.fn(),
+      logout: mockLogout,
+      hasPermission: vi.fn(),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: null
+    });
+    
     await waitFor(() => expect(screen.getByText('Login Page')).toBeInTheDocument());
   });
 });
@@ -82,12 +147,36 @@ describe('Dashboard edge cases', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      user: mockUser as any,
+      role: Role.USER,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn((r) => r === Role.USER),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     window.alert = vi.fn();
     window.confirm = vi.fn(() => true);
   });
 
   it('admin can delete a user and sees confirmation', async () => {
     const adminUser = { ...mockUser, role: 'admin' };
+    vi.mocked(useAuth).mockReturnValue({
+      user: adminUser as any,
+      role: Role.ADMIN,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     const users = [{ id: '2', email: 'delete@x.com', role: 'user', is_active: true }];
     vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: users, total: 1 } } as any);
@@ -103,7 +192,15 @@ describe('Dashboard edge cases', () => {
     await screen.findByText('delete@x.com');
     fireEvent.click(screen.getByTitle(/Delete User/i));
     
-    expect(window.confirm).toHaveBeenCalled();
+    // Custom Modal shows up, enter password
+    const passwordInput = await screen.findByPlaceholderText(/Enter your current password/i);
+    fireEvent.change(passwordInput, { target: { value: 'password' } });
+    
+    // Mock successful password verification
+    vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({ data: { access_token: 'valid' } } as any);
+    
+    fireEvent.click(screen.getByRole('button', { name: /Confirm Delete/i }));
+    
     await waitFor(() => expect(sdk.deleteUserApiV1UsersIdDelete).toHaveBeenCalledWith({ path: { id: '2' } }));
   });
 
@@ -162,6 +259,18 @@ describe('Dashboard edge cases', () => {
 
   it('admin can create a new admin account', async () => {
     const adminUser = { ...mockUser, role: 'admin' };
+    vi.mocked(useAuth).mockReturnValue({
+      user: adminUser as any,
+      role: Role.ADMIN,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: [], total: 0 } } as any);
     (sdk.createUserApiV1UsersPost as any).mockResolvedValue({ data: {} } as any);
@@ -173,24 +282,36 @@ describe('Dashboard edge cases', () => {
     );
 
     await screen.findByText(/Identity & Access/i);
-    fireEvent.click(screen.getByRole('button', { name: /Provision Admin/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Provision User/i }));
     
-    fireEvent.change(screen.getByPlaceholderText(/admin@company\.com/i), { target: { value: 'newadmin@x.com' } });
+    fireEvent.change(screen.getByPlaceholderText(/user@example\.com/i), { target: { value: 'newadmin@x.com' } });
     fireEvent.change(screen.getByLabelText(/Temporary Password/i), { target: { value: 'password123' } });
     fireEvent.change(screen.getByPlaceholderText(/e\.g\. Sarah Connor/i), { target: { value: 'New Admin' } });
     
-    fireEvent.click(screen.getByRole('button', { name: /Create Admin Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Create User Account/i }));
     
     await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalledWith({
       body: expect.objectContaining({
         email: 'newadmin@x.com',
-        role: 'admin'
+        role: 'user'
       })
     }));
   });
 
   it('admin can toggle user active status', async () => {
     const adminUser = { ...mockUser, role: 'admin' };
+    vi.mocked(useAuth).mockReturnValue({
+      user: adminUser as any,
+      role: Role.ADMIN,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
+      accessDenied: false,
+      setAccessDenied: vi.fn(),
+      token: 'valid'
+    });
     const otherUser = { id: '2', email: 'user2@x.com', role: 'user', is_active: true };
     vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: [otherUser], total: 1 } } as any);

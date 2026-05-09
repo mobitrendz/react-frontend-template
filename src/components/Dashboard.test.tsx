@@ -3,23 +3,57 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import Dashboard from './Dashboard'
 import * as sdk from '../client/sdk.gen'
+import { useAuth, Role } from '../contexts/AuthContext'
 
 // Mock the entire SDK
 vi.mock('../client/sdk.gen', () => ({
-    getCurrentUserApiV1LoginCurrentUserGet: vi.fn(),
-    readTodosApiV1TodosGet: vi.fn(),
-    readUsersApiV1UsersGet: vi.fn(),
-    createTodoApiV1TodosPost: vi.fn(),
-    deleteTodoApiV1TodosIdDelete: vi.fn(),
-    deleteUserApiV1UsersIdDelete: vi.fn(),
-    updateTodoApiV1TodosIdPatch: vi.fn(),
-    updateUserApiV1UsersIdPatch: vi.fn(),
-    createUserApiV1UsersPost: vi.fn()
+    getCurrentUserApiV1LoginCurrentUserGet: vi.fn(() => Promise.resolve({ data: {} })),
+    readTodosApiV1TodosGet: vi.fn(() => Promise.resolve({ data: { data: [], count: 0 } })),
+    readUsersApiV1UsersGet: vi.fn(() => Promise.resolve({ data: { items: [], total: 0 } })),
+    createTodoApiV1TodosPost: vi.fn(() => Promise.resolve({ data: {} })),
+    deleteTodoApiV1TodosIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+    deleteUserApiV1UsersIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
+    updateTodoApiV1TodosIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
+    updateUserApiV1UsersIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
+    createUserApiV1UsersPost: vi.fn(() => Promise.resolve({ data: {} })),
+    loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() => Promise.resolve({ data: {} }))
+}))
+
+vi.mock('../lib/auth', () => ({
+    auth: {
+        initialize: vi.fn(),
+        isAuthenticated: vi.fn(),
+        clearToken: vi.fn(),
+        getToken: vi.fn(),
+        setToken: vi.fn()
+    }
+}))
+
+vi.mock('../contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+    Role: {
+        SUPER: 'SUPER',
+        ADMIN: 'ADMIN',
+        USER: 'USER'
+    },
+    AuthProvider: ({ children }: any) => <div>{children}</div>
 }))
 
 describe('Dashboard Component', () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(useAuth).mockReturnValue({
+            user: { id: 'user-1', email: 'user@test.com', role: 'user', full_name: 'Normal User', is_active: true },
+            role: Role.USER,
+            isAuthenticated: true,
+            isLoading: false,
+            login: vi.fn(),
+            logout: vi.fn(),
+            hasPermission: vi.fn((r) => r === Role.USER),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: 'fake-token'
+        })
         window.alert = vi.fn()
         window.confirm = vi.fn(() => true)
     })
@@ -46,6 +80,19 @@ describe('Dashboard Component', () => {
     })
 
     it('handles admin management workflow', async () => {
+        vi.mocked(useAuth).mockReturnValue({
+            user: mockAdmin as any,
+            role: Role.ADMIN,
+            isAuthenticated: true,
+            isLoading: false,
+            login: vi.fn(),
+            logout: vi.fn(),
+            hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
+            accessDenied: false,
+            setAccessDenied: vi.fn(),
+            token: 'fake-token'
+        })
+
         const users = [{ id: '1', email: 'a@test.com', role: 'user', is_active: true }]
         vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: mockAdmin } as any)
         vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: users, total: 1 } } as any)
@@ -56,13 +103,13 @@ describe('Dashboard Component', () => {
         // Wait for the table to load
         await screen.findByText('a@test.com')
 
-        // Click Provision Admin
-        fireEvent.click(screen.getByText(/Provision Admin/i))
+        // Click Provision User
+        fireEvent.click(screen.getByText(/Provision User/i))
         
         const emailInput = await screen.findByLabelText(/Email Address/i)
         fireEvent.change(emailInput, { target: { value: 'new@admin.com' } })
         fireEvent.change(screen.getByLabelText(/Temporary Password/i), { target: { value: 'pass' } })
-        fireEvent.click(screen.getByRole('button', { name: /Create Admin Account/i }))
+        fireEvent.click(screen.getByRole('button', { name: /Create User Account/i }))
         
         await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalled())
     })
