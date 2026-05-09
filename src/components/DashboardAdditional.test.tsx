@@ -1,46 +1,60 @@
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
-import App from '../App';
-import Dashboard from './Dashboard';
-import * as sdk from '../client/sdk.gen';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import App from "../App";
+import Dashboard from "./Dashboard";
+import * as sdk from "../client/sdk.gen";
 
-import { useAuth, Role } from '../contexts/AuthContext';
+import { useAuth, Role } from "../contexts/AuthContext";
 
-vi.mock('../client/sdk.gen', () => ({
-  getCurrentUserApiV1LoginCurrentUserGet: vi.fn(() => Promise.resolve({ data: {} })),
-  readTodosApiV1TodosGet: vi.fn(() => Promise.resolve({ data: { data: [], count: 0 } })),
+vi.mock("../client/sdk.gen", () => ({
+  getCurrentUserApiV1LoginCurrentUserGet: vi.fn(() =>
+    Promise.resolve({ data: {} }),
+  ),
+  readTodosApiV1TodosGet: vi.fn(() =>
+    Promise.resolve({ data: { data: [], count: 0 } }),
+  ),
   createTodoApiV1TodosPost: vi.fn(() => Promise.resolve({ data: {} })),
-  readUsersApiV1UsersGet: vi.fn(() => Promise.resolve({ data: { items: [], total: 0 } })),
+  readUsersApiV1UsersGet: vi.fn(() =>
+    Promise.resolve({ data: { items: [], total: 0 } }),
+  ),
   deleteUserApiV1UsersIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
   updateTodoApiV1TodosIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
   createUserApiV1UsersPost: vi.fn(() => Promise.resolve({ data: {} })),
   updateUserApiV1UsersIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
   deleteTodoApiV1TodosIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
-  loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() => Promise.resolve({ data: {} }))
+  loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() =>
+    Promise.resolve({ data: {} }),
+  ),
 }));
 
-vi.mock('../lib/auth', () => ({
+vi.mock("../lib/auth", () => ({
   auth: {
     initialize: vi.fn(),
     isAuthenticated: vi.fn(),
     clearToken: vi.fn(),
     getToken: vi.fn(),
-    setToken: vi.fn()
+    setToken: vi.fn(),
   },
 }));
 
-vi.mock('../contexts/AuthContext', () => ({
+vi.mock("../contexts/AuthContext", () => ({
   useAuth: vi.fn(),
   Role: {
-    SUPER: 'SUPER',
-    ADMIN: 'ADMIN',
-    USER: 'USER'
+    SUPER: "SUPER",
+    ADMIN: "ADMIN",
+    USER: "USER",
   },
-  AuthProvider: ({ children }: any) => <div>{children}</div>
+  AuthProvider: ({ children }: any) => <div>{children}</div>,
 }));
 
-vi.mock('./Login', () => ({
+vi.mock("./Login", () => ({
   default: ({ onLoginSuccess }: any) => (
     <div>
       Login Page
@@ -49,11 +63,11 @@ vi.mock('./Login', () => ({
   ),
 }));
 
-vi.mock('./Profile', () => ({
+vi.mock("./Profile", () => ({
   default: () => <div>Profile Page</div>,
 }));
 
-describe('App routing & auth flow', () => {
+describe("App routing & auth flow", () => {
   const mockLogin = vi.fn();
   const mockLogout = vi.fn();
 
@@ -69,21 +83,21 @@ describe('App routing & auth flow', () => {
       hasPermission: vi.fn(),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: null
+      token: null,
     });
   });
 
-  it('redirects unknown route to login when unauthenticated', async () => {
-    const { auth } = await import('../lib/auth');
+  it("redirects unknown route to login when unauthenticated", async () => {
+    const { auth } = await import("../lib/auth");
     vi.mocked(auth.isAuthenticated).mockReturnValue(false);
-    window.history.pushState({}, 'Test', '/unknown');
+    window.history.pushState({}, "Test", "/unknown");
     render(<App />);
-    expect(screen.getByText('Login Page')).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 
-  it('allows access to profile when authenticated', async () => {
+  it("allows access to profile when authenticated", async () => {
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: 'u1', email: 'u@x.com', role: 'user', is_active: true },
+      user: { id: "u1", email: "u@x.com", role: "user", is_active: true },
       role: Role.USER,
       isAuthenticated: true,
       isLoading: false,
@@ -92,15 +106,21 @@ describe('App routing & auth flow', () => {
       hasPermission: vi.fn(() => true),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
-    window.history.pushState({}, 'Test', '/profile');
+    window.history.pushState({}, "Test", "/profile");
     render(<App />);
-    expect(screen.getByText('Profile Page')).toBeInTheDocument();
+    expect(screen.getByText("Profile Page")).toBeInTheDocument();
   });
 
-  it('handles logout from dashboard and returns to login', async () => {
-    const mockUser = { id: 'u1', email: 'user@x.com', role: 'user', full_name: 'User One', is_active: true };
+  it("handles logout from dashboard and returns to login", async () => {
+    const mockUser = {
+      id: "u1",
+      email: "user@x.com",
+      role: "user",
+      full_name: "User One",
+      is_active: true,
+    };
     vi.mocked(useAuth).mockReturnValue({
       user: mockUser as any,
       role: Role.USER,
@@ -111,19 +131,23 @@ describe('App routing & auth flow', () => {
       hasPermission: vi.fn(() => true),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
-    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({ data: mockUser } as any);
-    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({ data: { data: [], count: 0 } } as any);
+    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({
+      data: mockUser,
+    } as any);
+    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({
+      data: { data: [], count: 0 },
+    } as any);
 
-    window.history.pushState({}, 'Test', '/');
+    window.history.pushState({}, "Test", "/");
     render(<App />);
 
     await screen.findByText(/My Tasks/i);
-    
+
     fireEvent.click(screen.getByText(/Sign Out/i));
     expect(mockLogout).toHaveBeenCalled();
-    
+
     // Simulate navigation to login after logout
     vi.mocked(useAuth).mockReturnValue({
       user: null,
@@ -135,15 +159,23 @@ describe('App routing & auth flow', () => {
       hasPermission: vi.fn(),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: null
+      token: null,
     });
-    
-    await waitFor(() => expect(screen.getByText('Login Page')).toBeInTheDocument());
+
+    await waitFor(() =>
+      expect(screen.getByText("Login Page")).toBeInTheDocument(),
+    );
   });
 });
 
-describe('Dashboard edge cases', () => {
-  const mockUser = { id: 'u1', email: 'user@x.com', role: 'user', full_name: 'User One', is_active: true };
+describe("Dashboard edge cases", () => {
+  const mockUser = {
+    id: "u1",
+    email: "user@x.com",
+    role: "user",
+    full_name: "User One",
+    is_active: true,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -157,14 +189,14 @@ describe('Dashboard edge cases', () => {
       hasPermission: vi.fn((r) => r === Role.USER),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
     window.alert = vi.fn();
     window.confirm = vi.fn(() => true);
   });
 
-  it('admin can delete a user and sees confirmation', async () => {
-    const adminUser = { ...mockUser, role: 'admin' };
+  it("admin can delete a user and sees confirmation", async () => {
+    const adminUser = { ...mockUser, role: "admin" };
     vi.mocked(useAuth).mockReturnValue({
       user: adminUser as any,
       role: Role.ADMIN,
@@ -175,90 +207,142 @@ describe('Dashboard edge cases', () => {
       hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
-    const users = [{ id: '2', email: 'delete@x.com', role: 'user', is_active: true }];
-    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
-    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: users, total: 1 } } as any);
-    vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockResolvedValue({ data: {} } as any);
+    const users = [
+      { id: "2", email: "delete@x.com", role: "user", is_active: true },
+    ];
+    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({
+      data: adminUser,
+    } as any);
+    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
+      data: { items: users, total: 1 },
+    } as any);
+    vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockResolvedValue({
+      data: {},
+    } as any);
 
     render(
       <MemoryRouter>
         <Dashboard onLogout={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/Identity & Access/i);
-    await screen.findByText('delete@x.com');
+    await screen.findByText("delete@x.com");
     fireEvent.click(screen.getByTitle(/Delete User/i));
-    
+
     // Custom Modal shows up, enter password
-    const passwordInput = await screen.findByPlaceholderText(/Enter your current password/i);
-    fireEvent.change(passwordInput, { target: { value: 'password' } });
-    
+    const passwordInput = await screen.findByPlaceholderText(
+      /Enter your current password/i,
+    );
+    fireEvent.change(passwordInput, { target: { value: "password" } });
+
     // Mock successful password verification
-    vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({ data: { access_token: 'valid' } } as any);
-    
-    fireEvent.click(screen.getByRole('button', { name: /Confirm Delete/i }));
-    
-    await waitFor(() => expect(sdk.deleteUserApiV1UsersIdDelete).toHaveBeenCalledWith({ path: { id: '2' } }));
+    vi.mocked(sdk.loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValue({
+      data: { access_token: "valid" },
+    } as any);
+
+    fireEvent.click(screen.getByRole("button", { name: /Confirm Delete/i }));
+
+    await waitFor(() =>
+      expect(sdk.deleteUserApiV1UsersIdDelete).toHaveBeenCalledWith({
+        path: { id: "2" },
+      }),
+    );
   });
 
-  it('user can search for tasks', async () => {
+  it("user can search for tasks", async () => {
     const tasks = [
-      { id: '1', title: 'Task One', description: 'Description One', status: 'pending', priority: 'medium' },
-      { id: '2', title: 'Task Two', description: 'Description Two', status: 'pending', priority: 'medium' },
+      {
+        id: "1",
+        title: "Task One",
+        description: "Description One",
+        status: "pending",
+        priority: "medium",
+      },
+      {
+        id: "2",
+        title: "Task Two",
+        description: "Description Two",
+        status: "pending",
+        priority: "medium",
+      },
     ];
-    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({ data: mockUser } as any);
-    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({ data: { data: tasks, count: 2 } } as any);
+    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({
+      data: mockUser,
+    } as any);
+    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({
+      data: { data: tasks, count: 2 },
+    } as any);
 
     render(
       <MemoryRouter>
         <Dashboard onLogout={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/My Tasks/i);
-    expect(screen.getByText('Task One')).toBeInTheDocument();
-    expect(screen.getByText('Task Two')).toBeInTheDocument();
+    expect(screen.getByText("Task One")).toBeInTheDocument();
+    expect(screen.getByText("Task Two")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByPlaceholderText(/Search tasks/i), { target: { value: 'One' } });
-    
-    expect(screen.getByText('Task One')).toBeInTheDocument();
-    expect(screen.queryByText('Task Two')).not.toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText(/Search tasks/i), {
+      target: { value: "One" },
+    });
+
+    expect(screen.getByText("Task One")).toBeInTheDocument();
+    expect(screen.queryByText("Task Two")).not.toBeInTheDocument();
   });
 
-  it('user can edit a task', async () => {
-    const task = { id: '1', title: 'Old Title', description: 'Old Desc', status: 'pending', priority: 'medium' };
-    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({ data: mockUser } as any);
-    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({ data: { data: [task], count: 1 } } as any);
-    (sdk.updateTodoApiV1TodosIdPatch as any).mockResolvedValue({ data: { ...task, title: 'New Title' } } as any);
+  it("user can edit a task", async () => {
+    const task = {
+      id: "1",
+      title: "Old Title",
+      description: "Old Desc",
+      status: "pending",
+      priority: "medium",
+    };
+    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({
+      data: mockUser,
+    } as any);
+    (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({
+      data: { data: [task], count: 1 },
+    } as any);
+    (sdk.updateTodoApiV1TodosIdPatch as any).mockResolvedValue({
+      data: { ...task, title: "New Title" },
+    } as any);
 
     render(
       <MemoryRouter>
         <Dashboard onLogout={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/My Tasks/i);
     fireEvent.click(await screen.findByTitle(/Edit Task/i));
-    
-    fireEvent.change(screen.getByDisplayValue('Old Title'), { target: { value: 'New Title' } });
-    fireEvent.change(screen.getByDisplayValue('Old Desc'), { target: { value: 'New Desc' } });
-    
-    fireEvent.click(screen.getByRole('button', { name: /Update Task/i }));
-    
-    await waitFor(() => expect(sdk.updateTodoApiV1TodosIdPatch).toHaveBeenCalledWith({
-      path: { id: '1' },
-      body: expect.objectContaining({ 
-        title: 'New Title',
-        description: 'New Desc'
-      })
-    }));
+
+    fireEvent.change(screen.getByDisplayValue("Old Title"), {
+      target: { value: "New Title" },
+    });
+    fireEvent.change(screen.getByDisplayValue("Old Desc"), {
+      target: { value: "New Desc" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Update Task/i }));
+
+    await waitFor(() =>
+      expect(sdk.updateTodoApiV1TodosIdPatch).toHaveBeenCalledWith({
+        path: { id: "1" },
+        body: expect.objectContaining({
+          title: "New Title",
+          description: "New Desc",
+        }),
+      }),
+    );
   });
 
-  it('admin can create a new admin account', async () => {
-    const adminUser = { ...mockUser, role: 'admin' };
+  it("admin can create a new admin account", async () => {
+    const adminUser = { ...mockUser, role: "admin" };
     vi.mocked(useAuth).mockReturnValue({
       user: adminUser as any,
       role: Role.ADMIN,
@@ -269,37 +353,53 @@ describe('Dashboard edge cases', () => {
       hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
-    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
-    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: [], total: 0 } } as any);
-    (sdk.createUserApiV1UsersPost as any).mockResolvedValue({ data: {} } as any);
+    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({
+      data: adminUser,
+    } as any);
+    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
+      data: { items: [], total: 0 },
+    } as any);
+    (sdk.createUserApiV1UsersPost as any).mockResolvedValue({
+      data: {},
+    } as any);
 
     render(
       <MemoryRouter>
         <Dashboard onLogout={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/Identity & Access/i);
-    fireEvent.click(screen.getByRole('button', { name: /Provision User/i }));
-    
-    fireEvent.change(screen.getByPlaceholderText(/user@example\.com/i), { target: { value: 'newadmin@x.com' } });
-    fireEvent.change(screen.getByLabelText(/Temporary Password/i), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByPlaceholderText(/e\.g\. Sarah Connor/i), { target: { value: 'New Admin' } });
-    
-    fireEvent.click(screen.getByRole('button', { name: /Create User Account/i }));
-    
-    await waitFor(() => expect(sdk.createUserApiV1UsersPost).toHaveBeenCalledWith({
-      body: expect.objectContaining({
-        email: 'newadmin@x.com',
-        role: 'user'
-      })
-    }));
+    fireEvent.click(screen.getByRole("button", { name: /Provision User/i }));
+
+    fireEvent.change(screen.getByPlaceholderText(/user@example\.com/i), {
+      target: { value: "newadmin@x.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Temporary Password/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/e\.g\. Sarah Connor/i), {
+      target: { value: "New Admin" },
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Create User Account/i }),
+    );
+
+    await waitFor(() =>
+      expect(sdk.createUserApiV1UsersPost).toHaveBeenCalledWith({
+        body: expect.objectContaining({
+          email: "newadmin@x.com",
+          role: "user",
+        }),
+      }),
+    );
   });
 
-  it('admin can toggle user active status', async () => {
-    const adminUser = { ...mockUser, role: 'admin' };
+  it("admin can toggle user active status", async () => {
+    const adminUser = { ...mockUser, role: "admin" };
     vi.mocked(useAuth).mockReturnValue({
       user: adminUser as any,
       role: Role.ADMIN,
@@ -310,26 +410,39 @@ describe('Dashboard edge cases', () => {
       hasPermission: vi.fn((r) => [Role.USER, Role.ADMIN].includes(r)),
       accessDenied: false,
       setAccessDenied: vi.fn(),
-      token: 'valid'
+      token: "valid",
     });
-    const otherUser = { id: '2', email: 'user2@x.com', role: 'user', is_active: true };
-    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({ data: adminUser } as any);
-    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({ data: { items: [otherUser], total: 1 } } as any);
-    (sdk.updateUserApiV1UsersIdPatch as any).mockResolvedValue({ data: { ...otherUser, is_active: false } } as any);
+    const otherUser = {
+      id: "2",
+      email: "user2@x.com",
+      role: "user",
+      is_active: true,
+    };
+    vi.mocked(sdk.getCurrentUserApiV1LoginCurrentUserGet).mockResolvedValue({
+      data: adminUser,
+    } as any);
+    vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
+      data: { items: [otherUser], total: 1 },
+    } as any);
+    (sdk.updateUserApiV1UsersIdPatch as any).mockResolvedValue({
+      data: { ...otherUser, is_active: false },
+    } as any);
 
     render(
       <MemoryRouter>
         <Dashboard onLogout={() => {}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await screen.findByText(/Identity & Access/i);
-    const toggleButton = await screen.findByRole('button', { name: /Active/i });
+    const toggleButton = await screen.findByRole("button", { name: /Active/i });
     fireEvent.click(toggleButton);
-    
-    await waitFor(() => expect(sdk.updateUserApiV1UsersIdPatch).toHaveBeenCalledWith({
-      path: { id: '2' },
-      body: expect.objectContaining({ is_active: false })
-    }));
+
+    await waitFor(() =>
+      expect(sdk.updateUserApiV1UsersIdPatch).toHaveBeenCalledWith({
+        path: { id: "2" },
+        body: expect.objectContaining({ is_active: false }),
+      }),
+    );
   });
 });
