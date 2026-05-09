@@ -1,23 +1,29 @@
-import { ReactNode, useState } from 'react'
-import Sidebar from './Sidebar'
-import { UserPublic } from '../../client/types.gen'
-import { Menu } from 'lucide-react'
+import { ReactNode, useState } from "react";
+import Sidebar from "./Sidebar";
+import { UserPublic } from "../../client/types.gen";
+import { Menu } from "lucide-react";
 
 interface DashboardLayoutProps {
-  children: ReactNode
-  currentUser: UserPublic | null
-  onLogout: () => void
-  activeView: 'admin' | 'user'
-  onViewChange: (view: 'admin' | 'user') => void
+  children: ReactNode;
+  currentUser: UserPublic | null;
+  onLogout: () => void;
+  activeView: "admin" | "user";
+  onViewChange: (view: "admin" | "user") => void;
 }
 
-const DashboardLayout = ({ children, currentUser, onLogout, activeView, onViewChange }: DashboardLayoutProps) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+const DashboardLayout = ({
+  children,
+  currentUser,
+  onLogout,
+  activeView,
+  onViewChange,
+}: DashboardLayoutProps) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[var(--bg)] overflow-hidden">
-      <Sidebar 
-        userRole={currentUser?.role as any} 
+      <Sidebar
+        userRole={currentUser?.role as any}
         userName={currentUser?.full_name || currentUser?.email}
         onLogout={onLogout}
         activeView={activeView}
@@ -28,7 +34,7 @@ const DashboardLayout = ({ children, currentUser, onLogout, activeView, onViewCh
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Mobile Header */}
         <header className="lg:hidden h-[var(--header-height)] flex items-center px-4 bg-[var(--sidebar-bg)] border-b border-[var(--sidebar-border)] shrink-0">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 -ml-2 text-[var(--text-dim)] hover:text-[var(--accent)] transition-all"
           >
@@ -46,7 +52,7 @@ const DashboardLayout = ({ children, currentUser, onLogout, activeView, onViewCh
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;

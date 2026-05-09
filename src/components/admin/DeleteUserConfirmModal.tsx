@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { X, AlertTriangle, Lock } from 'lucide-react'
-import { UserPublic } from '../../client/types.gen'
-import { loginAccessTokenApiV1LoginAccessTokenPost } from '../../client/sdk.gen'
+import { useState } from "react";
+import { X, AlertTriangle, Lock } from "lucide-react";
+import { UserPublic } from "../../client/types.gen";
+import { loginAccessTokenApiV1LoginAccessTokenPost } from "../../client/sdk.gen";
 
 interface DeleteUserConfirmModalProps {
-  userToDelete: UserPublic
-  currentUserEmail: string
-  isDeleting: boolean
-  onClose: () => void
-  onConfirm: () => void
+  userToDelete: UserPublic;
+  currentUserEmail: string;
+  isDeleting: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
 }
 
 const DeleteUserConfirmModal = ({
@@ -16,37 +16,37 @@ const DeleteUserConfirmModal = ({
   currentUserEmail,
   isDeleting,
   onClose,
-  onConfirm
+  onConfirm,
 }: DeleteUserConfirmModalProps) => {
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [isVerifying, setIsVerifying] = useState(false)
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerifyAndConfirm = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsVerifying(true)
+    e.preventDefault();
+    setError(null);
+    setIsVerifying(true);
 
     try {
       // Verify current user's password by attempting to get a token
       const response = await loginAccessTokenApiV1LoginAccessTokenPost({
         body: {
           username: currentUserEmail,
-          password: password
-        }
-      })
+          password: password,
+        },
+      });
 
       if (response.data?.access_token) {
-        onConfirm()
+        onConfirm();
       } else {
-        setError('Incorrect password. Please try again.')
+        setError("Incorrect password. Please try again.");
       }
     } catch (err) {
-      setError('Invalid credentials. Password verification failed.')
+      setError("Invalid credentials. Password verification failed.");
     } finally {
-      setIsVerifying(false)
+      setIsVerifying(false);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -56,7 +56,10 @@ const DeleteUserConfirmModal = ({
             <AlertTriangle className="w-6 h-6" />
             <h3 className="font-bold text-lg">Confirm Deletion</h3>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-red-500/10 rounded-xl transition-all">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-red-500/10 rounded-xl transition-all"
+          >
             <X className="w-5 h-5 text-[var(--text-dim)]" />
           </button>
         </div>
@@ -64,10 +67,15 @@ const DeleteUserConfirmModal = ({
         <div className="p-8 space-y-6">
           <div className="space-y-2">
             <p className="text-[var(--text)]">
-              You are about to permanently delete <span className="font-bold text-red-500">{userToDelete.email}</span>.
+              You are about to permanently delete{" "}
+              <span className="font-bold text-red-500">
+                {userToDelete.email}
+              </span>
+              .
             </p>
             <p className="text-sm text-[var(--text-dim)]">
-              This action cannot be undone. Please enter your password to confirm this sensitive operation.
+              This action cannot be undone. Please enter your password to
+              confirm this sensitive operation.
             </p>
           </div>
 
@@ -107,14 +115,14 @@ const DeleteUserConfirmModal = ({
                 disabled={isVerifying || isDeleting}
                 className="flex-1 px-6 py-3.5 bg-red-500 text-white rounded-2xl font-bold hover:shadow-lg shadow-red-500/25 active:scale-95 transition-all disabled:opacity-50"
               >
-                {isVerifying || isDeleting ? 'Processing...' : 'Confirm Delete'}
+                {isVerifying || isDeleting ? "Processing..." : "Confirm Delete"}
               </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DeleteUserConfirmModal
+export default DeleteUserConfirmModal;

@@ -1,15 +1,22 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
-import { jwtDecode } from 'jwt-decode';
-import { auth } from '../lib/auth';
-import { UserPublic } from '../client/types.gen';
-import { client } from '../client/client.gen';
-import { getCurrentUserApiV1LoginCurrentUserGet } from '../client/sdk.gen';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  ReactNode,
+} from "react";
+import { jwtDecode } from "jwt-decode";
+import { auth } from "../lib/auth";
+import { UserPublic } from "../client/types.gen";
+import { client } from "../client/client.gen";
+import { getCurrentUserApiV1LoginCurrentUserGet } from "../client/sdk.gen";
 
 // Role Hierarchy
 export enum Role {
-  SUPER = 'SUPER',
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+  SUPER = "SUPER",
+  ADMIN = "ADMIN",
+  USER = "USER",
 }
 
 interface AuthContextType {
@@ -27,7 +34,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<UserPublic | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<Role | null>(null);
@@ -38,18 +47,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // Set token for the client immediately so the profile request is authorized
       auth.setToken(currentToken);
-      
+
       const response = await getCurrentUserApiV1LoginCurrentUserGet();
       if (response.data) {
         const profile = response.data;
         setUser(profile);
-        const mappedRole = (profile.role || 'USER').toUpperCase() as Role;
+        const mappedRole = (profile.role || "USER").toUpperCase() as Role;
         setRole(mappedRole);
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
+      console.error("Failed to fetch user profile:", error);
       return false;
     }
   };
@@ -58,25 +67,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setToken(newToken);
       const success = await fetchProfile(newToken);
-      
+
       if (!success) {
         // Fallback to JWT decoding if API fails
         const decoded: any = jwtDecode(newToken);
-        const rawRole = (decoded.role || decoded.user_role || 'USER').toUpperCase();
+        const rawRole = (
+          decoded.role ||
+          decoded.user_role ||
+          "USER"
+        ).toUpperCase();
         setRole(rawRole as Role);
-        
+
         setUser({
-          id: decoded.sub || '',
-          email: decoded.email || '',
-          full_name: decoded.full_name || '',
+          id: decoded.sub || "",
+          email: decoded.email || "",
+          full_name: decoded.full_name || "",
           role: rawRole.toLowerCase() as any,
           is_active: true,
         });
       }
-      
+
       setAccessDenied(false);
     } catch (error) {
-      console.error('Auth initialization error:', error);
+      console.error("Auth initialization error:", error);
       logout();
     }
   };
@@ -128,18 +141,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    token,
-    role,
-    isAuthenticated: !!token,
-    isLoading,
-    accessDenied,
-    login,
-    logout,
-    hasPermission,
-    setAccessDenied,
-  }), [user, token, role, isLoading, accessDenied]);
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      role,
+      isAuthenticated: !!token,
+      isLoading,
+      accessDenied,
+      login,
+      logout,
+      hasPermission,
+      setAccessDenied,
+    }),
+    [user, token, role, isLoading, accessDenied],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -147,7 +163,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

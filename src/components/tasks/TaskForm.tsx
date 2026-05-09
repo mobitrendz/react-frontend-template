@@ -1,21 +1,21 @@
-import { X, Calendar, Flag, Activity } from 'lucide-react'
-import { ToDoPriority, ToDoStatus } from '../../client/types.gen'
+import { X, Calendar, Flag, Activity } from "lucide-react";
+import { ToDoPriority, ToDoStatus } from "../../client/types.gen";
 
 interface TaskFormProps {
-  title: string
-  description: string
-  priority: ToDoPriority
-  status: ToDoStatus
-  dueDate: string
-  isEditing: boolean
-  isSubmitting: boolean
-  onClose: () => void
-  onSubmit: (e: React.FormEvent) => void
-  onTitleChange: (val: string) => void
-  onDescriptionChange: (val: string) => void
-  onPriorityChange: (val: ToDoPriority) => void
-  onStatusChange: (val: ToDoStatus) => void
-  onDueDateChange: (val: string) => void
+  title: string;
+  description: string;
+  priority: ToDoPriority;
+  status: ToDoStatus;
+  dueDate: string;
+  isEditing: boolean;
+  isSubmitting: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onTitleChange: (val: string) => void;
+  onDescriptionChange: (val: string) => void;
+  onPriorityChange: (val: ToDoPriority) => void;
+  onStatusChange: (val: ToDoStatus) => void;
+  onDueDateChange: (val: string) => void;
 }
 
 const TaskForm = ({
@@ -32,7 +32,7 @@ const TaskForm = ({
   onDescriptionChange,
   onPriorityChange,
   onStatusChange,
-  onDueDateChange
+  onDueDateChange,
 }: TaskFormProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
@@ -40,13 +40,13 @@ const TaskForm = ({
         <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]">
           <div>
             <h2 className="text-xl font-bold text-[var(--text-h)]">
-              {isEditing ? 'Edit Task' : 'Create New Task'}
+              {isEditing ? "Edit Task" : "Create New Task"}
             </h2>
             <p className="text-xs text-[var(--text-dim)] font-medium uppercase tracking-widest mt-0.5">
               Task Details
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 text-[var(--text-dim)] hover:text-[var(--text-h)] hover:bg-[var(--bg)] rounded-xl transition-all"
           >
@@ -56,10 +56,13 @@ const TaskForm = ({
 
         <form onSubmit={onSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label htmlFor="task-title" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
+            <label
+              htmlFor="task-title"
+              className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+            >
               Title
             </label>
-            <input 
+            <input
               id="task-title"
               type="text"
               placeholder="What needs to be done?"
@@ -71,7 +74,12 @@ const TaskForm = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="task-desc" className="text-sm font-bold text-[var(--text-h)]">Description</label>
+            <label
+              htmlFor="task-desc"
+              className="text-sm font-bold text-[var(--text-h)]"
+            >
+              Description
+            </label>
             <textarea
               id="task-desc"
               placeholder="Add more context or sub-tasks..."
@@ -83,7 +91,10 @@ const TaskForm = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="task-priority" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
+              <label
+                htmlFor="task-priority"
+                className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+              >
                 <Flag className="w-3.5 h-3.5 text-[var(--text-dim)]" />
                 Priority
               </label>
@@ -91,7 +102,9 @@ const TaskForm = ({
                 id="task-priority"
                 className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm font-medium"
                 value={priority}
-                onChange={(e) => onPriorityChange(e.target.value as ToDoPriority)}
+                onChange={(e) =>
+                  onPriorityChange(e.target.value as ToDoPriority)
+                }
               >
                 <option value="low">Low Priority</option>
                 <option value="medium">Medium Priority</option>
@@ -99,7 +112,10 @@ const TaskForm = ({
               </select>
             </div>
             <div className="space-y-2">
-              <label htmlFor="task-status" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
+              <label
+                htmlFor="task-status"
+                className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+              >
                 <Activity className="w-3.5 h-3.5 text-[var(--text-dim)]" />
                 Status
               </label>
@@ -117,7 +133,10 @@ const TaskForm = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="task-due-date" className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2">
+            <label
+              htmlFor="task-due-date"
+              className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+            >
               <Calendar className="w-3.5 h-3.5 text-[var(--text-dim)]" />
               Due Date
             </label>
@@ -131,25 +150,29 @@ const TaskForm = ({
           </div>
 
           <div className="flex gap-4 pt-4">
-            <button 
+            <button
               type="button"
               onClick={onClose}
               className="flex-1 px-6 py-3.5 bg-[var(--bg)] border border-[var(--border)] text-[var(--text-h)] rounded-2xl font-bold hover:bg-[var(--sidebar-bg)] transition-all"
             >
               Cancel
             </button>
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 px-6 py-3.5 bg-[var(--accent)] text-white rounded-2xl font-bold hover:shadow-lg shadow-[var(--accent)]/20 active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              {isSubmitting ? 'Processing...' : isEditing ? 'Update Task' : 'Create Task'}
+              {isSubmitting
+                ? "Processing..."
+                : isEditing
+                  ? "Update Task"
+                  : "Create Task"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TaskForm
+export default TaskForm;
