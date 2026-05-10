@@ -14,17 +14,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "posttest:coverage": "node scripts/update-readme.js",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "src/**/*.{css,scss,md,json}": [
-      "prettier --write"
-    ]
+    "test:coverage": "vitest run --coverage",
+    "posttest:coverage": "node scripts/update-readme.js"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.8",
@@ -60,9 +51,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
-    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
-    "lint-staged": "^17.0.3",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.10",

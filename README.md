@@ -80,20 +80,22 @@ Our **GitHub Actions** workflow (`frontend.yml`) includes an automated **API Syn
 
 ### Local Git Hooks
 
-Before every commit, **Husky** and **lint-staged** run ESLint, Prettier, and TypeScript type-checks to ensure only high-quality code enters the repository.
+Before every commit, **pre-commit** runs ESLint, Prettier, and TypeScript type-checks to ensure only high-quality code enters the repository. This ensures absolute consistency with our CI/CD standards.
 
 ## 🏁 Getting Started
 
 ### Prerequisites
 
-1.  **Node.js**: v22.14.0+ recommended.
-2.  **Backend**: FastAPI backend running (default: `http://localhost:8000`).
+1.  **Node.js**: v22.14.0 (locked via `.nvmrc`).
+2.  **Python**: 3.12+ (required for `pre-commit`).
+3.  **Backend**: FastAPI backend running (default: `http://localhost:8000`).
 
 ### Installation
 
 1.  **Install dependencies**:
     ```bash
     npm install
+    pre-commit install
     ```
 2.  **Configure Environment**:
     ```bash

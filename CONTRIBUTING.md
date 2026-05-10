@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This project follows modern 2026 in
 
 ### Prerequisites
 
-- **Node.js**: v22.14.0 or higher
+- **Node.js**: v22.14.0 (Check `.nvmrc`)
 - **npm**: v10.0.0 or higher
 - **FastAPI Backend**: Ensure the [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template) is running locally on port 8000 for full functionality.
 
@@ -16,6 +16,7 @@ Thank you for your interest in contributing! This project follows modern 2026 in
 2.  Install dependencies:
     ```bash
     npm install
+    pre-commit install
     ```
 3.  Set up your environment variables:
     ```bash
@@ -65,7 +66,7 @@ We maintain a **90%+ test coverage** goal.
 ## 🚀 Pull Request Process
 
 1.  Create a feature branch from `main`.
-2.  Ensure `npm run lint` and `npm run type-check` pass.
+2.  Ensure `pre-commit run --all-files` passes locally.
 3.  Verify all tests pass locally.
 4.  Update the `README.md` if you are adding new features or changing configuration.
 5.  Open a PR with a clear description of changes and screenshots for UI modifications.
