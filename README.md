@@ -6,6 +6,9 @@
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. This template is pre-configured with a premium design system, multi-page routing, advanced administrative controls, and comprehensive unit testing.
 
+### 🔗 Related Repositories
+- **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
+
 ## 🧪 Unit Testing & Quality Assurance
 
 The project maintains high standards for reliability with a comprehensive test suite and automated quality gates.
