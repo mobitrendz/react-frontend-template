@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdminActivityDashboard from "./AdminActivityDashboard";
 import { useAuth, Role } from "../../../contexts/AuthContext";
 import * as sdk from "../../../client/sdk.gen";
@@ -19,10 +20,27 @@ vi.mock("../../../client/sdk.gen", () => ({
   readAdminDashboardStatsApiV1AdminDashboardStatsGet: vi.fn(),
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
 describe("AdminActivityDashboard", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = createTestQueryClient();
   });
+
+  const renderDashboard = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AdminActivityDashboard />
+      </QueryClientProvider>,
+    );
 
   it("renders access restricted for non-admin users", () => {
     vi.mocked(useAuth).mockReturnValue({
@@ -31,7 +49,7 @@ describe("AdminActivityDashboard", () => {
       hasPermission: (r: any) => r === Role.USER,
     } as any);
 
-    render(<AdminActivityDashboard />);
+    renderDashboard();
     expect(screen.getByText(/Access Restricted/i)).toBeInTheDocument();
   });
 
@@ -61,7 +79,7 @@ describe("AdminActivityDashboard", () => {
       hasPermission: (r: any) => r === Role.ADMIN || r === Role.USER,
     } as any);
 
-    render(<AdminActivityDashboard />);
+    renderDashboard();
 
     await waitFor(() => expect(screen.getByText("1,250")).toBeInTheDocument());
     expect(screen.getByText("Platform Pulse")).toBeInTheDocument();
@@ -90,7 +108,7 @@ describe("AdminActivityDashboard", () => {
       hasPermission: (r: any) => r === Role.ADMIN || r === Role.USER,
     } as any);
 
-    render(<AdminActivityDashboard />);
+    renderDashboard();
 
     await waitFor(() =>
       expect(screen.getByText(/No Recent Activity/i)).toBeInTheDocument(),

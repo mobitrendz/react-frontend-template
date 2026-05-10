@@ -1,17 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   UserMinus,
-  UserCheck,
-  Shield,
   Mail,
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Shield,
+  Loader2,
 } from "lucide-react";
 import { UserPublic } from "../../client/types.gen";
 import { readUsersApiV1UsersGet } from "../../client/sdk.gen";
 import { Role, useAuth } from "../../contexts/AuthContext";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 
 interface AdminUserTableProps {
   currentUser: UserPublic | null;
@@ -25,45 +37,28 @@ const AdminUserTable = ({
   onDeleteUser,
 }: AdminUserTableProps) => {
   const { role: currentUserRole } = useAuth();
-  const [users, setUsers] = useState<UserPublic[]>([]);
-  const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [currentPage]);
-
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
+  const { data: usersData, isLoading } = useQuery({
+    queryKey: ["users", currentPage, pageSize],
+    queryFn: async () => {
       const response = await readUsersApiV1UsersGet({
         query: { page: currentPage, size: pageSize },
       });
-      // Supporting both {items, total} and {data, count}
-      if (response.data) {
-        const data =
-          (response.data as any).data || (response.data as any).items || [];
-        const count =
-          (response.data as any).count || (response.data as any).total || 0;
-        setUsers(data);
-        setTotalUsers(count);
-      }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      if (response.error) throw response.error;
+      return response.data;
+    },
+  });
+
+  const users = (usersData as any)?.data || (usersData as any)?.items || [];
+  const totalUsers = (usersData as any)?.count || (usersData as any)?.total || 0;
 
   const canManageUser = (targetUser: UserPublic) => {
     if (currentUserRole === Role.SUPER) return true;
     if (currentUserRole === Role.ADMIN) {
-      // ADMIN can only manage regular USERs, and themselves (partially)
-      // Hide or disable actions for any account where role === 'SUPER' or role === 'ADMIN' (except their own)
       const targetRole = targetUser.role?.toUpperCase();
       if (targetUser.id === currentUser?.id) return true;
       if (targetRole === Role.SUPER || targetRole === Role.ADMIN) return false;
@@ -72,16 +67,13 @@ const AdminUserTable = ({
     return false;
   };
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = users.filter((user: UserPublic) => {
     const matchesSearch =
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Role filtering
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
 
-    // Visibility restriction: ADMINs should not see SUPER users,
-    // and no one should see themselves in the management list
     if (user.id === currentUser?.id) return false;
 
     if (currentUserRole === Role.ADMIN) {
@@ -93,36 +85,39 @@ const AdminUserTable = ({
   });
 
   return (
-    <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
-      {/* Table Header / Controls */}
-      <div className="p-6 border-b border-[var(--border)] space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h2 className="text-xl font-bold text-[var(--text-h)]">
-            User Directory
-          </h2>
-          <div className="flex gap-4 items-center">
-            <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs font-bold">
-              {filteredUsers.filter((u) => u.is_active).length} Active
-            </span>
-            <span className="px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-full text-xs font-bold">
+    <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+      <div className="p-8 border-b border-slate-800 space-y-6 bg-gradient-to-br from-slate-900 to-slate-950">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h2 className="text-2xl font-black text-white tracking-tight">
+              User Directory
+            </h2>
+            <p className="text-slate-400 font-medium text-sm mt-1">
+              Manage platform access and security roles
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase">
+              {filteredUsers.filter((u: UserPublic) => u.is_active).length} Active
+            </Badge>
+            <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase">
               {filteredUsers.length} Visible
-            </span>
+            </Badge>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" />
-            <input
-              type="text"
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Input
               placeholder="Search by name or email..."
-              className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm"
+              className="pl-12 h-12 bg-slate-950 border-slate-800 text-white rounded-2xl focus:ring-indigo-500 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select
-            className="bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all text-sm font-medium"
+            className="bg-slate-950 border border-slate-800 rounded-2xl px-6 h-12 text-slate-300 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -136,153 +131,185 @@ const AdminUserTable = ({
         </div>
       </div>
 
-      {/* Table Content */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-[var(--sidebar-bg)] text-[var(--text-dim)] text-xs uppercase tracking-widest font-black">
-              <th className="px-6 py-4">User Details</th>
-              <th className="px-6 py-4">Security Role</th>
-              <th className="px-6 py-4">System Status</th>
-              <th className="px-6 py-4">Registration</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border)]">
+      <div className="p-2">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-none hover:bg-transparent">
+              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+                User Details
+              </TableHead>
+              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+                Security Role
+              </TableHead>
+              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+                System Status
+              </TableHead>
+              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+                Registration
+              </TableHead>
+              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px] text-right">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {isLoading ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-12 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
-                </td>
-              </tr>
+              <TableRow className="hover:bg-transparent border-none">
+                <TableCell colSpan={5} className="py-24 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+                    <p className="text-slate-500 font-bold animate-pulse">
+                      Synchronizing User Data...
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : filteredUsers.length === 0 ? (
-              <tr>
-                <td
+              <TableRow className="hover:bg-transparent border-none">
+                <TableCell
                   colSpan={5}
-                  className="px-6 py-12 text-center text-[var(--text-dim)]"
+                  className="py-24 text-center text-slate-500"
                 >
-                  <p className="font-medium text-lg">No users found</p>
-                </td>
-              </tr>
+                  <p className="font-black text-xl tracking-tight">
+                    No users found
+                  </p>
+                  <p className="text-sm font-medium mt-1">
+                    Try adjusting your search or filters
+                  </p>
+                </TableCell>
+              </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <tr
+              filteredUsers.map((user: UserPublic) => (
+                <TableRow
                   key={user.id}
-                  className="hover:bg-[var(--sidebar-bg)]/50 transition-colors"
+                  className="border-slate-800/50 hover:bg-slate-800/30 transition-all group"
                 >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[var(--accent-bg)] text-[var(--accent)] flex items-center justify-center font-bold text-sm">
+                  <TableCell className="px-6 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-black text-lg border border-indigo-500/10 group-hover:scale-110 transition-transform">
                         {user.full_name?.charAt(0) ||
                           user.email.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-[var(--text-h)]">
-                          {user.full_name || "Anonymous"}
+                        <span className="font-black text-white tracking-tight">
+                          {user.full_name || "Anonymous User"}
                         </span>
-                        <div className="flex items-center gap-1 text-xs text-[var(--text-dim)]">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
                           <Mail className="w-3 h-3" />
                           <span>{user.email}</span>
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
                     <div
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
                         user.role === "super"
                           ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                           : user.role === "admin"
                             ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
-                            : "bg-slate-500/10 text-slate-500 border border-slate-500/20"
+                            : "bg-slate-700/20 text-slate-400 border border-slate-700/30"
                       }`}
                     >
-                      <Shield className="w-3 h-3" />
+                      <Shield className="w-3.5 h-3.5" />
                       {user.role}
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onToggleStatus(user)}
                       disabled={
                         !canManageUser(user) || user.id === currentUser?.id
                       }
-                      className={`flex items-center gap-2 group px-2 py-1 rounded-lg transition-all ${
-                        !canManageUser(user) || user.id === currentUser?.id
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-[var(--bg)]"
+                      className={`h-auto p-2 rounded-xl transition-all ${
+                        user.is_active
+                          ? "text-emerald-500 hover:bg-emerald-500/10"
+                          : "text-rose-500 hover:bg-rose-500/10"
                       }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${user.is_active ? "bg-green-500" : "bg-red-500"}`}
+                        className={`w-2.5 h-2.5 rounded-full mr-2 ${
+                          user.is_active
+                            ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                            : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                        }`}
                       />
-                      <span
-                        className={`text-sm font-medium ${user.is_active ? "text-green-500" : "text-red-500"}`}
-                      >
+                      <span className="font-black uppercase tracking-tight text-[11px]">
                         {user.is_active ? "Active" : "Inactive"}
                       </span>
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1.5 text-sm text-[var(--text-dim)]">
+                    </Button>
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-black">
                       <Calendar className="w-3.5 h-3.5" />
                       {user.created_at
-                        ? new Date(user.created_at).toLocaleDateString()
+                        ? new Date(user.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : "N/A"}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
+                  </TableCell>
+                  <TableCell className="px-6 py-5 text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => onDeleteUser(user)}
                       disabled={
                         !canManageUser(user) || user.id === currentUser?.id
                       }
-                      className="p-2 text-[var(--text-dim)] hover:text-red-500 disabled:opacity-20 transition-colors"
-                      title="Delete User"
+                      className="text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
                     >
                       <UserMinus className="w-5 h-5" />
-                    </button>
-                  </td>
-                </tr>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}
       {totalUsers > pageSize && (
-        <div className="px-6 py-4 bg-[var(--sidebar-bg)] border-t border-[var(--border)] flex justify-between items-center">
-          <p className="text-xs text-[var(--text-dim)] font-medium">
+        <div className="px-8 py-6 bg-slate-950/50 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">
             Showing{" "}
-            <span className="text-[var(--text-h)] font-bold">
+            <span className="text-white font-black">
               {(currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="text-[var(--text-h)] font-bold">
+            <span className="text-white font-black">
               {Math.min(currentPage * pageSize, totalUsers)}
             </span>{" "}
-            of {totalUsers}
+            of <span className="text-white font-black">{totalUsers}</span> Records
           </p>
-          <div className="flex gap-1">
-            <button
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="p-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--accent-bg)] disabled:opacity-30 transition-all"
+              className="bg-slate-900 border-slate-800 text-slate-400 hover:text-white rounded-xl h-10 w-10 p-0"
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() =>
                 setCurrentPage((prev) =>
-                  Math.min(Math.ceil(totalUsers / pageSize), prev + 1),
+                  Math.min(Math.ceil(totalUsers / pageSize), prev + 1)
                 )
               }
               disabled={currentPage === Math.ceil(totalUsers / pageSize)}
-              className="p-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg hover:bg-[var(--accent-bg)] disabled:opacity-30 transition-all"
+              className="bg-slate-900 border-slate-800 text-slate-400 hover:text-white rounded-xl h-10 w-10 p-0"
             >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              <ChevronRight className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       )}

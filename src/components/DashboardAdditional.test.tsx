@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "../App";
 import Dashboard from "./Dashboard";
 import * as sdk from "../client/sdk.gen";
@@ -30,6 +31,9 @@ vi.mock("../client/sdk.gen", () => ({
   updateUserApiV1UsersIdPatch: vi.fn(() => Promise.resolve({ data: {} })),
   deleteTodoApiV1TodosIdDelete: vi.fn(() => Promise.resolve({ data: {} })),
   loginAccessTokenApiV1LoginAccessTokenPost: vi.fn(() =>
+    Promise.resolve({ data: {} }),
+  ),
+  readAdminDashboardStatsApiV1AdminDashboardStatsGet: vi.fn(() =>
     Promise.resolve({ data: {} }),
   ),
 }));
@@ -67,12 +71,20 @@ vi.mock("./Profile", () => ({
   default: () => <div>Profile Page</div>,
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
 describe("App routing & auth flow", () => {
   let authState = {
     isAuthenticated: false,
     user: null as any,
     role: null as any,
   };
+  let queryClient: QueryClient;
 
   const mockLogin = vi.fn((token: string) => {
     authState.isAuthenticated = true;
@@ -93,6 +105,7 @@ describe("App routing & auth flow", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = createTestQueryClient();
     authState = {
       isAuthenticated: false,
       user: null,
@@ -123,7 +136,11 @@ describe("App routing & auth flow", () => {
     const { auth } = await import("../lib/auth");
     vi.mocked(auth.isAuthenticated).mockReturnValue(false);
     window.history.pushState({}, "Test", "/unknown");
-    render(<App />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    );
     expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 
@@ -141,7 +158,11 @@ describe("App routing & auth flow", () => {
       token: "valid",
     });
     window.history.pushState({}, "Test", "/profile");
-    render(<App />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    );
     expect(screen.getByText("Profile Page")).toBeInTheDocument();
   });
 
@@ -186,9 +207,11 @@ describe("App routing & auth flow", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Dashboard onLogout={mockLogout} />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/"]}>
+          <Dashboard onLogout={mockLogout} />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
     await screen.findByText(/Sign Out/i);
@@ -206,9 +229,11 @@ describe("Dashboard edge cases", () => {
     full_name: "User One",
     is_active: true,
   };
+  let queryClient: QueryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = createTestQueryClient();
     vi.mocked(useAuth).mockReturnValue({
       user: mockUser as any,
       role: Role.USER,
@@ -224,6 +249,15 @@ describe("Dashboard edge cases", () => {
     window.alert = vi.fn();
     window.confirm = vi.fn(() => true);
   });
+
+  const renderDashboard = (props = {}) =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Dashboard onLogout={() => {}} {...props} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   it("admin can delete a user and sees confirmation", async () => {
     const adminUser = { ...mockUser, role: "admin" };
@@ -246,20 +280,18 @@ describe("Dashboard edge cases", () => {
       data: adminUser,
     } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
-      data: { items: users, total: 1 },
+      data: { data: users, count: 1 },
     } as any);
     vi.mocked(sdk.deleteUserApiV1UsersIdDelete).mockResolvedValue({
       data: {},
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} initialTab="users" />
-      </MemoryRouter>,
-    );
+    renderDashboard({ initialTab: "users" });
 
     await screen.findByText("delete@x.com");
-    fireEvent.click(screen.getByTitle(/Delete User/i));
+    // In the new UI, delete button is an icon. Let's find it by icon or button.
+    const deleteBtn = screen.getAllByRole("button").find(b => b.innerHTML.includes('user-minus'));
+    if (deleteBtn) fireEvent.click(deleteBtn);
 
     // Custom Modal shows up, enter password
     const passwordInput = await screen.findByPlaceholderText(
@@ -305,11 +337,7 @@ describe("Dashboard edge cases", () => {
       data: { data: tasks, count: 2 },
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
 
     await screen.findByText(/My Tasks/i);
     expect(screen.getByText("Task One")).toBeInTheDocument();
@@ -341,11 +369,7 @@ describe("Dashboard edge cases", () => {
       data: { ...task, title: "New Title" },
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
 
     await screen.findByText(/My Tasks/i);
     fireEvent.click(await screen.findByTitle(/Edit Task/i));
@@ -388,17 +412,13 @@ describe("Dashboard edge cases", () => {
       data: adminUser,
     } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
-      data: { items: [], total: 0 },
+      data: { data: [], count: 0 },
     } as any);
     (sdk.createUserApiV1UsersPost as any).mockResolvedValue({
       data: {},
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} initialTab="users" />
-      </MemoryRouter>,
-    );
+    renderDashboard({ initialTab: "users" });
 
     await screen.findByText(/Provision User/i);
     fireEvent.click(screen.getByRole("button", { name: /Provision User/i }));
@@ -451,17 +471,13 @@ describe("Dashboard edge cases", () => {
       data: adminUser,
     } as any);
     vi.mocked(sdk.readUsersApiV1UsersGet).mockResolvedValue({
-      data: { items: [otherUser], total: 1 },
+      data: { data: [otherUser], count: 1 },
     } as any);
     (sdk.updateUserApiV1UsersIdPatch as any).mockResolvedValue({
       data: { ...otherUser, is_active: false },
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
 
     fireEvent.click(await screen.findByText("Users"));
     await screen.findByText("user2@x.com");

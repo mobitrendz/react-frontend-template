@@ -1,6 +1,7 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Dashboard from "./Dashboard";
 import * as sdk from "../client/sdk.gen";
 import { useAuth, Role } from "../contexts/AuthContext";
@@ -47,9 +48,19 @@ vi.mock("../contexts/AuthContext", () => ({
   AuthProvider: ({ children }: any) => <div>{children}</div>,
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
 describe("Dashboard Component", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = createTestQueryClient();
     vi.mocked(useAuth).mockReturnValue({
       user: {
         id: "user-1",
@@ -71,6 +82,15 @@ describe("Dashboard Component", () => {
     window.alert = vi.fn();
     window.confirm = vi.fn(() => true);
   });
+
+  const renderDashboard = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Dashboard onLogout={() => {}} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   const mockUser = {
     id: "user-1",
@@ -98,11 +118,7 @@ describe("Dashboard Component", () => {
       data: {},
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
 
     await waitFor(() =>
       expect(screen.getByText(/No tasks found/i)).toBeInTheDocument(),
@@ -149,11 +165,7 @@ describe("Dashboard Component", () => {
       data: {},
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
 
     fireEvent.click(await screen.findByText("Users"));
 
@@ -197,11 +209,7 @@ describe("Dashboard Component", () => {
       data: {},
     } as any);
 
-    render(
-      <MemoryRouter>
-        <Dashboard onLogout={() => {}} />
-      </MemoryRouter>,
-    );
+    renderDashboard();
     await screen.findByText("Test Task");
 
     // Wait for the button to be ready

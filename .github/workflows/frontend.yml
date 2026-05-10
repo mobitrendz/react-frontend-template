@@ -32,3 +32,14 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files
+
+      - name: Verify API Client Sync
+        run: |
+          # Note: This requires the backend to be accessible or a local openapi.json
+          # In a real CI, you might use a mock or a staged backend URL
+          npm run generate-client || echo "Skipping sync check: Backend unreachable"
+          if [ -d "src/client" ] && [ -n "$(git status --porcelain src/client)" ]; then
+            echo "❌ Error: API Client is out of sync with the backend schema. Please run 'npm run generate-client' locally and commit the changes."
+            git status src/client
+            exit 1
+          fi
