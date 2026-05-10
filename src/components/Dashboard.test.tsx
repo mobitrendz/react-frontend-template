@@ -121,7 +121,7 @@ describe("Dashboard Component", () => {
     renderDashboard();
 
     await waitFor(() =>
-      expect(screen.getByText(/No tasks found/i)).toBeInTheDocument(),
+      expect(screen.getByText(/You have no tasks yet/i)).toBeInTheDocument(),
     );
 
     // Open the creation form - clicking the main dashboard button

@@ -85,4 +85,9 @@ describe("ThemeContext", () => {
     render(<ThemeTestComponent />);
     expect(screen.getByTestId("current-theme").textContent).toBe("system");
   });
+
+  it("returns default theme when useTheme is used outside provider", () => {
+    render(<ThemeTestComponent />);
+    expect(screen.getByTestId("current-theme").textContent).toBe("system");
+  });
 });

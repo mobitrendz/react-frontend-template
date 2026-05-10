@@ -161,4 +161,46 @@ describe("UserTaskView", () => {
 
     window.confirm = originalConfirm;
   });
+
+  describe("UX States", () => {
+    it("displays empty state when no tasks exist", async () => {
+      (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({
+        data: { data: [] },
+      });
+
+      render(<UserTaskView />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/You have no tasks yet/i)).toBeInTheDocument();
+        expect(screen.getByText(/Create your first task/i)).toBeInTheDocument();
+      });
+    });
+
+    it("displays error message when API fails", async () => {
+      (sdk.readTodosApiV1TodosGet as any).mockResolvedValue({
+        error: { detail: "Failed to fetch tasks from server" },
+      });
+
+      render(<UserTaskView />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Failed to fetch tasks from server"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("displays loading skeletons during fetch", async () => {
+      // Return a promise that doesn't resolve immediately
+      (sdk.readTodosApiV1TodosGet as any).mockReturnValue(
+        new Promise(() => {}),
+      );
+
+      render(<UserTaskView />);
+
+      // Skeletons are rendered while loading
+      const skeletons = document.querySelectorAll(".animate-pulse");
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
+  });
 });

@@ -10,6 +10,8 @@ interface TaskBoardProps {
   onToggleStatus: (todo: ToDoListPublic) => void;
   onEditClick: (todo: ToDoListPublic) => void;
   onDeleteTask: (id: string) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const TaskBoard = ({
@@ -20,6 +22,8 @@ const TaskBoard = ({
   onToggleStatus,
   onEditClick,
   onDeleteTask,
+  isLoading,
+  error,
 }: TaskBoardProps) => {
   const filteredTodos = todos.filter(
     (todo) =>
@@ -62,19 +66,35 @@ const TaskBoard = ({
         </button>
       </div>
 
-      {/* Grid */}
-      {filteredTodos.length === 0 ? (
+      {/* Error State */}
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-6 py-4 rounded-2xl text-sm font-medium animate-in fade-in zoom-in duration-300">
+          {error}
+        </div>
+      )}
+
+      {/* Grid / States */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              className="h-40 bg-card border border-border rounded-3xl animate-pulse"
+            />
+          ))}
+        </div>
+      ) : filteredTodos.length === 0 ? (
         <div className="bg-card rounded-3xl border-2 border-dashed border-border p-16 text-center shadow-inner">
           <div className="bg-muted w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckSquare className="w-10 h-10 text-primary" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">
-            No tasks found
+            {searchTerm ? "No tasks found" : "You have no tasks yet"}
           </h3>
           <p className="text-muted-foreground max-w-sm mx-auto">
             {searchTerm
               ? "Try a different search term or clear the filter."
-              : "You're all caught up! Create a new task to get started."}
+              : "Create your first task to get started."}
           </p>
         </div>
       ) : (

@@ -322,12 +322,57 @@ describe("AuthContext", () => {
         screen.getByText("Login").click();
       });
 
-      // Verification: if fetchProfile returns false, decodeAndSetUser falls back to JWT.
-      // So the user will still be set but from decoded token.
       await waitFor(() => {
         expect(screen.getByTestId("auth-status")).toHaveTextContent(
           "Authenticated",
         );
+      });
+    });
+
+    it("handles missing role in profile (defaults to USER)", async () => {
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValueOnce(
+        {
+          data: { id: "123", email: "test@test.com" }, // No role
+        },
+      );
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      act(() => {
+        screen.getByText("Login").click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-role")).toHaveTextContent("USER");
+      });
+    });
+
+    it("handles alternate role key in JWT (user_role)", async () => {
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockRejectedValueOnce(
+        new Error("API Down"),
+      );
+      vi.mocked(jwtDecode).mockReturnValueOnce({
+        sub: "user-1",
+        email: "test@test.com",
+        user_role: "SUPER", // Using user_role instead of role
+      } as any);
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      act(() => {
+        screen.getByText("Login").click();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-role")).toHaveTextContent("SUPER");
       });
     });
   });

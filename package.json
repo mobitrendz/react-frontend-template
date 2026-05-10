@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "generate-client": "openapi-ts",
     "test": "vitest",
-    "test:run": "vitest run",
+    "test:run": "vitest run --coverage.thresholds.statements 92 --coverage.thresholds.lines 92 --coverage.thresholds.functions 85 --coverage.thresholds.branches 80",
     "test:coverage": "vitest run --coverage",
     "posttest:coverage": "node scripts/update-readme.js"
   },

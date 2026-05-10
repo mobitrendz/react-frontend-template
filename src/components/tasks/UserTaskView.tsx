@@ -12,6 +12,7 @@ import {
   ToDoPriority,
   ToDoStatus,
 } from "../../client/types.gen";
+import { extractApiError } from "../../lib/error-handler";
 
 const UserTaskView = () => {
   const [todos, setTodos] = useState<ToDoListPublic[]>([]);
@@ -19,6 +20,7 @@ const UserTaskView = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTodo, setEditingTodo] = useState<ToDoListPublic | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState("");
@@ -35,12 +37,16 @@ const UserTaskView = () => {
   const fetchTodos = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await readTodosApiV1TodosGet();
-      if (response.data && response.data.data) {
+      if (response.error) {
+        setError(extractApiError(response.error));
+      } else if (response.data && response.data.data) {
         setTodos(response.data.data);
       }
-    } catch (error) {
-      console.error("Failed to fetch todos:", error);
+    } catch (err: any) {
+      console.error("Failed to fetch todos:", err);
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +136,8 @@ const UserTaskView = () => {
         onToggleStatus={handleToggleStatus}
         onEditClick={handleEditClick}
         onDeleteTask={handleDeleteTask}
+        isLoading={isLoading}
+        error={error}
       />
 
       {isFormOpen && (
