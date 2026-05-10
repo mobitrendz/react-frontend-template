@@ -15,7 +15,6 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:coverage": "vitest run --coverage",
     "posttest:coverage": "node scripts/update-readme.js"
   },
   "dependencies": {
