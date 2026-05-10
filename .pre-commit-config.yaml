@@ -33,3 +33,10 @@ repos:
         language: system
         types_or: [ts, tsx]
         pass_filenames: false
+
+      - id: test
+        name: test
+        entry: npm run test:run
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: false
