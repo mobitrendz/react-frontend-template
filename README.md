@@ -61,9 +61,9 @@ The project maintains high standards for reliability with a comprehensive test s
 | **Functions** | **88.58%** |
 | **Branches** | **84.77%** |
 =======
-| **Lines**      | **93.07%** |
-| **Functions**  | **88.58%** |
-| **Branches**   | **84.77%** |
+| **Lines** | **93.07%** |
+| **Functions** | **88.58%** |
+| **Branches** | **84.77%** |
 >>>>>>> 9993eda (chore: standardize project formatting and add node version configuration)
 
 ### Testing Stack
