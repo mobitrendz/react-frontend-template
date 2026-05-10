@@ -38,7 +38,7 @@ describe("Sidebar", () => {
           onClose={mockOnClose}
           {...props}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
@@ -61,16 +61,18 @@ describe("Sidebar", () => {
     renderSidebar();
     const collapseBtn = screen.getByText("Collapse Sidebar");
     fireEvent.click(collapseBtn);
-    
+
     // Once collapsed, the text "Collapse Sidebar" should disappear (it's hidden when isCollapsed is true)
     expect(screen.queryByText("Collapse Sidebar")).not.toBeInTheDocument();
-    
+
     // Find the button again (it's the only one with hidden lg:flex... and ChevronRight icon inside)
     // The easiest way is to find it by role or inside the actions div
     const toggleBtns = screen.getAllByRole("button");
-    const toggleBtn = toggleBtns.find(btn => btn.className.includes("hidden lg:flex"));
+    const toggleBtn = toggleBtns.find((btn) =>
+      btn.className.includes("hidden lg:flex"),
+    );
     if (toggleBtn) fireEvent.click(toggleBtn);
-    
+
     // Now it should be back
     expect(screen.getByText("Collapse Sidebar")).toBeInTheDocument();
   });

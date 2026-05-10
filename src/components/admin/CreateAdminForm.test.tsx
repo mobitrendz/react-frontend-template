@@ -24,13 +24,17 @@ describe("CreateAdminForm", () => {
   it("renders correctly for a normal user creation", () => {
     render(<CreateAdminForm {...defaultProps} />);
     expect(screen.getByText("New System User")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Create User Account" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create User Account" }),
+    ).toBeInTheDocument();
   });
 
   it("renders correctly for an admin user creation", () => {
     render(<CreateAdminForm {...defaultProps} isSuper={true} />);
     expect(screen.getByText("New Admin User")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Create Admin Account" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create Admin Account" }),
+    ).toBeInTheDocument();
   });
 
   it("displays error message if passed", () => {
@@ -40,20 +44,26 @@ describe("CreateAdminForm", () => {
 
   it("calls input handlers on change", () => {
     render(<CreateAdminForm {...defaultProps} />);
-    
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: "New Name" } });
+
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: "New Name" },
+    });
     expect(defaultProps.onFullNameChange).toHaveBeenCalledWith("New Name");
 
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: "new@test.com" } });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: "new@test.com" },
+    });
     expect(defaultProps.onEmailChange).toHaveBeenCalledWith("new@test.com");
 
-    fireEvent.change(screen.getByLabelText(/Temporary Password/i), { target: { value: "password123" } });
+    fireEvent.change(screen.getByLabelText(/Temporary Password/i), {
+      target: { value: "password123" },
+    });
     expect(defaultProps.onPasswordChange).toHaveBeenCalledWith("password123");
   });
 
   it("calls onClose when cancel or X is clicked", () => {
     render(<CreateAdminForm {...defaultProps} />);
-    
+
     fireEvent.click(screen.getByText("Cancel"));
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
 

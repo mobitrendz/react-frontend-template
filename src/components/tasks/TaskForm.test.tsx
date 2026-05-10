@@ -28,7 +28,9 @@ describe("TaskForm", () => {
   it("renders correctly for creating a task", () => {
     render(<TaskForm {...defaultProps} />);
     expect(screen.getByText("Create New Task")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Create Task" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create Task" }),
+    ).toBeInTheDocument();
     expect(screen.getByDisplayValue("Test Title")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Test Desc")).toBeInTheDocument();
   });
@@ -36,26 +38,40 @@ describe("TaskForm", () => {
   it("renders correctly for editing a task", () => {
     render(<TaskForm {...defaultProps} isEditing={true} />);
     expect(screen.getByText("Edit Task")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Update Task" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Update Task" }),
+    ).toBeInTheDocument();
   });
 
   it("calls onChange handlers when inputs change", () => {
     render(<TaskForm {...defaultProps} />);
 
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "New Title" } });
+    fireEvent.change(screen.getByLabelText("Title"), {
+      target: { value: "New Title" },
+    });
     expect(defaultProps.onTitleChange).toHaveBeenCalledWith("New Title");
 
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: "New Desc" } });
+    fireEvent.change(screen.getByLabelText("Description"), {
+      target: { value: "New Desc" },
+    });
     expect(defaultProps.onDescriptionChange).toHaveBeenCalledWith("New Desc");
 
-    fireEvent.change(screen.getByLabelText(/Priority/i), { target: { value: "high" } });
+    fireEvent.change(screen.getByLabelText(/Priority/i), {
+      target: { value: "high" },
+    });
     expect(defaultProps.onPriorityChange).toHaveBeenCalledWith("high");
 
-    fireEvent.change(screen.getByLabelText(/Status/i), { target: { value: "completed" } });
+    fireEvent.change(screen.getByLabelText(/Status/i), {
+      target: { value: "completed" },
+    });
     expect(defaultProps.onStatusChange).toHaveBeenCalledWith("completed");
 
-    fireEvent.change(screen.getByLabelText(/Due Date/i), { target: { value: "2024-01-01T10:00" } });
-    expect(defaultProps.onDueDateChange).toHaveBeenCalledWith("2024-01-01T10:00");
+    fireEvent.change(screen.getByLabelText(/Due Date/i), {
+      target: { value: "2024-01-01T10:00" },
+    });
+    expect(defaultProps.onDueDateChange).toHaveBeenCalledWith(
+      "2024-01-01T10:00",
+    );
   });
 
   it("calls onClose when cancel or X is clicked", () => {
@@ -78,6 +94,8 @@ describe("TaskForm", () => {
 
   it("shows processing state when isSubmitting is true", () => {
     render(<TaskForm {...defaultProps} isSubmitting={true} />);
-    expect(screen.getByRole("button", { name: "Processing..." })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Processing..." }),
+    ).toBeDisabled();
   });
 });

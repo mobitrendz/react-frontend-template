@@ -160,7 +160,7 @@ describe("App Component", () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Access Forbidden")).toBeInTheDocument();

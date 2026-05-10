@@ -165,14 +165,22 @@ describe("Login Component", () => {
     );
 
     const submitButton = screen.getByRole("button", { name: /Sign in/i });
-    fireEvent.change(screen.getByPlaceholderText(/Username \/ Email/i), { target: { value: "test" } });
-    fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: "test" } });
+    fireEvent.change(screen.getByPlaceholderText(/Username \/ Email/i), {
+      target: { value: "test" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Password/i), {
+      target: { value: "test" },
+    });
 
     // 1. Network error (catch block)
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValueOnce(new Error("Network Error"));
+    vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValueOnce(
+      new Error("Network Error"),
+    );
     fireEvent.click(submitButton);
-    expect(await screen.findByText(/A network error occurred/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/A network error occurred/i),
+    ).toBeInTheDocument();
     consoleSpy.mockRestore();
 
     // 2. Array detail error

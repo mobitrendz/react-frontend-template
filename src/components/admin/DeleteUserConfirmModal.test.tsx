@@ -35,7 +35,7 @@ describe("DeleteUserConfirmModal", () => {
 
   it("calls onClose when cancel button or X is clicked", () => {
     render(<DeleteUserConfirmModal {...defaultProps} />);
-    
+
     fireEvent.click(screen.getByText("Cancel"));
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
 
@@ -51,13 +51,18 @@ describe("DeleteUserConfirmModal", () => {
 
     render(<DeleteUserConfirmModal {...defaultProps} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter your current password"), {
-      target: { value: "correct-password" },
-    });
+    fireEvent.change(
+      screen.getByPlaceholderText("Enter your current password"),
+      {
+        target: { value: "correct-password" },
+      },
+    );
     fireEvent.submit(screen.getByRole("button", { name: "Confirm Delete" }));
 
     await waitFor(() => {
-      expect(sdk.loginAccessTokenApiV1LoginAccessTokenPost).toHaveBeenCalledWith({
+      expect(
+        sdk.loginAccessTokenApiV1LoginAccessTokenPost,
+      ).toHaveBeenCalledWith({
         body: { username: "admin@test.com", password: "correct-password" },
       });
       expect(defaultProps.onConfirm).toHaveBeenCalled();
@@ -71,29 +76,41 @@ describe("DeleteUserConfirmModal", () => {
 
     render(<DeleteUserConfirmModal {...defaultProps} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter your current password"), {
-      target: { value: "wrong-password" },
-    });
+    fireEvent.change(
+      screen.getByPlaceholderText("Enter your current password"),
+      {
+        target: { value: "wrong-password" },
+      },
+    );
     fireEvent.submit(screen.getByRole("button", { name: "Confirm Delete" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Incorrect password. Please try again.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Incorrect password. Please try again."),
+      ).toBeInTheDocument();
       expect(defaultProps.onConfirm).not.toHaveBeenCalled();
     });
   });
 
   it("displays error if password verification API throws error", async () => {
-    (sdk.loginAccessTokenApiV1LoginAccessTokenPost as any).mockRejectedValue(new Error("API Error"));
+    (sdk.loginAccessTokenApiV1LoginAccessTokenPost as any).mockRejectedValue(
+      new Error("API Error"),
+    );
 
     render(<DeleteUserConfirmModal {...defaultProps} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter your current password"), {
-      target: { value: "error-password" },
-    });
+    fireEvent.change(
+      screen.getByPlaceholderText("Enter your current password"),
+      {
+        target: { value: "error-password" },
+      },
+    );
     fireEvent.submit(screen.getByRole("button", { name: "Confirm Delete" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Invalid credentials. Password verification failed.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Invalid credentials. Password verification failed."),
+      ).toBeInTheDocument();
       expect(defaultProps.onConfirm).not.toHaveBeenCalled();
     });
   });

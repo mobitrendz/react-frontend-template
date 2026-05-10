@@ -12,7 +12,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <div data-testid="child">Happy Child</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByTestId("child")).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ProblemChild />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText("Application Crash")).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("ErrorBoundary", () => {
 
   it("reloads page when refresh button is clicked", () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    
+
     // Mock window.location.reload
     const originalLocation = window.location;
     delete (window as any).location;
@@ -45,7 +45,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ProblemChild />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     const btn = screen.getByText("Refresh Application");

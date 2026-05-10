@@ -25,10 +25,12 @@ vi.mock("../../contexts/AuthContext", () => ({
 vi.mock("./AdminUserTable", () => ({
   default: ({ onToggleStatus, onDeleteUser }: any) => (
     <div data-testid="admin-user-table">
-      <button onClick={() => onToggleStatus({ id: "1", is_active: false })}>Toggle User</button>
+      <button onClick={() => onToggleStatus({ id: "1", is_active: false })}>
+        Toggle User
+      </button>
       <button onClick={() => onDeleteUser({ id: "2" })}>Delete User</button>
     </div>
-  )
+  ),
 }));
 vi.mock("./CreateAdminForm", () => ({
   default: ({ onSubmit, onClose }: any) => (
@@ -38,7 +40,7 @@ vi.mock("./CreateAdminForm", () => ({
       </form>
       <button onClick={onClose}>Close Form</button>
     </div>
-  )
+  ),
 }));
 vi.mock("./DeleteUserConfirmModal", () => ({
   default: ({ onConfirm, onClose }: any) => (
@@ -46,13 +48,13 @@ vi.mock("./DeleteUserConfirmModal", () => ({
       <button onClick={onConfirm}>Confirm Delete</button>
       <button onClick={onClose}>Cancel Delete</button>
     </div>
-  )
+  ),
 }));
 vi.mock("./dashboard/SuperAdminDashboard", () => ({
-  default: () => <div data-testid="super-admin-dashboard" />
+  default: () => <div data-testid="super-admin-dashboard" />,
 }));
 vi.mock("./activity/AdminActivityDashboard", () => ({
-  default: () => <div data-testid="admin-activity-dashboard" />
+  default: () => <div data-testid="admin-activity-dashboard" />,
 }));
 
 describe("AdminDashboardView", () => {
@@ -75,7 +77,7 @@ describe("AdminDashboardView", () => {
     return render(
       <MemoryRouter>
         <AdminDashboardView currentUser={mockCurrentUser} {...props} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
@@ -111,7 +113,7 @@ describe("AdminDashboardView", () => {
     (sdk.createUserApiV1UsersPost as any).mockResolvedValue({});
 
     renderView({ initialTab: "users" });
-    
+
     // Open modal
     fireEvent.click(screen.getByText("Provision Admin"));
     expect(screen.getByTestId("create-admin-form")).toBeInTheDocument();
@@ -127,10 +129,10 @@ describe("AdminDashboardView", () => {
 
   it("opens CreateAdminForm and closes it", () => {
     renderView({ initialTab: "users" });
-    
+
     // Open modal
     fireEvent.click(screen.getByText("Provision Admin"));
-    
+
     // Close modal
     fireEvent.click(screen.getByText("Close Form"));
     expect(screen.queryByTestId("create-admin-form")).not.toBeInTheDocument();
@@ -145,7 +147,7 @@ describe("AdminDashboardView", () => {
     await waitFor(() => {
       expect(sdk.updateUserApiV1UsersIdPatch).toHaveBeenCalledWith({
         path: { id: "1" },
-        body: { is_active: true }
+        body: { is_active: true },
       });
     });
   });
@@ -163,9 +165,11 @@ describe("AdminDashboardView", () => {
 
     await waitFor(() => {
       expect(sdk.deleteUserApiV1UsersIdDelete).toHaveBeenCalledWith({
-        path: { id: "2" }
+        path: { id: "2" },
       });
-      expect(screen.queryByTestId("delete-confirm-modal")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("delete-confirm-modal"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -174,54 +178,72 @@ describe("AdminDashboardView", () => {
 
     // Open modal
     fireEvent.click(screen.getByText("Delete User"));
-    
+
     // Cancel
     fireEvent.click(screen.getByText("Cancel Delete"));
 
     expect(sdk.deleteUserApiV1UsersIdDelete).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("delete-confirm-modal")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("delete-confirm-modal"),
+    ).not.toBeInTheDocument();
   });
 
   describe("Error handling and tab reset", () => {
     it("logs error when status toggle fails", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      (sdk.updateUserApiV1UsersIdPatch as any).mockRejectedValueOnce(new Error("Update failed"));
-      
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      (sdk.updateUserApiV1UsersIdPatch as any).mockRejectedValueOnce(
+        new Error("Update failed"),
+      );
+
       renderView({ initialTab: "users" });
       fireEvent.click(screen.getByText("Toggle User"));
-      
+
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith("Failed to toggle status:", expect.any(Error));
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "Failed to toggle status:",
+          expect.any(Error),
+        );
       });
       consoleSpy.mockRestore();
     });
 
     it("logs error when user deletion fails", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      (sdk.deleteUserApiV1UsersIdDelete as any).mockRejectedValueOnce(new Error("Delete failed"));
-      
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      (sdk.deleteUserApiV1UsersIdDelete as any).mockRejectedValueOnce(
+        new Error("Delete failed"),
+      );
+
       renderView({ initialTab: "users" });
       fireEvent.click(screen.getByText("Delete User"));
       fireEvent.click(screen.getByText("Confirm Delete"));
-      
+
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith("Failed to delete user:", expect.any(Error));
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "Failed to delete user:",
+          expect.any(Error),
+        );
       });
       consoleSpy.mockRestore();
     });
 
     it("handles admin creation error", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       (sdk.createUserApiV1UsersPost as any).mockRejectedValueOnce({
-        body: { detail: "Email already exists" }
+        body: { detail: "Email already exists" },
       });
-      
+
       renderView({ initialTab: "users" });
       fireEvent.click(screen.getByText("Provision Admin"));
       fireEvent.submit(screen.getByRole("form", { name: "create-form" }));
-      
+
       // Verification: error state would be in AdminDashboardView, but it's not exposed to mocks.
-      // However, the catch block will run. 
+      // However, the catch block will run.
       await waitFor(() => {
         expect(sdk.createUserApiV1UsersPost).toHaveBeenCalled();
       });
@@ -239,7 +261,9 @@ describe("AdminDashboardView", () => {
         user: mockCurrentUser,
       } as any);
       renderView({ initialTab: undefined });
-      expect(screen.getByTestId("admin-activity-dashboard")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("admin-activity-dashboard"),
+      ).toBeInTheDocument();
     });
   });
 });

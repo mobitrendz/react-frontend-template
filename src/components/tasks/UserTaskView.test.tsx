@@ -63,9 +63,11 @@ describe("UserTaskView", () => {
     await waitFor(() => expect(screen.getByText("Task 1")).toBeInTheDocument());
 
     fireEvent.click(screen.getByText("Create Task"));
-    
+
     // Fill out form
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "New Task Title" } });
+    fireEvent.change(screen.getByLabelText("Title"), {
+      target: { value: "New Task Title" },
+    });
     const createBtns = screen.getAllByRole("button", { name: "Create Task" });
     fireEvent.submit(createBtns[createBtns.length - 1]);
 
@@ -89,8 +91,10 @@ describe("UserTaskView", () => {
     fireEvent.click(editBtns[0]);
 
     expect(screen.getByText("Edit Task")).toBeInTheDocument();
-    
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Updated Title" } });
+
+    fireEvent.change(screen.getByLabelText("Title"), {
+      target: { value: "Updated Title" },
+    });
     fireEvent.submit(screen.getByRole("button", { name: "Update Task" }));
 
     await waitFor(() => {
@@ -110,7 +114,9 @@ describe("UserTaskView", () => {
     // Task 1 is pending, so clicking toggle should change it to completed
     // Toggle button is the first button in the TaskCard without aria-label
     // Let's find it by icon or class... or we can just query all buttons and click the first one for Task 1
-    const toggleBtn = screen.getAllByRole("button").find(b => b.className.includes("mt-1"));
+    const toggleBtn = screen
+      .getAllByRole("button")
+      .find((b) => b.className.includes("mt-1"));
     if (toggleBtn) fireEvent.click(toggleBtn);
 
     await waitFor(() => {

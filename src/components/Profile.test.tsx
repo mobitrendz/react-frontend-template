@@ -145,14 +145,21 @@ describe("Profile Component", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: /^Update Password$/i }));
-    
+
     // Check success message appears
-    expect(await screen.findByText(/Password successfully updated!/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Password successfully updated!/i),
+    ).toBeInTheDocument();
 
     // Check it disappears after 2 seconds
-    await waitFor(() => {
-      expect(screen.queryByText(/Password successfully updated!/i)).not.toBeInTheDocument();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(
+          screen.queryByText(/Password successfully updated!/i),
+        ).not.toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   });
 
   it("handles deletion process", async () => {

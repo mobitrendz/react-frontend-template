@@ -80,7 +80,7 @@ describe("AdminUserTable", () => {
         onToggleStatus={mockOnToggleStatus}
         onDeleteUser={mockOnDeleteUser}
         {...props}
-      />
+      />,
     );
   };
 
@@ -94,16 +94,20 @@ describe("AdminUserTable", () => {
       expect(screen.getByText("Regular User")).toBeInTheDocument();
       expect(screen.getByText("Super Admin")).toBeInTheDocument();
     });
-    
+
     // Pagination info (count is 15)
     expect(screen.getByText(/of 15/)).toBeInTheDocument();
   });
 
   it("filters users by search term", async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText("Regular User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Regular User")).toBeInTheDocument(),
+    );
 
-    const searchInput = screen.getByPlaceholderText("Search by name or email...");
+    const searchInput = screen.getByPlaceholderText(
+      "Search by name or email...",
+    );
     fireEvent.change(searchInput, { target: { value: "super" } });
 
     expect(screen.getByText("Super Admin")).toBeInTheDocument();
@@ -112,7 +116,9 @@ describe("AdminUserTable", () => {
 
   it("filters users by role", async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText("Regular User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Regular User")).toBeInTheDocument(),
+    );
 
     const select = screen.getByRole("combobox");
     fireEvent.change(select, { target: { value: "user" } });
@@ -137,7 +143,9 @@ describe("AdminUserTable", () => {
 
   it("calls toggle status for valid user", async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText("Regular User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Regular User")).toBeInTheDocument(),
+    );
 
     // Toggle status button has text Active or Inactive
     const toggleBtn = screen.getByText("Inactive").closest("button");
@@ -148,12 +156,14 @@ describe("AdminUserTable", () => {
 
   it("calls delete for valid user", async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText("Regular User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Regular User")).toBeInTheDocument(),
+    );
 
     // Delete buttons have title="Delete User"
     const deleteBtns = screen.getAllByTitle("Delete User");
     // Click the first active delete button
-    const deleteBtn = deleteBtns.find(b => !b.disabled);
+    const deleteBtn = deleteBtns.find((b) => !b.disabled);
     if (deleteBtn) fireEvent.click(deleteBtn);
 
     expect(mockOnDeleteUser).toHaveBeenCalled();
@@ -161,12 +171,17 @@ describe("AdminUserTable", () => {
 
   it("handles fetch users failure", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    (sdk.readUsersApiV1UsersGet as any).mockRejectedValueOnce(new Error("Fetch failed"));
-    
+    (sdk.readUsersApiV1UsersGet as any).mockRejectedValueOnce(
+      new Error("Fetch failed"),
+    );
+
     renderTable();
-    
+
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch users:", expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to fetch users:",
+        expect.any(Error),
+      );
     });
     consoleSpy.mockRestore();
   });
@@ -176,9 +191,9 @@ describe("AdminUserTable", () => {
     (useAuth as any).mockReturnValue({
       role: Role.ADMIN,
     });
-    
+
     renderTable();
-    
+
     await waitFor(() => {
       expect(screen.getByText("Other Admin")).toBeInTheDocument();
     });
@@ -186,9 +201,9 @@ describe("AdminUserTable", () => {
     // For "Other Admin", the actions should be disabled or not present.
     // In AdminUserTable, if canManageUser returns false, buttons are disabled.
     const row = screen.getByText("Other Admin").closest("tr");
-    const toggleBtn = row?.querySelector('button'); // First button in actions is toggle
+    const toggleBtn = row?.querySelector("button"); // First button in actions is toggle
     const deleteBtn = row?.querySelector('button[title="Delete User"]');
-    
+
     expect(toggleBtn).toHaveTextContent("Active");
     expect(toggleBtn).toBeDisabled();
     expect(deleteBtn).toBeDisabled();
