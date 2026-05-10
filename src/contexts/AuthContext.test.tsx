@@ -32,17 +32,34 @@ vi.mock("jwt-decode", () => ({
 }));
 
 const TestComponent = () => {
-  const { user, token, role, isAuthenticated, isLoading, login, logout, hasPermission } = useAuth();
-  
+  const {
+    user,
+    token,
+    role,
+    isAuthenticated,
+    isLoading,
+    login,
+    logout,
+    hasPermission,
+  } = useAuth();
+
   if (isLoading) return <div>Loading...</div>;
-  
+
   return (
     <div>
-      <div data-testid="auth-status">{isAuthenticated ? "Authenticated" : "Not Authenticated"}</div>
+      <div data-testid="auth-status">
+        {isAuthenticated ? "Authenticated" : "Not Authenticated"}
+      </div>
       <div data-testid="user-role">{role || "No Role"}</div>
-      <div data-testid="has-super">{hasPermission(Role.SUPER) ? "Yes" : "No"}</div>
-      <div data-testid="has-admin">{hasPermission(Role.ADMIN) ? "Yes" : "No"}</div>
-      <div data-testid="has-user">{hasPermission(Role.USER) ? "Yes" : "No"}</div>
+      <div data-testid="has-super">
+        {hasPermission(Role.SUPER) ? "Yes" : "No"}
+      </div>
+      <div data-testid="has-admin">
+        {hasPermission(Role.ADMIN) ? "Yes" : "No"}
+      </div>
+      <div data-testid="has-user">
+        {hasPermission(Role.USER) ? "Yes" : "No"}
+      </div>
       <button onClick={() => login("fake-token")}>Login</button>
       <button onClick={logout}>Logout</button>
     </div>
@@ -59,14 +76,16 @@ describe("AuthContext", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
       expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
     });
 
-    expect(screen.getByTestId("auth-status")).toHaveTextContent("Not Authenticated");
+    expect(screen.getByTestId("auth-status")).toHaveTextContent(
+      "Not Authenticated",
+    );
     expect(screen.getByTestId("user-role")).toHaveTextContent("No Role");
   });
 
@@ -84,17 +103,21 @@ describe("AuthContext", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
-    await waitFor(() => expect(screen.queryByText("Loading...")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByText("Loading...")).not.toBeInTheDocument(),
+    );
 
     act(() => {
       screen.getByText("Login").click();
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("auth-status")).toHaveTextContent("Authenticated");
+      expect(screen.getByTestId("auth-status")).toHaveTextContent(
+        "Authenticated",
+      );
       expect(screen.getByTestId("user-role")).toHaveTextContent("ADMIN");
       expect(screen.getByTestId("has-super")).toHaveTextContent("No");
       expect(screen.getByTestId("has-admin")).toHaveTextContent("Yes");
@@ -103,22 +126,28 @@ describe("AuthContext", () => {
   });
 
   it("logs in user and falls back to JWT if API fails", async () => {
-    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockRejectedValue(new Error("API Error"));
+    (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockRejectedValue(
+      new Error("API Error"),
+    );
 
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
-    await waitFor(() => expect(screen.queryByText("Loading...")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByText("Loading...")).not.toBeInTheDocument(),
+    );
 
     act(() => {
       screen.getByText("Login").click();
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("auth-status")).toHaveTextContent("Authenticated");
+      expect(screen.getByTestId("auth-status")).toHaveTextContent(
+        "Authenticated",
+      );
       expect(screen.getByTestId("user-role")).toHaveTextContent("ADMIN"); // From mocked jwtDecode
     });
   });
@@ -132,11 +161,13 @@ describe("AuthContext", () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("auth-status")).toHaveTextContent("Authenticated");
+      expect(screen.getByTestId("auth-status")).toHaveTextContent(
+        "Authenticated",
+      );
     });
 
     act(() => {
@@ -144,7 +175,9 @@ describe("AuthContext", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId("auth-status")).toHaveTextContent("Not Authenticated");
+      expect(screen.getByTestId("auth-status")).toHaveTextContent(
+        "Not Authenticated",
+      );
     });
   });
 });

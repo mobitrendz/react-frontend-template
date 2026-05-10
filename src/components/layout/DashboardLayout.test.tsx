@@ -9,9 +9,11 @@ vi.mock("./Sidebar", () => {
     default: ({ isOpen, onClose }: any) => (
       <div data-testid="sidebar">
         <span>{isOpen ? "Sidebar Open" : "Sidebar Closed"}</span>
-        <button data-testid="close-sidebar" onClick={onClose}>Close Sidebar</button>
+        <button data-testid="close-sidebar" onClick={onClose}>
+          Close Sidebar
+        </button>
       </div>
-    )
+    ),
   };
 });
 
@@ -40,7 +42,7 @@ describe("DashboardLayout", () => {
         onViewChange={mockOnViewChange}
       >
         <div data-testid="child-content">Child Content</div>
-      </DashboardLayout>
+      </DashboardLayout>,
     );
 
     expect(screen.getByTestId("child-content")).toBeInTheDocument();
@@ -55,7 +57,7 @@ describe("DashboardLayout", () => {
         onViewChange={mockOnViewChange}
       >
         <div>Content</div>
-      </DashboardLayout>
+      </DashboardLayout>,
     );
 
     // Initial state: closed
@@ -63,12 +65,14 @@ describe("DashboardLayout", () => {
 
     // Find and click the menu button (which has the lucide Menu icon)
     const menuButtons = screen.getAllByRole("button");
-    const mobileMenuButton = menuButtons.find(b => b.className.includes("-ml-2")); // based on className in component
-    
+    const mobileMenuButton = menuButtons.find((b) =>
+      b.className.includes("-ml-2"),
+    ); // based on className in component
+
     if (mobileMenuButton) {
       fireEvent.click(mobileMenuButton);
     }
-    
+
     // Now it should be open
     expect(screen.getByText("Sidebar Open")).toBeInTheDocument();
 

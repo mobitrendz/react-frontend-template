@@ -26,7 +26,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe("ProtectedRoute", () => {
           />
           <Route path="/login" element={<div>Login Page</div>} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Login Page")).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -88,7 +88,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute requiredRole={Role.ADMIN}>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Access Denied")).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute requiredRole={Role.ADMIN}>
           <div>Protected Content</div>
         </ProtectedRoute>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();

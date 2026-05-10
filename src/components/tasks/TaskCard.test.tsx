@@ -29,17 +29,20 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     expect(screen.getByText("Test Task")).toBeInTheDocument();
     expect(screen.getByText("This is a test task")).toBeInTheDocument();
     expect(screen.getByText("high")).toBeInTheDocument();
     expect(screen.getByText("pending")).toBeInTheDocument();
-    const expectedDate = new Date("2023-12-31T23:59:59Z").toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    });
+    const expectedDate = new Date("2023-12-31T23:59:59Z").toLocaleDateString(
+      undefined,
+      {
+        month: "short",
+        day: "numeric",
+      },
+    );
     expect(screen.getByText(expectedDate)).toBeInTheDocument();
   });
 
@@ -51,7 +54,7 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     expect(screen.getByText("No description provided.")).toBeInTheDocument();
@@ -64,7 +67,7 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     // The button wraps the lucide icon. Let's find it by role or inside structure.
@@ -82,7 +85,7 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     const editBtn = screen.getByLabelText("Edit Task");
@@ -97,7 +100,7 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     const deleteBtn = screen.getByLabelText("Delete Task");
@@ -113,7 +116,7 @@ describe("TaskCard", () => {
         onToggle={mockOnToggle}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
-      />
+      />,
     );
 
     expect(screen.getByText("completed")).toBeInTheDocument();
