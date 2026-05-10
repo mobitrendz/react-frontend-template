@@ -2,7 +2,7 @@
 
 ![Frontend Code Quality](https://github.com/mobitrendz/react-frontend-template/actions/workflows/frontend.yml/badge.svg?branch=develop)
 ![Test Coverage](https://github.com/mobitrendz/react-frontend-template/actions/workflows/coverage.yml/badge.svg?branch=develop)
-![Coverage Percentage](https://img.shields.io/badge/coverage-91.56%25-brightgreen)
+![Coverage Percentage](https://img.shields.io/badge/coverage-86.66%25-green)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. Optimized for **2026 industry standards**, this template is pre-configured with a premium design system, TanStack Query orchestration, and comprehensive unit testing.
 
@@ -55,10 +55,22 @@ The project maintains high standards for reliability with a comprehensive test s
 
 | Category       | Coverage   |
 | :------------- | :--------- |
-| **Statements** | **91.56%** |
-| **Lines** | **93.07%** |
-| **Functions** | **88.58%** |
-| **Branches** | **84.77%** |
+| **Statements** | **86.66%** |
+| **Lines**      | **88.01%** |
+| **Functions**  | **83.16%** |
+| **Branches**   | **76.82%** |
+
+### Test Coverage Details
+
+Our test suite covers critical user flows and administrative edge cases:
+
+- **🔐 Authentication**: Full coverage for login, token persistence, and role-based route protection.
+- **👤 Profile Management**: Testing for user details updates, password changes, and account deletion flows.
+- **✅ Task Operations**: Comprehensive testing of Task CRUD, filtering, and real-time search functionality.
+- **🛠️ Admin Controls**:
+  - **User Management**: Creation, deletion, and status toggling for administrative and regular accounts.
+  - **System Intelligence**: Metrics visualization, server health monitoring, and request success ratios.
+- **🛡️ Error Handling**: Robust testing of global Error Boundaries and API error extraction logic.
 
 ### Testing Stack
 
@@ -66,11 +78,30 @@ The project maintains high standards for reliability with a comprehensive test s
 - **React Testing Library**: The industry standard for testing component behavior.
 - **JSDOM**: Modern browser environment simulation.
 
-```bash
-npm test              # Run vitest in interactive watch mode
-npm run test:run      # Single run (useful for CI)
-npm run test:coverage # Generate comprehensive coverage report in /coverage
-```
+### Testing Workflow
+
+To maintain our high reliability standards, follow these steps during development:
+
+1.  **Watch Mode**: Best for active development.
+    ```bash
+    npm test
+    ```
+2.  **Full Validation**: Run the entire suite once (used in pre-commit).
+    ```bash
+    npm run test:run
+    ```
+3.  **Coverage Report**: Generate a detailed HTML report in `/coverage`.
+    ```bash
+    npm run test:coverage
+    ```
+4.  **Formatting Check**: Verify code style without applying fixes.
+    ```bash
+    npm run format:check
+    ```
+5.  **UI Debugging**: Vitest provides a powerful UI for visualizing test flows.
+    ```bash
+    npx vitest --ui
+    ```
 
 ## 🛡️ Automated Quality Checks
 

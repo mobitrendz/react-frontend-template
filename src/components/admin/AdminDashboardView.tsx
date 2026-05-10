@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { UserPlus, ShieldAlert } from "lucide-react";
+import { UserPlus, ShieldAlert, Terminal } from "lucide-react";
 import AdminUserTable from "./AdminUserTable";
 import CreateAdminForm from "./CreateAdminForm";
 import DeleteUserConfirmModal from "./DeleteUserConfirmModal";
 import { UserPublic } from "../../client/types.gen";
 import SuperAdminDashboard from "./dashboard/SuperAdminDashboard";
 import AdminActivityDashboard from "./activity/AdminActivityDashboard";
+import SystemErrorLogs from "./dashboard/SystemErrorLogs";
 import {
   updateUserApiV1UsersIdPatch,
   deleteUserApiV1UsersIdDelete,
@@ -16,7 +17,7 @@ import { Role, useAuth } from "../../contexts/AuthContext";
 
 interface AdminDashboardViewProps {
   currentUser: UserPublic | null;
-  initialTab?: "intelligence" | "activity" | "users";
+  initialTab?: "intelligence" | "activity" | "users" | "logs";
 }
 
 const AdminDashboardView = ({
@@ -37,7 +38,7 @@ const AdminDashboardView = ({
   // Key for forcing refresh of the table
   const [tableKey, setTableKey] = useState(0);
   const [activeTab, setActiveTab] = useState<
-    "intelligence" | "activity" | "users"
+    "intelligence" | "activity" | "users" | "logs"
   >(
     initialTab ||
       (currentUserRole === Role.SUPER ? "intelligence" : "activity"),
@@ -90,11 +91,7 @@ const AdminDashboardView = ({
     setError(null);
     try {
       setIsSubmitting(true);
-
-      // Determination of role based on creator's permission
-      // SUPER can create Admins, ADMIN can only create regular Users
       const targetRole = currentUserRole === Role.SUPER ? "admin" : "user";
-
       await createUserApiV1UsersPost({
         body: {
           email: newAdminEmail,
@@ -127,19 +124,34 @@ const AdminDashboardView = ({
           </h2>
           <div className="flex items-center gap-4 mt-2">
             {currentUserRole === Role.SUPER && (
-              <button
-                onClick={() => {
-                  setActiveTab("intelligence");
-                  navigate("/", { state: { fromTabClick: true } });
-                }}
-                className={`text-sm font-bold pb-1 transition-all border-b-2 ${
-                  activeTab === "intelligence"
-                    ? "text-primary border-primary"
-                    : "text-muted-foreground border-transparent hover:text-foreground"
-                }`}
-              >
-                Intelligence
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setActiveTab("intelligence");
+                    navigate("/", { state: { fromTabClick: true } });
+                  }}
+                  className={`text-sm font-bold pb-1 transition-all border-b-2 ${
+                    activeTab === "intelligence"
+                      ? "text-primary border-primary"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
+                  }`}
+                >
+                  Intelligence
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("logs");
+                    navigate("/", { state: { fromTabClick: true } });
+                  }}
+                  className={`text-sm font-bold pb-1 transition-all border-b-2 ${
+                    activeTab === "logs"
+                      ? "text-primary border-primary"
+                      : "text-muted-foreground border-transparent hover:text-foreground"
+                  }`}
+                >
+                  System Logs
+                </button>
+              </>
             )}
             <button
               onClick={() => {
@@ -207,6 +219,8 @@ const AdminDashboardView = ({
 
       {activeTab === "intelligence" ? (
         <SuperAdminDashboard />
+      ) : activeTab === "logs" ? (
+        <SystemErrorLogs />
       ) : activeTab === "activity" ? (
         <AdminActivityDashboard />
       ) : (
