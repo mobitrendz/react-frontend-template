@@ -96,7 +96,10 @@ const Login: React.FC = () => {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground/80 ml-1 font-bold">
+              <Label
+                htmlFor="email"
+                className="text-foreground/80 ml-1 font-bold"
+              >
                 Email Address
               </Label>
               <Input
@@ -110,7 +113,10 @@ const Login: React.FC = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground/80 ml-1 font-bold">
+              <Label
+                htmlFor="password"
+                className="text-foreground/80 ml-1 font-bold"
+              >
                 Password
               </Label>
               <Input

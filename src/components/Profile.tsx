@@ -201,9 +201,7 @@ const Profile = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <header>
-        <h1 className="text-3xl font-bold text-foreground">
-          Account Settings
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">Account Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your personal information and security preferences
         </p>
@@ -363,42 +361,42 @@ const Profile = () => {
                       required
                     />
                   </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="new_password"
-                          style={{ display: "block" }}
-                          className="text-sm font-bold text-foreground"
-                        >
-                          New Password
-                        </label>
-                        <input
-                          id="new_password"
-                          type="password"
-                          className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="confirm_password"
-                          style={{ display: "block" }}
-                          className="text-sm font-bold text-foreground"
-                        >
-                          Confirm New Password
-                        </label>
-                        <input
-                          id="confirm_password"
-                          type="password"
-                          className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          required
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="new_password"
+                        style={{ display: "block" }}
+                        className="text-sm font-bold text-foreground"
+                      >
+                        New Password
+                      </label>
+                      <input
+                        id="new_password"
+                        type="password"
+                        className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
                     </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="confirm_password"
+                        style={{ display: "block" }}
+                        className="text-sm font-bold text-foreground"
+                      >
+                        Confirm New Password
+                      </label>
+                      <input
+                        id="confirm_password"
+                        type="password"
+                        className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
                   {passwordError && (
                     <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold">
@@ -413,22 +411,22 @@ const Profile = () => {
                     </div>
                   )}
 
-                    <div className="flex gap-4">
-                      <button
-                        type="submit"
-                        disabled={isUpdatingPassword}
-                        className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all disabled:opacity-50"
-                      >
-                        {isUpdatingPassword ? "Updating..." : "Update Password"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsChangingPassword(false)}
-                        className="px-8 py-3 bg-background border border-border text-foreground rounded-xl font-bold hover:bg-accent transition-all"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      disabled={isUpdatingPassword}
+                      className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {isUpdatingPassword ? "Updating..." : "Update Password"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsChangingPassword(false)}
+                      className="px-8 py-3 bg-background border border-border text-foreground rounded-xl font-bold hover:bg-accent transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </form>
               ) : (
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

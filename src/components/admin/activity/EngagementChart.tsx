@@ -67,13 +67,21 @@ const EngagementChart: React.FC<EngagementChartProps> = ({ data, loading }) => {
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12, fontWeight: 600 }}
+              tick={{
+                fill: "var(--muted-foreground)",
+                fontSize: 12,
+                fontWeight: 600,
+              }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12, fontWeight: 600 }}
+              tick={{
+                fill: "var(--muted-foreground)",
+                fontSize: 12,
+                fontWeight: 600,
+              }}
             />
             <Tooltip
               contentStyle={{

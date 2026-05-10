@@ -29,7 +29,9 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(() => {
     try {
       if (typeof window !== "undefined" && window.localStorage) {
-        return (window.localStorage.getItem(storageKey) as Theme) || defaultTheme;
+        return (
+          (window.localStorage.getItem(storageKey) as Theme) || defaultTheme
+        );
       }
     } catch (e) {
       console.warn("localStorage is not available", e);
