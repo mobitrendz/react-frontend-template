@@ -7,6 +7,7 @@
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. Optimized for **2026 industry standards**, this template is pre-configured with a premium design system, TanStack Query orchestration, and comprehensive unit testing.
 
 ### 🔗 Related Repositories
+
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
 ## 🛠 Tech Stack
@@ -32,6 +33,7 @@ This template goes beyond basic boilerplate by implementing high-performance pat
 ## 🚀 Key Features
 
 ### 💻 Frontend & User Experience
+
 - **🔒 Secure Authentication**: Robust login/signup flow with JWT persistence and public registration support.
 - **🛣 Multi-Page Architecture**: Seamless navigation between Dashboard and Profile using React Router 7.
 - **✅ Advanced Task Management**: Inline editing, priority filtering, and real-time search for tasks.
@@ -39,6 +41,7 @@ This template goes beyond basic boilerplate by implementing high-performance pat
 - **🌓 Adaptive Design**: Premium dark-mode design system with modern micro-animations.
 
 ### 🛠 Administrative Controls
+
 - **👥 User Management**: Powerful admin dashboard to manage all system users.
 - **⚡ Status Control**: Instant activation/deactivation of user accounts with visual feedback.
 - **➕ Admin Creation**: Create new administrative accounts directly from the control center.
@@ -53,9 +56,15 @@ The project maintains high standards for reliability with a comprehensive test s
 | Category       | Coverage   |
 | :------------- | :--------- |
 | **Statements** | **91.56%** |
+<<<<<<< HEAD
 | **Lines** | **93.07%** |
 | **Functions** | **88.58%** |
 | **Branches** | **84.77%** |
+=======
+| **Lines**      | **93.07%** |
+| **Functions**  | **88.58%** |
+| **Branches**   | **84.77%** |
+>>>>>>> 9993eda (chore: standardize project formatting and add node version configuration)
 
 ### Testing Stack
 
@@ -72,9 +81,11 @@ npm run test:coverage # Generate comprehensive coverage report in /coverage
 ## 🛡️ Automated Quality Checks
 
 ### CI/CD API Guardrails
+
 Our **GitHub Actions** workflow (`frontend.yml`) includes an automated **API Sync Check**. If the backend schema changes without a corresponding frontend SDK update (`npm run generate-client`), the CI pipeline will fail, preventing broken contracts from reaching production.
 
 ### Local Git Hooks
+
 Before every commit, **Husky** and **lint-staged** run ESLint, Prettier, and TypeScript type-checks to ensure only high-quality code enters the repository.
 
 ## 🏁 Getting Started
@@ -114,11 +125,10 @@ import { useQuery } from "@tanstack/react-query";
 import { readTodosApiV1TodosGet } from "./client/sdk.gen";
 
 const { data, isLoading, error } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: () => readTodosApiV1TodosGet(),
 });
 ```
-
 
 ## 📂 Project Structure
 
@@ -133,10 +143,13 @@ const { data, isLoading, error } = useQuery({
 Built with ❤️ for rapid full-stack development. Refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
 
 ## 📋 Release Notes
+
 See the full [Release Notes](./RELEASE_NOTES.md) for a detailed history of changes.
 
 ## ⚖️ License
+
 This project is licensed under the MIT License.
 
 ## 💡 Inspiration
+
 This project is heavily inspired by the official [full-stack-fastapi-template](https://github.com/fastapi/full-stack-fastapi-template) in the FastAPI repository. It builds upon those foundational concepts, incorporating modern toolchain upgrades, enhanced observability, and AI-optimized developer workflows.

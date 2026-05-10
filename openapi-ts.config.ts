@@ -1,7 +1,12 @@
 import { defineConfig } from "@hey-api/openapi-ts";
+import { existsSync } from "node:fs";
+
+const input = existsSync("./openapi.json")
+  ? "./openapi.json"
+  : "http://localhost:8000/openapi.json";
 
 export default defineConfig({
-  input: "http://localhost:8000/openapi.json",
+  input,
   output: "src/client",
   plugins: [
     "@hey-api/client-fetch",
