@@ -67,7 +67,7 @@ const SuperAdminDashboard: React.FC = () => {
       <div className="flex flex-col items-center justify-center h-96 p-8 text-center bg-red-500/5 border border-red-500/10 rounded-3xl">
         <AlertCircle className="w-16 h-16 text-red-500 mb-6" />
         <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
-        <p className="text-[var(--text-dim)] mt-2 max-w-md">
+        <p className="text-muted-foreground mt-2 max-w-md">
           This secure console is reserved for Super User administrative actions.
           Your account does not have sufficient permissions to view this data.
         </p>
@@ -80,7 +80,7 @@ const SuperAdminDashboard: React.FC = () => {
       {/* Header with status */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-[var(--text-h)] tracking-tight">
+          <h1 className="text-3xl font-black text-foreground tracking-tight">
             System Intelligence
           </h1>
           <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 mt-1 uppercase tracking-widest">
@@ -93,21 +93,21 @@ const SuperAdminDashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right hidden sm:block">
-            <div className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-widest">
+            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
               Last Sync
             </div>
-            <div className="text-sm font-bold text-[var(--text)] flex items-center gap-1.5 justify-end">
+            <div className="text-sm font-bold text-foreground flex items-center gap-1.5 justify-end">
               <Clock className="w-3.5 h-3.5" />
               {lastRefreshed.toLocaleTimeString()}
             </div>
           </div>
           <button
             onClick={fetchStats}
-            className="p-3 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 transition-colors"
+            className="p-3 bg-accent/50 border border-border rounded-xl hover:bg-accent transition-colors group"
             title="Force Refresh"
           >
             <RefreshCw
-              className={`w-5 h-5 text-indigo-400 ${isLoading ? "animate-spin" : ""}`}
+              className={`w-5 h-5 text-primary ${isLoading ? "animate-spin" : ""}`}
             />
           </button>
         </div>
@@ -144,18 +144,18 @@ const SuperAdminDashboard: React.FC = () => {
       </div>
 
       {/* System Health */}
-      <div className="bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)] p-8 rounded-3xl">
+      <div className="bg-card border border-border p-8 rounded-3xl shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-h)]">
+            <h2 className="text-xl font-bold text-foreground">
               Server Fleet Health
             </h2>
-            <p className="text-sm text-[var(--text-dim)]">
+            <p className="text-sm text-muted-foreground">
               Real-time resource utilization metrics
             </p>
           </div>
           {data?.server && (
-            <div className="px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-full text-xs font-bold text-indigo-400">
+            <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-xs font-bold text-primary">
               UPTIME: {formatUptime(data.server.uptime_seconds)}
             </div>
           )}

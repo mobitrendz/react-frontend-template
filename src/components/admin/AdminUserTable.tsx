@@ -86,14 +86,14 @@ const AdminUserTable = ({
   });
 
   return (
-    <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
-      <div className="p-8 border-b border-slate-800 space-y-6 bg-gradient-to-br from-slate-900 to-slate-950">
+    <div className="bg-card rounded-3xl border border-border shadow-2xl overflow-hidden">
+      <div className="p-8 border-b border-border space-y-6 bg-muted/30">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">
+            <h2 className="text-2xl font-black text-foreground tracking-tight">
               User Directory
             </h2>
-            <p className="text-slate-400 font-medium text-sm mt-1">
+            <p className="text-muted-foreground font-medium text-sm mt-1">
               Manage platform access and security roles
             </p>
           </div>
@@ -110,16 +110,16 @@ const AdminUserTable = ({
 
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by name or email..."
-              className="pl-12 h-12 bg-slate-950 border-slate-800 text-white rounded-2xl focus:ring-indigo-500 transition-all"
+              className="pl-12 h-12 bg-background border-border text-foreground rounded-2xl focus:ring-primary transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select
-            className="bg-slate-950 border border-slate-800 rounded-2xl px-6 h-12 text-slate-300 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
+            className="bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
           >
@@ -137,19 +137,19 @@ const AdminUserTable = ({
         <Table>
           <TableHeader>
             <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
                 User Details
               </TableHead>
-              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
                 Security Role
               </TableHead>
-              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
                 System Status
               </TableHead>
-              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px]">
+              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
                 Registration
               </TableHead>
-              <TableHead className="px-6 py-5 text-slate-500 font-black uppercase tracking-widest text-[10px] text-right">
+              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] text-right">
                 Actions
               </TableHead>
             </TableRow>
@@ -159,8 +159,8 @@ const AdminUserTable = ({
               <TableRow className="hover:bg-transparent border-none">
                 <TableCell colSpan={5} className="py-24 text-center">
                   <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-                    <p className="text-slate-500 font-bold animate-pulse">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    <p className="text-muted-foreground font-bold animate-pulse">
                       Synchronizing User Data...
                     </p>
                   </div>
@@ -170,7 +170,7 @@ const AdminUserTable = ({
               <TableRow className="hover:bg-transparent border-none">
                 <TableCell
                   colSpan={5}
-                  className="py-24 text-center text-slate-500"
+                  className="py-24 text-center text-muted-foreground"
                 >
                   <p className="font-black text-xl tracking-tight">
                     No users found
@@ -184,19 +184,19 @@ const AdminUserTable = ({
               filteredUsers.map((user: UserPublic) => (
                 <TableRow
                   key={user.id}
-                  className="border-slate-800/50 hover:bg-slate-800/30 transition-all group"
+                  className="border-border hover:bg-accent/50 transition-all group"
                 >
                   <TableCell className="px-6 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-black text-lg border border-indigo-500/10 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-lg border border-primary/10 group-hover:scale-110 transition-transform">
                         {user.full_name?.charAt(0) ||
                           user.email.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-black text-white tracking-tight">
+                        <span className="font-black text-foreground tracking-tight">
                           {user.full_name || "Anonymous User"}
                         </span>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-bold">
                           <Mail className="w-3 h-3" />
                           <span>{user.email}</span>
                         </div>
@@ -244,7 +244,7 @@ const AdminUserTable = ({
                     </Button>
                   </TableCell>
                   <TableCell className="px-6 py-5">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-black">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-black">
                       <Calendar className="w-3.5 h-3.5" />
                       {user.created_at
                         ? new Date(user.created_at).toLocaleDateString(
@@ -266,7 +266,7 @@ const AdminUserTable = ({
                       disabled={
                         !canManageUser(user) || user.id === currentUser?.id
                       }
-                      className="text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+                      className="text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
                     >
                       <UserMinus className="w-5 h-5" />
                     </Button>
@@ -280,17 +280,17 @@ const AdminUserTable = ({
 
       {/* Pagination */}
       {totalUsers > pageSize && (
-        <div className="px-8 py-6 bg-slate-950/50 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">
+        <div className="px-8 py-6 bg-muted/20 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground font-bold uppercase tracking-tight">
             Showing{" "}
-            <span className="text-white font-black">
+            <span className="text-foreground font-black">
               {(currentPage - 1) * pageSize + 1}
             </span>{" "}
             to{" "}
-            <span className="text-white font-black">
+            <span className="text-foreground font-black">
               {Math.min(currentPage * pageSize, totalUsers)}
             </span>{" "}
-            of <span className="text-white font-black">{totalUsers}</span>{" "}
+            of <span className="text-foreground font-black">{totalUsers}</span>{" "}
             Records
           </p>
           <div className="flex gap-2">
@@ -299,7 +299,7 @@ const AdminUserTable = ({
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="bg-slate-900 border-slate-800 text-slate-400 hover:text-white rounded-xl h-10 w-10 p-0"
+              className="bg-card border-border text-muted-foreground hover:text-foreground rounded-xl h-10 w-10 p-0"
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
@@ -312,7 +312,7 @@ const AdminUserTable = ({
                 )
               }
               disabled={currentPage === Math.ceil(totalUsers / pageSize)}
-              className="bg-slate-900 border-slate-800 text-slate-400 hover:text-white rounded-xl h-10 w-10 p-0"
+              className="bg-card border-border text-muted-foreground hover:text-foreground rounded-xl h-10 w-10 p-0"
             >
               <ChevronRight className="w-5 h-5" />
             </Button>

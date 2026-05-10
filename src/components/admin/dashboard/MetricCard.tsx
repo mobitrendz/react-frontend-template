@@ -24,16 +24,16 @@ const MetricCard: React.FC<MetricCardProps> = ({
   loading,
 }) => {
   const icons = {
-    users: <Users className="w-6 h-6 text-indigo-400" />,
-    active: <Activity className="w-6 h-6 text-emerald-400" />,
-    new: <UserPlus className="w-6 h-6 text-amber-400" />,
+    users: <Users className="w-6 h-6 text-primary" />,
+    active: <Activity className="w-6 h-6 text-emerald-500" />,
+    new: <UserPlus className="w-6 h-6 text-amber-500" />,
   };
 
   if (loading) {
     return (
-      <div className="bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)] p-6 rounded-2xl animate-pulse">
-        <div className="h-4 w-24 bg-gray-700 rounded mb-4" />
-        <div className="h-8 w-32 bg-gray-700 rounded" />
+      <div className="bg-card border border-border p-6 rounded-2xl animate-pulse">
+        <div className="h-4 w-24 bg-muted rounded mb-4" />
+        <div className="h-8 w-32 bg-muted rounded" />
       </div>
     );
   }
@@ -42,23 +42,23 @@ const MetricCard: React.FC<MetricCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)] p-6 rounded-2xl relative overflow-hidden group hover:border-[var(--accent)] transition-colors"
+      className="bg-card border border-border p-6 rounded-2xl relative overflow-hidden group hover:border-primary/50 transition-colors"
     >
       <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
         {icons[icon]}
       </div>
 
       <div className="flex items-center gap-4 mb-4">
-        <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700">
+        <div className="p-3 bg-muted rounded-xl border border-border">
           {icons[icon]}
         </div>
-        <h3 className="text-sm font-medium text-[var(--text-dim)] uppercase tracking-wider">
+        <h3 className="text-sm font-black text-muted-foreground uppercase tracking-widest">
           {title}
         </h3>
       </div>
 
       <div className="flex items-end justify-between">
-        <div className="text-3xl font-bold text-[var(--text-h)]">
+        <div className="text-3xl font-black text-foreground tracking-tight">
           {typeof value === "number" ? value.toLocaleString() : (value ?? 0)}
         </div>
         {trend !== undefined && (

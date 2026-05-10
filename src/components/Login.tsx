@@ -73,13 +73,13 @@ const Login: React.FC = () => {
   const isLoading = loginMutation.isPending || signupMutation.isPending;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6">
-      <Card className="max-w-md w-full border-slate-800 bg-slate-900 shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <Card className="max-w-md w-full border-border bg-card shadow-2xl rounded-3xl">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-black text-white tracking-tight">
+          <CardTitle className="text-3xl font-black text-foreground tracking-tight">
             {isSignUp ? "Join MobiTrendz" : "Welcome Back"}
           </CardTitle>
-          <CardDescription className="text-slate-400 text-lg">
+          <CardDescription className="text-muted-foreground text-lg">
             {isSignUp
               ? "Create your account to get started"
               : "Sign in to access your dashboard"}
@@ -96,7 +96,7 @@ const Login: React.FC = () => {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-300 ml-1">
+              <Label htmlFor="email" className="text-foreground/80 ml-1 font-bold">
                 Email Address
               </Label>
               <Input
@@ -106,11 +106,11 @@ const Login: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="bg-slate-950 border-slate-800 text-white h-12 focus:ring-indigo-500"
+                className="bg-background border-border text-foreground h-12 focus:ring-primary"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300 ml-1">
+              <Label htmlFor="password" className="text-foreground/80 ml-1 font-bold">
                 Password
               </Label>
               <Input
@@ -120,13 +120,13 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-slate-950 border-slate-800 text-white h-12 focus:ring-indigo-500"
+                className="bg-background border-border text-foreground h-12 focus:ring-primary"
               />
             </div>
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg transition-all rounded-xl mt-6 shadow-lg shadow-indigo-500/20"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg transition-all rounded-xl mt-6 shadow-lg shadow-primary/20"
             >
               {isLoading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
@@ -141,10 +141,10 @@ const Login: React.FC = () => {
         <CardFooter className="flex flex-col space-y-4">
           <div className="relative w-full">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-800" />
+              <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-900 px-2 text-slate-500 font-bold">
+              <span className="bg-card px-2 text-muted-foreground font-bold">
                 Or continue with
               </span>
             </div>
@@ -152,7 +152,7 @@ const Login: React.FC = () => {
           <Button
             variant="ghost"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="w-full text-slate-400 hover:text-white hover:bg-slate-800 font-bold"
+            className="w-full text-muted-foreground hover:text-foreground hover:bg-accent font-bold"
           >
             {isSignUp
               ? "Already have an account? Sign in"

@@ -39,8 +39,11 @@ describe("ErrorBoundary", () => {
 
     // Mock window.location.reload
     const originalLocation = window.location;
-    delete (window as any).location;
-    window.location = { ...originalLocation, reload: vi.fn() };
+    const reloadMock = vi.fn();
+    vi.stubGlobal("location", {
+      ...originalLocation,
+      reload: reloadMock,
+    });
 
     render(
       <ErrorBoundary>
@@ -51,10 +54,10 @@ describe("ErrorBoundary", () => {
     const btn = screen.getByText("Refresh Application");
     fireEvent.click(btn);
 
-    expect(window.location.reload).toHaveBeenCalled();
+    expect(reloadMock).toHaveBeenCalled();
 
     // Restore window.location
-    window.location = originalLocation;
+    vi.unstubAllGlobals();
     consoleSpy.mockRestore();
   });
 });

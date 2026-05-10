@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [
     "@hey-api/client-fetch",
     "@hey-api/typescript",
-    "@hey-api/sdk",
-    "@hey-api/typescript-tanstack-query",
+    {
+      name: "@hey-api/sdk",
+      asSDK: true,
+    },
+    "@tanstack/react-query",
   ],
 });

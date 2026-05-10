@@ -31,13 +31,13 @@ const TaskCard = ({ todo, onToggle, onEdit, onDelete }: TaskCardProps) => {
 
   return (
     <div
-      className={`group bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5 transition-all hover:shadow-lg hover:border-[var(--accent)]/30 ${isCompleted ? "opacity-60" : ""}`}
+      className={`group bg-card border border-border rounded-2xl p-5 transition-all hover:shadow-lg hover:border-primary/30 ${isCompleted ? "opacity-60" : ""}`}
     >
       <div className="flex items-start gap-4">
         {/* Toggle Button */}
         <button
           onClick={() => onToggle(todo)}
-          className={`mt-1 flex-shrink-0 transition-all ${isCompleted ? "text-[var(--accent)]" : "text-[var(--text-dim)] hover:text-[var(--accent)]"}`}
+          className={`mt-1 flex-shrink-0 transition-all ${isCompleted ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
         >
           {isCompleted ? (
             <CheckCircle2 className="w-6 h-6" />
@@ -50,14 +50,14 @@ const TaskCard = ({ todo, onToggle, onEdit, onDelete }: TaskCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start">
             <h3
-              className={`font-bold text-lg transition-all truncate ${isCompleted ? "line-through text-[var(--text-dim)]" : "text-[var(--text-h)]"}`}
+              className={`font-bold text-lg transition-all truncate ${isCompleted ? "line-through text-muted-foreground" : "text-foreground"}`}
             >
               {todo.title}
             </h3>
             <div className="flex gap-1 transition-all">
               <button
                 onClick={() => onEdit(todo)}
-                className="p-1.5 text-[var(--text-dim)] hover:text-[var(--accent)] hover:bg-[var(--accent-bg)] rounded-lg transition-all"
+                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-all"
                 title="Edit Task"
                 aria-label="Edit Task"
               >
@@ -65,7 +65,7 @@ const TaskCard = ({ todo, onToggle, onEdit, onDelete }: TaskCardProps) => {
               </button>
               <button
                 onClick={() => onDelete(todo.id)}
-                className="p-1.5 text-[var(--text-dim)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                className="p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
                 title="Delete Task"
                 aria-label="Delete Task"
               >
@@ -75,7 +75,7 @@ const TaskCard = ({ todo, onToggle, onEdit, onDelete }: TaskCardProps) => {
           </div>
 
           <p
-            className={`text-sm mt-1 line-clamp-2 ${isCompleted ? "text-[var(--text-dim)]/50" : "text-[var(--text)]"}`}
+            className={`text-sm mt-1 line-clamp-2 ${isCompleted ? "text-muted-foreground/50" : "text-foreground"}`}
           >
             {todo.description || "No description provided."}
           </p>
@@ -88,7 +88,7 @@ const TaskCard = ({ todo, onToggle, onEdit, onDelete }: TaskCardProps) => {
             </span>
 
             {todo.due_date_time && (
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 <Clock className="w-3 h-3" />
                 {new Date(todo.due_date_time).toLocaleDateString(undefined, {
                   month: "short",

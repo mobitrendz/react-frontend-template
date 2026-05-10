@@ -120,7 +120,7 @@ const AdminDashboardView = ({
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[var(--text-h)]">
+          <h2 className="text-2xl font-bold text-foreground">
             {currentUserRole === Role.SUPER
               ? "Super User Control Center"
               : "Identity & Access"}
@@ -134,8 +134,8 @@ const AdminDashboardView = ({
                 }}
                 className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                   activeTab === "intelligence"
-                    ? "text-indigo-400 border-indigo-400"
-                    : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
               >
                 Intelligence
@@ -148,8 +148,8 @@ const AdminDashboardView = ({
               }}
               className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                 activeTab === "activity"
-                  ? "text-indigo-400 border-indigo-400"
-                  : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+                  ? "text-primary border-primary"
+                  : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
             >
               Activity
@@ -161,8 +161,8 @@ const AdminDashboardView = ({
               }}
               className={`text-sm font-bold pb-1 transition-all border-b-2 ${
                 activeTab === "users"
-                  ? "text-indigo-400 border-indigo-400"
-                  : "text-[var(--text-dim)] border-transparent hover:text-[var(--text)]"
+                  ? "text-primary border-primary"
+                  : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
             >
               Users
@@ -171,7 +171,7 @@ const AdminDashboardView = ({
         </div>
         <button
           onClick={() => setIsCreatingAdmin(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all active:scale-95"
         >
           <UserPlus className="w-5 h-5" />
           {currentUserRole === Role.SUPER
@@ -224,7 +224,7 @@ const AdminDashboardView = ({
           <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wider">
             Security Notice
           </h4>
-          <p className="text-xs text-[var(--text)] mt-1">
+          <p className="text-xs text-foreground mt-1">
             Administrative actions are logged. Changes to user status or role
             take effect upon their next session. Ensure you follow internal
             security protocols before provisioning new admin accounts.

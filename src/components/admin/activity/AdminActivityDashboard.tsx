@@ -37,7 +37,7 @@ const AdminActivityDashboard: React.FC = () => {
         <h1 className="text-3xl font-black text-rose-500 tracking-tight">
           Access Restricted
         </h1>
-        <p className="text-slate-400 mt-4 max-w-sm text-lg font-medium">
+        <p className="text-muted-foreground mt-4 max-w-sm text-lg font-medium">
           The User Engagement Console is restricted to administrative personnel
           only.
         </p>
@@ -49,15 +49,15 @@ const AdminActivityDashboard: React.FC = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">
+          <h1 className="text-3xl font-black text-foreground tracking-tight">
             Platform Pulse
           </h1>
-          <p className="text-lg text-slate-400 font-medium mt-1">
+          <p className="text-lg text-muted-foreground font-medium mt-1">
             Growth & engagement analytics across the user base
           </p>
         </div>
         {isLoading && (
-          <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+          <div className="flex items-center gap-2 text-primary font-bold text-sm">
             <Loader2 className="w-4 h-4 animate-spin" />
             Live Syncing...
           </div>

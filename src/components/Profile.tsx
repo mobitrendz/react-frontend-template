@@ -193,7 +193,7 @@ const Profile = () => {
   if (isLoading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -201,10 +201,10 @@ const Profile = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <header>
-        <h1 className="text-3xl font-bold text-[var(--text-h)]">
+        <h1 className="text-3xl font-bold text-foreground">
           Account Settings
         </h1>
-        <p className="text-[var(--text-dim)] mt-1">
+        <p className="text-muted-foreground mt-1">
           Manage your personal information and security preferences
         </p>
       </header>
@@ -212,20 +212,20 @@ const Profile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Personal Info */}
         <div className="lg:col-span-2 space-y-8">
-          <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
-            <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
+          <section className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-border flex justify-between items-center bg-muted/30">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] rounded-xl">
+                <div className="p-2 bg-primary/10 text-primary rounded-xl">
                   <UserCircle className="w-6 h-6" />
                 </div>
-                <h2 className="text-xl font-bold text-[var(--text-h)]">
+                <h2 className="text-xl font-bold text-foreground">
                   Personal Profile
                 </h2>
               </div>
               {!isEditingProfile && (
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/10 px-4 py-2 rounded-xl transition-all"
+                  className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-xl shadow-sm shadow-primary/20 hover:shadow-lg transition-all"
                 >
                   Edit Profile
                 </button>
@@ -238,15 +238,15 @@ const Profile = () => {
                   <div className="space-y-2">
                     <label
                       htmlFor="full_name"
-                      className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+                      className="text-sm font-bold text-foreground flex items-center gap-2"
                     >
-                      <User className="w-3.5 h-3.5 text-[var(--text-dim)]" />
+                      <User className="w-3.5 h-3.5 text-muted-foreground" />
                       Full Name
                     </label>
                     <input
                       id="full_name"
                       type="text"
-                      className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
+                      className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
                       value={editFullName}
                       onChange={(e) => setEditFullName(e.target.value)}
                       required
@@ -256,14 +256,14 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={isUpdatingProfile}
-                      className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all disabled:opacity-50"
                     >
                       {isUpdatingProfile ? "Saving..." : "Save Changes"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsEditingProfile(false)}
-                      className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
+                      className="px-8 py-3 bg-background border border-border text-foreground rounded-xl font-bold hover:bg-accent transition-all"
                     >
                       Cancel
                     </button>
@@ -272,29 +272,29 @@ const Profile = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Mail className="w-4 h-4" />
                       <span className="text-xs font-black uppercase tracking-widest">
                         Email Address
                       </span>
                     </div>
-                    <p className="text-lg text-[var(--text-h)] font-medium">
+                    <p className="text-lg text-foreground font-medium">
                       {currentUser?.email}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <User className="w-4 h-4" />
                       <span className="text-xs font-black uppercase tracking-widest">
                         Full Name
                       </span>
                     </div>
-                    <p className="text-lg text-[var(--text-h)] font-medium">
+                    <p className="text-lg text-foreground font-medium">
                       {currentUser?.full_name || "Not set"}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Shield className="w-4 h-4" />
                       <span className="text-xs font-black uppercase tracking-widest">
                         Account Role
@@ -313,7 +313,7 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-[var(--text-dim)]">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Activity className="w-4 h-4" />
                       <span className="text-xs font-black uppercase tracking-widest">
                         System Status
@@ -331,13 +331,13 @@ const Profile = () => {
             </div>
           </section>
 
-          <section className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-sm overflow-hidden">
-            <div className="px-8 py-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--sidebar-bg)]/30">
+          <section className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-border flex justify-between items-center bg-muted/30">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
+                <div className="p-2 bg-primary/10 text-primary rounded-xl">
                   <Key className="w-6 h-6" />
                 </div>
-                <h2 className="text-xl font-bold text-[var(--text-h)]">
+                <h2 className="text-xl font-bold text-foreground">
                   Security Credentials
                 </h2>
               </div>
@@ -350,55 +350,55 @@ const Profile = () => {
                     <label
                       htmlFor="current_password"
                       style={{ display: "block" }}
-                      className="text-sm font-bold text-[var(--text-h)]"
+                      className="text-sm font-bold text-foreground"
                     >
                       Current Password
                     </label>
                     <input
                       id="current_password"
                       type="password"
-                      className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
+                      className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="new_password"
-                        style={{ display: "block" }}
-                        className="text-sm font-bold text-[var(--text-h)]"
-                      >
-                        New Password
-                      </label>
-                      <input
-                        id="new_password"
-                        type="password"
-                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="new_password"
+                          style={{ display: "block" }}
+                          className="text-sm font-bold text-foreground"
+                        >
+                          New Password
+                        </label>
+                        <input
+                          id="new_password"
+                          type="password"
+                          className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="confirm_password"
+                          style={{ display: "block" }}
+                          className="text-sm font-bold text-foreground"
+                        >
+                          Confirm New Password
+                        </label>
+                        <input
+                          id="confirm_password"
+                          type="password"
+                          className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="confirm_password"
-                        style={{ display: "block" }}
-                        className="text-sm font-bold text-[var(--text-h)]"
-                      >
-                        Confirm New Password
-                      </label>
-                      <input
-                        id="confirm_password"
-                        type="password"
-                        className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
 
                   {passwordError && (
                     <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold">
@@ -413,37 +413,37 @@ const Profile = () => {
                     </div>
                   )}
 
-                  <div className="flex gap-4">
-                    <button
-                      type="submit"
-                      disabled={isUpdatingPassword}
-                      className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50"
-                    >
-                      {isUpdatingPassword ? "Updating..." : "Update Password"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsChangingPassword(false)}
-                      className="px-8 py-3 bg-[var(--bg)] border border-[var(--border)] rounded-xl font-bold hover:bg-[var(--accent-bg)] transition-all"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                    <div className="flex gap-4">
+                      <button
+                        type="submit"
+                        disabled={isUpdatingPassword}
+                        className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all disabled:opacity-50"
+                      >
+                        {isUpdatingPassword ? "Updating..." : "Update Password"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsChangingPassword(false)}
+                        className="px-8 py-3 bg-background border border-border text-foreground rounded-xl font-bold hover:bg-accent transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                 </form>
               ) : (
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="max-w-md">
-                    <p className="font-bold text-[var(--text-h)]">
+                    <p className="font-bold text-foreground">
                       Account Password
                     </p>
-                    <p className="text-[var(--text-dim)] text-sm mt-1">
+                    <p className="text-muted-foreground text-sm mt-1">
                       Protect your account by ensuring your password is complex
                       and updated regularly.
                     </p>
                   </div>
                   <button
                     onClick={() => setIsChangingPassword(true)}
-                    className="px-8 py-3.5 bg-[var(--bg)] border border-[var(--border)] text-[var(--text-h)] rounded-2xl font-bold hover:bg-[var(--accent-bg)] hover:text-[var(--accent)] transition-all flex items-center gap-2"
+                    className="px-8 py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg transition-all flex items-center gap-2"
                   >
                     <Lock className="w-4 h-4" />
                     Change Password
@@ -483,7 +483,7 @@ const Profile = () => {
                 </h2>
               </div>
 
-              <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {currentUserRole === Role.SUPER
                   ? "As a Super User, your account is protected from self-deletion to maintain system stability and prevent accidental loss of administrative access. Please contact support or another administrator for account removal."
                   : "Deleting your account is a permanent action. All your tasks, settings, and profile information will be wiped from our systems instantly."}
@@ -518,7 +518,7 @@ const Profile = () => {
                     <input
                       id="deletion_password"
                       type="password"
-                      className="w-full bg-[var(--bg)] border border-red-500/30 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium"
+                      className="w-full bg-background border border-red-500/30 text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-medium"
                       placeholder="Current Password"
                       value={deletionPassword}
                       onChange={(e) => setDeletionPassword(e.target.value)}
@@ -547,7 +547,7 @@ const Profile = () => {
                         setDeletionPassword("");
                         setDeleteError(null);
                       }}
-                      className="w-full py-3 bg-transparent text-[var(--text-dim)] hover:text-[var(--text-h)] font-bold transition-all"
+                      className="w-full py-3 bg-transparent text-muted-foreground hover:text-foreground font-bold transition-all"
                     >
                       Cancel
                     </button>

@@ -11,7 +11,8 @@ describe("TaskCard", () => {
     priority: "high" as any,
     status: "pending" as any,
     due_date_time: "2023-12-31T23:59:59Z",
-    owner_id: "user1",
+    user_id: "user1",
+    created_at: new Date().toISOString(),
   };
 
   const mockOnToggle = vi.fn();

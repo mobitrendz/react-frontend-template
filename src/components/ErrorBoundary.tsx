@@ -26,8 +26,8 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6">
-          <div className="max-w-xl w-full bg-slate-900 border border-red-500/20 rounded-[32px] p-12 text-center shadow-2xl">
+        <div className="min-h-screen flex items-center justify-center bg-background p-6">
+          <div className="max-w-xl w-full bg-card border border-red-500/20 rounded-[32px] p-12 text-center shadow-2xl">
             <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
               <svg
                 className="w-10 h-10 text-red-500"
@@ -43,21 +43,21 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight mb-4">
+            <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">
               Application Crash
             </h1>
-            <p className="text-slate-400 text-lg mb-8 font-medium">
+            <p className="text-muted-foreground text-lg mb-8 font-medium">
               Something went wrong in the dashboard. Please try refreshing or
               contact support.
             </p>
-            <div className="bg-black/50 rounded-2xl p-6 text-left mb-8 overflow-auto max-h-48 border border-slate-800">
-              <code className="text-red-400 text-sm font-mono break-all">
+            <div className="bg-muted/50 rounded-2xl p-6 text-left mb-8 overflow-auto max-h-48 border border-border">
+              <code className="text-red-500 text-sm font-mono break-all font-bold">
                 {this.state.error?.toString()}
               </code>
             </div>
             <button
               onClick={() => window.location.reload()}
-              className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.98]"
+              className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-primary/25 active:scale-[0.98]"
             >
               Refresh Application
             </button>

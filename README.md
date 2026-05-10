@@ -1,8 +1,8 @@
-# MobiTrendz | React 19 + FastAPI Frontend Template
+# React 19 + FastAPI Frontend Template
 
 ![Frontend Code Quality](https://github.com/mobitrendz/react-frontend-template/actions/workflows/frontend.yml/badge.svg?branch=develop)
 ![Test Coverage](https://github.com/mobitrendz/react-frontend-template/actions/workflows/coverage.yml/badge.svg?branch=develop)
-![Coverage Percentage](https://img.shields.io/badge/coverage-94.36%25-brightgreen)
+![Coverage Percentage](https://img.shields.io/badge/coverage-94.09%25-brightgreen)
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. Optimized for **2026 industry standards**, this template is pre-configured with a premium design system, TanStack Query orchestration, and comprehensive unit testing.
 

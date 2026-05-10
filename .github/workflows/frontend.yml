@@ -1,10 +1,10 @@
-name: Frontend CI
+name: Frontend Code Quality
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master, stage, develop ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master, stage, develop ]
 
 jobs:
   validate:
@@ -32,6 +32,9 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files
+
+      - name: Run Unit Tests
+        run: npm run test:run
 
       - name: Verify API Client Sync
         run: |

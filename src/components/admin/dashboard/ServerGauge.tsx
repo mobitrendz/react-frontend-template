@@ -21,8 +21,8 @@ const ServerGauge: React.FC<ServerGaugeProps> = ({
   if (loading) {
     return (
       <div className="flex flex-col items-center p-4">
-        <div className="w-24 h-24 rounded-full bg-gray-800 animate-pulse" />
-        <div className="h-4 w-16 bg-gray-800 rounded mt-4" />
+        <div className="w-24 h-24 rounded-full bg-muted animate-pulse" />
+        <div className="h-4 w-16 bg-muted rounded mt-4" />
       </div>
     );
   }
@@ -39,7 +39,7 @@ const ServerGauge: React.FC<ServerGaugeProps> = ({
             stroke="currentColor"
             strokeWidth="8"
             fill="transparent"
-            className="text-gray-800"
+            className="text-muted"
           />
           {/* Progress circle */}
           <motion.circle

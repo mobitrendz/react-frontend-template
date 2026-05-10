@@ -26,24 +26,24 @@ const CreateAdminForm = ({
   onFullNameChange,
 }: CreateAdminFormProps) => {
   return (
-    <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border)] shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="px-8 py-6 border-b border-[var(--border)] bg-[var(--sidebar-bg)] flex justify-between items-center">
+    <div className="bg-card rounded-3xl border border-border shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+      <div className="px-8 py-6 border-b border-border bg-muted/50 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
+          <div className="p-2 bg-primary/10 text-primary rounded-xl">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-[var(--text-h)]">
+            <h3 className="font-bold text-lg text-foreground">
               {isSuper ? "New Admin User" : "New System User"}
             </h3>
-            <p className="text-xs text-[var(--text-dim)] font-medium uppercase tracking-widest">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
               {isSuper ? "Elevated Access Account" : "Access Provisioning"}
             </p>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="p-2 text-[var(--text-dim)] hover:text-[var(--text-h)] hover:bg-[var(--bg)] rounded-xl transition-all"
+          className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-xl transition-all"
         >
           <X className="w-6 h-6" />
         </button>
@@ -54,15 +54,15 @@ const CreateAdminForm = ({
           <div className="space-y-2">
             <label
               htmlFor="full-name"
-              className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+              className="text-sm font-bold text-foreground flex items-center gap-2"
             >
-              <User className="w-3.5 h-3.5 text-[var(--text-dim)]" />
+              <User className="w-3.5 h-3.5 text-muted-foreground" />
               Full Name
             </label>
             <input
               id="full-name"
               type="text"
-              className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
+              className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
               placeholder="e.g. Sarah Connor"
               value={fullName}
               onChange={(e) => onFullNameChange(e.target.value)}
@@ -73,15 +73,15 @@ const CreateAdminForm = ({
           <div className="space-y-2">
             <label
               htmlFor="admin-email"
-              className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+              className="text-sm font-bold text-foreground flex items-center gap-2"
             >
-              <Mail className="w-3.5 h-3.5 text-[var(--text-dim)]" />
+              <Mail className="w-3.5 h-3.5 text-muted-foreground" />
               Email Address
             </label>
             <input
               id="admin-email"
               type="email"
-              className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
+              className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
               placeholder="user@example.com"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
@@ -93,15 +93,15 @@ const CreateAdminForm = ({
         <div className="space-y-2">
           <label
             htmlFor="admin-password"
-            className="text-sm font-bold text-[var(--text-h)] flex items-center gap-2"
+            className="text-sm font-bold text-foreground flex items-center gap-2"
           >
-            <Lock className="w-3.5 h-3.5 text-[var(--text-dim)]" />
+            <Lock className="w-3.5 h-3.5 text-muted-foreground" />
             Temporary Password
           </label>
           <input
             id="admin-password"
             type="password"
-            className="w-full bg-[var(--bg)] border border-[var(--border)] rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-medium"
+            className="w-full bg-background border border-border text-foreground rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
             placeholder="Min. 8 characters"
             onChange={(e) => onPasswordChange(e.target.value)}
             required
@@ -118,14 +118,14 @@ const CreateAdminForm = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-8 py-3.5 bg-[var(--bg)] border border-[var(--border)] rounded-2xl font-bold hover:bg-[var(--sidebar-bg)] transition-all"
+            className="px-8 py-3.5 bg-background border border-border text-foreground rounded-2xl font-bold hover:bg-accent transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-10 py-3.5 bg-[var(--accent)] text-white rounded-2xl font-bold hover:shadow-lg shadow-[var(--accent)]/20 active:scale-[0.98] transition-all disabled:opacity-50"
+            className="px-10 py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold shadow-sm shadow-primary/20 hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {isSubmitting
               ? "Provisioning..."
