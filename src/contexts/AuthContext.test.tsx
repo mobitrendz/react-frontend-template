@@ -1,7 +1,8 @@
 import { render, screen, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React, { useEffect } from "react";
-import { AuthProvider, useAuth, Role } from "./AuthContext";
+import { AuthProvider, useAuth, useHasPermission, Role } from "./AuthContext";
+import { jwtDecode } from "jwt-decode";
 import { auth } from "../lib/auth";
 import { client } from "../client/client.gen";
 import * as sdk from "../client/sdk.gen";
@@ -31,6 +32,17 @@ vi.mock("jwt-decode", () => ({
   }),
 }));
 
+vi.mock("../client/client.gen", () => ({
+  client: {
+    interceptors: {
+      response: {
+        use: vi.fn(),
+        eject: vi.fn(),
+      },
+    },
+  },
+}));
+
 const TestComponent = () => {
   const {
     user,
@@ -38,6 +50,7 @@ const TestComponent = () => {
     role,
     isAuthenticated,
     isLoading,
+    accessDenied,
     login,
     logout,
     hasPermission,
@@ -51,6 +64,9 @@ const TestComponent = () => {
         {isAuthenticated ? "Authenticated" : "Not Authenticated"}
       </div>
       <div data-testid="user-role">{role || "No Role"}</div>
+      <div data-testid="access-denied">
+        {accessDenied ? "Denied" : "Allowed"}
+      </div>
       <div data-testid="has-super">
         {hasPermission(Role.SUPER) ? "Yes" : "No"}
       </div>
@@ -178,6 +194,128 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("auth-status")).toHaveTextContent(
         "Not Authenticated",
       );
+    });
+  });
+
+  describe("useAuth hook error", () => {
+    it("throws error if used outside AuthProvider", () => {
+      // Suppress console.error for expected react error boundary issues in the test
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const TestComponent = () => {
+        useAuth();
+        return null;
+      };
+      
+      expect(() => render(<TestComponent />)).toThrow("useAuth must be used within an AuthProvider");
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("useHasPermission hook", () => {
+    it("returns correct permission boolean", async () => {
+      vi.mocked(jwtDecode).mockReturnValue({
+        sub: "user-1",
+        email: "admin@test.com",
+        role: "ADMIN",
+      } as any);
+
+      auth.getToken = vi.fn().mockReturnValue("valid-token");
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({
+        data: {
+          id: "user-1",
+          email: "admin@test.com",
+          role: "admin",
+          is_active: true,
+        },
+      });
+
+      const TestComponent = () => {
+        const hasSuper = useHasPermission(Role.SUPER);
+        const hasAdmin = useHasPermission(Role.ADMIN);
+        const hasUser = useHasPermission(Role.USER);
+        
+        return (
+          <div>
+            <span data-testid="super">{hasSuper ? "yes" : "no"}</span>
+            <span data-testid="admin">{hasAdmin ? "yes" : "no"}</span>
+            <span data-testid="user">{hasUser ? "yes" : "no"}</span>
+          </div>
+        );
+      };
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("super").textContent).toBe("no");
+        expect(screen.getByTestId("admin").textContent).toBe("yes");
+        expect(screen.getByTestId("user").textContent).toBe("yes");
+      });
+    });
+  });
+
+  describe("Edge cases and Error handling", () => {
+    it("sets accessDenied to true on 403 status", async () => {
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      // Trigger the interceptor by calling a mock that simulates a 403 response
+      // We need to access the client interceptor or just simulate a response that passes through it
+      const [onSuccess] = (client.interceptors.response.use as any).mock.calls[0];
+      
+      act(() => {
+        onSuccess({ status: 403 });
+      });
+
+      expect(screen.getByTestId("access-denied")).toHaveTextContent("Denied");
+    });
+
+    it("logs out on auth initialization error", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      vi.mocked(jwtDecode).mockImplementationOnce(() => {
+        throw new Error("Decode Error");
+      });
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockRejectedValueOnce(new Error("Fetch Error"));
+      auth.getToken = vi.fn().mockReturnValue("bad-token");
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      await waitFor(() => {
+        expect(auth.clearToken).toHaveBeenCalled();
+      });
+      consoleSpy.mockRestore();
+    });
+
+    it("returns false in fetchProfile when data is missing", async () => {
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValueOnce({
+        data: null,
+      });
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      act(() => {
+        screen.getByText("Login").click();
+      });
+
+      // Verification: if fetchProfile returns false, decodeAndSetUser falls back to JWT.
+      // So the user will still be set but from decoded token.
+      await waitFor(() => {
+        expect(screen.getByTestId("auth-status")).toHaveTextContent("Authenticated");
+      });
     });
   });
 });

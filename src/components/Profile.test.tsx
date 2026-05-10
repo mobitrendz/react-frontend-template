@@ -75,6 +75,10 @@ describe("Profile Component", () => {
     window.confirm = vi.fn(() => true);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("handles profile update", async () => {
     vi.mocked(sdk.updateUserApiV1UsersIdPatch).mockResolvedValue({
       data: { ...mockUser, full_name: "John Updated" },
@@ -141,9 +145,14 @@ describe("Profile Component", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: /^Update Password$/i }));
-    expect(
-      await screen.findByText(/Password successfully updated!/i),
-    ).toBeInTheDocument();
+    
+    // Check success message appears
+    expect(await screen.findByText(/Password successfully updated!/i)).toBeInTheDocument();
+
+    // Check it disappears after 2 seconds
+    await waitFor(() => {
+      expect(screen.queryByText(/Password successfully updated!/i)).not.toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it("handles deletion process", async () => {

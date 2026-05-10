@@ -156,4 +156,37 @@ describe("Login Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Sign up/i }));
     expect(await screen.findByText(/Already exists/i)).toBeInTheDocument();
   });
+
+  it("handles network errors and fallback messages", async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
+    );
+
+    const submitButton = screen.getByRole("button", { name: /Sign in/i });
+    fireEvent.change(screen.getByPlaceholderText(/Username \/ Email/i), { target: { value: "test" } });
+    fireEvent.change(screen.getByPlaceholderText(/Password/i), { target: { value: "test" } });
+
+    // 1. Network error (catch block)
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockRejectedValueOnce(new Error("Network Error"));
+    fireEvent.click(submitButton);
+    expect(await screen.findByText(/A network error occurred/i)).toBeInTheDocument();
+    consoleSpy.mockRestore();
+
+    // 2. Array detail error
+    vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({
+      error: { detail: [{ msg: "Error 1" }, { msg: "Error 2" }] },
+    } as any);
+    fireEvent.click(submitButton);
+    expect(await screen.findByText("Error 1, Error 2")).toBeInTheDocument();
+
+    // 3. Fallback error with status
+    vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({
+      error: { status: 500 },
+    } as any);
+    fireEvent.click(submitButton);
+    expect(await screen.findByText(/Status: 500/i)).toBeInTheDocument();
+  });
 });

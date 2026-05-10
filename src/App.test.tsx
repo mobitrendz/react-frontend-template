@@ -142,6 +142,33 @@ describe("App Component", () => {
     expect(await screen.findByText("Dashboard Page")).toBeInTheDocument();
   });
 
+  it("renders AccessDeniedOverlay when accessDenied is true", async () => {
+    const mockSetAccessDenied = vi.fn();
+    vi.mocked(useAuth).mockImplementation(() => ({
+      isAuthenticated: true,
+      isLoading: false,
+      user: authState.user,
+      role: authState.role,
+      login: vi.fn(),
+      logout: vi.fn(),
+      hasPermission: vi.fn().mockReturnValue(true),
+      accessDenied: true,
+      setAccessDenied: mockSetAccessDenied,
+      token: "fake",
+    }));
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Access Forbidden")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Dismiss"));
+    expect(mockSetAccessDenied).toHaveBeenCalledWith(false);
+  });
+
   it("handles login and logout cycle", async () => {
     render(
       <MemoryRouter initialEntries={["/login"]}>
