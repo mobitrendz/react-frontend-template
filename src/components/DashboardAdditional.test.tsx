@@ -290,7 +290,9 @@ describe("Dashboard edge cases", () => {
 
     await screen.findByText("delete@x.com");
     // In the new UI, delete button is an icon. Let's find it by icon or button.
-    const deleteBtn = screen.getAllByRole("button").find(b => b.innerHTML.includes('user-minus'));
+    const deleteBtn = screen
+      .getAllByRole("button")
+      .find((b) => b.innerHTML.includes("user-minus"));
     if (deleteBtn) fireEvent.click(deleteBtn);
 
     // Custom Modal shows up, enter password

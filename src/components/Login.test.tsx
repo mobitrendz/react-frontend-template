@@ -96,8 +96,12 @@ describe("Login Component", () => {
 
   it("handles generic login failure", async () => {
     renderLogin();
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: "any@test.com" } });
-    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "any" } });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: "any@test.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/i), {
+      target: { value: "any" },
+    });
 
     vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({
       error: { detail: "Invalid credentials" },
@@ -108,14 +112,20 @@ describe("Login Component", () => {
 
   it("handles inactive user account failure", async () => {
     renderLogin();
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: "any@test.com" } });
-    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "any" } });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: "any@test.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/i), {
+      target: { value: "any" },
+    });
 
     vi.mocked(loginAccessTokenApiV1LoginAccessTokenPost).mockResolvedValueOnce({
       error: { detail: "Inactive user" },
     } as any);
     fireEvent.click(screen.getByRole("button", { name: /Sign In/i }));
-    expect(await screen.findByText(/Your account is currently inactive/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Your account is currently inactive/i),
+    ).toBeInTheDocument();
   });
 
   it("handles signup workflow and errors", async () => {
@@ -144,7 +154,9 @@ describe("Login Component", () => {
 
     // 2. Error path
     // Switches back to Login mode. Switch to Signup again.
-    fireEvent.click(await screen.findByText(/Don't have an account\? Sign up/i));
+    fireEvent.click(
+      await screen.findByText(/Don't have an account\? Sign up/i),
+    );
 
     vi.mocked(registerUserApiV1LoginSignupPost).mockResolvedValueOnce({
       error: { detail: "Already exists" },
@@ -183,6 +195,8 @@ describe("Login Component", () => {
       error: { detail: [{ msg: "Error 1" }, { msg: "Error 2" }] },
     } as any);
     fireEvent.click(submitButton);
-    expect(await screen.findByText(/Error 1; error: Error 2/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Error 1; error: Error 2/i),
+    ).toBeInTheDocument();
   });
 });

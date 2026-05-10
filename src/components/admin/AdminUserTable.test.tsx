@@ -171,13 +171,19 @@ describe("AdminUserTable", () => {
     );
 
     // Delete buttons have title="Delete User"
-    const deleteBtns = screen.getAllByRole("button").filter(b => b.querySelector('svg')?.classList.contains('lucide-user-minus'));
+    const deleteBtns = screen
+      .getAllByRole("button")
+      .filter((b) =>
+        b.querySelector("svg")?.classList.contains("lucide-user-minus"),
+      );
     // Actually I used UserMinus icon. Let's find by button with icon.
     // In the new UI, the delete button is a ghost button with UserMinus icon.
     // I didn't add title anymore. I should check how to find it.
     // The button has UserMinus icon.
-    
-    const deleteBtn = screen.getAllByRole("button").find(b => b.innerHTML.includes('user-minus'));
+
+    const deleteBtn = screen
+      .getAllByRole("button")
+      .find((b) => b.innerHTML.includes("user-minus"));
     if (deleteBtn) fireEvent.click(deleteBtn);
 
     expect(mockOnDeleteUser).toHaveBeenCalled();
@@ -185,13 +191,13 @@ describe("AdminUserTable", () => {
 
   it("handles fetch users failure", async () => {
     (sdk.readUsersApiV1UsersGet as any).mockResolvedValueOnce({
-      error: { detail: "Fetch failed" }
+      error: { detail: "Fetch failed" },
     });
 
     renderTable();
 
     await waitFor(() => {
-       expect(screen.getByText(/No users found/i)).toBeInTheDocument();
+      expect(screen.getByText(/No users found/i)).toBeInTheDocument();
     });
   });
 
@@ -210,8 +216,8 @@ describe("AdminUserTable", () => {
     // For "Other Admin", the actions should be disabled or not present.
     const row = screen.getByText("Other Admin").closest("tr");
     const buttons = row?.querySelectorAll("button");
-    
-    buttons?.forEach(btn => {
+
+    buttons?.forEach((btn) => {
       expect(btn).toBeDisabled();
     });
   });

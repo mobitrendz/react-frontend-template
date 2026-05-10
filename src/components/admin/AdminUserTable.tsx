@@ -54,7 +54,8 @@ const AdminUserTable = ({
   });
 
   const users = (usersData as any)?.data || (usersData as any)?.items || [];
-  const totalUsers = (usersData as any)?.count || (usersData as any)?.total || 0;
+  const totalUsers =
+    (usersData as any)?.count || (usersData as any)?.total || 0;
 
   const canManageUser = (targetUser: UserPublic) => {
     if (currentUserRole === Role.SUPER) return true;
@@ -98,7 +99,8 @@ const AdminUserTable = ({
           </div>
           <div className="flex gap-3">
             <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase">
-              {filteredUsers.filter((u: UserPublic) => u.is_active).length} Active
+              {filteredUsers.filter((u: UserPublic) => u.is_active).length}{" "}
+              Active
             </Badge>
             <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase">
               {filteredUsers.length} Visible
@@ -245,11 +247,14 @@ const AdminUserTable = ({
                     <div className="flex items-center gap-2 text-xs text-slate-500 font-black">
                       <Calendar className="w-3.5 h-3.5" />
                       {user.created_at
-                        ? new Date(user.created_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
+                        ? new Date(user.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )
                         : "N/A"}
                     </div>
                   </TableCell>
@@ -285,7 +290,8 @@ const AdminUserTable = ({
             <span className="text-white font-black">
               {Math.min(currentPage * pageSize, totalUsers)}
             </span>{" "}
-            of <span className="text-white font-black">{totalUsers}</span> Records
+            of <span className="text-white font-black">{totalUsers}</span>{" "}
+            Records
           </p>
           <div className="flex gap-2">
             <Button
@@ -302,7 +308,7 @@ const AdminUserTable = ({
               size="sm"
               onClick={() =>
                 setCurrentPage((prev) =>
-                  Math.min(Math.ceil(totalUsers / pageSize), prev + 1)
+                  Math.min(Math.ceil(totalUsers / pageSize), prev + 1),
                 )
               }
               disabled={currentPage === Math.ceil(totalUsers / pageSize)}

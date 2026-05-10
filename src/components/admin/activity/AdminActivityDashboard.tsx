@@ -20,7 +20,8 @@ const AdminActivityDashboard: React.FC = () => {
   } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
-      const response = await readAdminDashboardStatsApiV1AdminDashboardStatsGet();
+      const response =
+        await readAdminDashboardStatsApiV1AdminDashboardStatsGet();
       if (response.error) throw response.error;
       return response.data as AdminDashboardReport;
     },

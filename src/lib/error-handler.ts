@@ -21,10 +21,12 @@ export const extractApiError = (error: any): string => {
     if (typeof data.detail === "string") {
       return data.detail;
     }
-    
+
     // Handle Pydantic validation errors (array of objects)
     if (Array.isArray(data.detail)) {
-      return data.detail.map((err) => `${err.loc?.join(".") || "error"}: ${err.msg}`).join("; ");
+      return data.detail
+        .map((err) => `${err.loc?.join(".") || "error"}: ${err.msg}`)
+        .join("; ");
     }
   }
 

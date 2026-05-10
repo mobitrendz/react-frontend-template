@@ -7,7 +7,9 @@ import { z } from "zod";
 
 const envSchema = z.object({
   VITE_API_URL: z.string().url().default("http://localhost:8000"),
-  VITE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  VITE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
 });
 
 // Parse and validate current environment variables
