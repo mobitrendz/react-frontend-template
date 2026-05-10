@@ -56,9 +56,9 @@ The project maintains high standards for reliability with a comprehensive test s
 | Category       | Coverage   |
 | :------------- | :--------- |
 | **Statements** | **91.56%** |
-| **Lines** | **93.07%** |
-| **Functions** | **88.58%** |
-| **Branches** | **84.77%** |
+| **Lines**      | **93.07%** |
+| **Functions**  | **88.58%** |
+| **Branches**   | **84.77%** |
 
 ### Testing Stack
 
