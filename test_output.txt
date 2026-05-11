@@ -1,0 +1,812 @@
+
+ RUN  v4.1.5 /Volumes/Sree/Learn/react/react-frontend-template
+
+ ❯ src/components/admin/AdminUserTable.test.tsx (9 tests | 4 failed) 4178ms
+     × fetches and renders users correctly 1448ms
+     × filters users by search term 443ms
+     × filters users by role 1543ms
+     ✓ ADMIN cannot see SUPER users 134ms
+     ✓ calls toggle status for valid user 96ms
+     ✓ calls delete for valid user 217ms
+     ✓ handles fetch users failure 54ms
+     ✓ prevents ADMIN from managing other ADMINs 101ms
+     × calls onUpdateUser when role is changed by SUPER 132ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/admin/AdminUserTable.test.tsx > AdminUserTable > fetches and renders users correctly
+TestingLibraryElementError: Found multiple elements with the text: Super Admin
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<option[39m
+  [33mvalue[39m=[32m"super"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</option>[39m
+
+Ignored nodes: comments, script, style
+[36m<span[39m
+  [33mclass[39m=[32m"font-black text-foreground tracking-tight"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</span>[39m
+
+Ignored nodes: comments, script, style
+[36m<option[39m
+  [33mvalue[39m=[32m"super"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</option>[39m
+
+Ignored nodes: comments, script, style
+[36m<option[39m
+  [33mvalue[39m=[32m"super"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</option>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-card rounded-3xl border border-border shadow-2xl overflow-hidden"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-8 border-b border-border space-y-6 bg-muted/30"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row justify-between items-start md:items-center gap-6"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black text-foreground tracking-tight"[39m
+            [36m>[39m
+              [0mUser Directory[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-muted-foreground font-medium text-sm mt-1"[39m
+            [36m>[39m
+              [0mManage platform access and security roles[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m2[0m
+              [0m [0m
+              [0mActive[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m3[0m
+              [0m Visible[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex-1 relative"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-search w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21 21-4.34-4.34"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"11"[39m
+                [33mcy[39m=[32m"11"[39m
+                [33mr[39m=[32m"8"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex w-full border px-3 py-1 text-sm shadow-sm file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-12 h-12 bg-background border-border text-foreground rounded-2xl focus:ring-primary transition-all"[39m
+              [33mplaceholder[39m=[32m"Search by name or email..."[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"all"[39m
+            [36m>[39m
+              [0mAll Roles[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"super"[39m
+            [36m>[39m
+              [0mSuper Admins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"admin"[39m
+            [36m>[39m
+              [0mAdmins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"user"[39m
+            [36m>[39m
+              [0mUsers[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"relative w-full overflow-auto"[39m
+        [36m>[39m
+          [36m<table[39m
+            [33mclass[39m=[32m"w-full caption-bottom text-sm"[39m
+          [36m>[39m
+            [36m<thead[39m
+              [33mclass[39m=[32m"[&_tr]:border-b"[39m
+            [36m>[39m
+              [36m<tr[39m
+                [33mclass[39m=[32m"border-b transition-colors data-[state=selected]:bg-muted border-none hover:bg-transparent"[39m
+              [36m>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mUser Details[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSecurity Role[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSystem Status[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mRegistration[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 align-middle ...
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-card rounded-3xl border border-border shadow-2xl overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-8 border-b border-border space-y-6 bg-muted/30"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col md:flex-row justify-between items-start md:items-center gap-6"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<h2[39m
+                [33mclass[39m=[32m"text-2xl font-black text-foreground tracking-tight"[39m
+              [36m>[39m
+                [0mUser Directory[0m
+              [36m</h2>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-muted-foreground font-medium text-sm mt-1"[39m
+              [36m>[39m
+                [0mManage platform access and security roles[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex gap-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+              [36m>[39m
+                [0m2[0m
+                [0m [0m
+                [0mActive[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+              [36m>[39m
+                [0m3[0m
+                [0m Visible[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col md:flex-row gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex-1 relative"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-search w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m21 21-4.34-4.34"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"11"[39m
+                  [33mcy[39m=[32m"11"[39m
+                  [33mr[39m=[32m"8"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"flex w-full border px-3 py-1 text-sm shadow-sm file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-12 h-12 bg-background border-border text-foreground rounded-2xl focus:ring-primary transition-all"[39m
+                [33mplaceholder[39m=[32m"Search by name or email..."[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<select[39m
+              [33mclass[39m=[32m"bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"[39m
+            [36m>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"all"[39m
+              [36m>[39m
+                [0mAll Roles[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"super"[39m
+              [36m>[39m
+                [0mSuper Admins[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"admin"[39m
+              [36m>[39m
+                [0mAdmins[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m"user"[39m
+              [36m>[39m
+                [0mUsers[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"relative w-full overflow-auto"[39m
+          [36m>[39m
+            [36m<table[39m
+              [33mclass[39m=[32m"w-full caption-bottom text-sm"[39m
+            [36m>[39m
+              [36m<thead[39m
+                [33mclass[39m=[32m"[&_tr]:border-b"[39m
+              [36m>[39m
+                [36m<tr[39m
+                  [33mclass[39m=[32m"border-b transition-colors data-[state=selected]:bg-muted border-none hover:bg-transparent"[39m
+                [36m>[39m
+                  [36m<th[39m
+                    [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                  [36m>[39m
+                    [0mUser Details[0m
+                  [36m</th>[39m
+                  [36m<th[39m
+                    [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                  [36m>[39m
+                    [0mSecurity Role[0m
+                  [36m</th>[39m
+                  [36m<th[39m
+                    [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                  [36m>[39m
+                    [0mSystem Status[0m
+                  [36m</th>[39m
+                  [36m<th[39m
+                    [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role...
+ ❯ Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/components/admin/AdminUserTable.test.tsx:102:11
+    100|     renderTable();
+    101|
+    102|     await waitFor(() => {
+       |           ^
+    103|       // It shouldn't render "admin-1" (themselves)
+    104|       expect(screen.queryByText("admin@test.com")).not.toBeInTheDocume…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/components/admin/AdminUserTable.test.tsx > AdminUserTable > filters users by search term
+TestingLibraryElementError: Found multiple elements with the text: Super Admin
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<span[39m
+  [33mclass[39m=[32m"font-black text-foreground tracking-tight"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</span>[39m
+
+Ignored nodes: comments, script, style
+[36m<option[39m
+  [33mvalue[39m=[32m"super"[39m
+[36m>[39m
+  [0mSuper Admin[0m
+[36m</option>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-card rounded-3xl border border-border shadow-2xl overflow-hidden"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-8 border-b border-border space-y-6 bg-muted/30"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row justify-between items-start md:items-center gap-6"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black text-foreground tracking-tight"[39m
+            [36m>[39m
+              [0mUser Directory[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-muted-foreground font-medium text-sm mt-1"[39m
+            [36m>[39m
+              [0mManage platform access and security roles[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m1[0m
+              [0m [0m
+              [0mActive[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m1[0m
+              [0m Visible[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex-1 relative"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-search w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21 21-4.34-4.34"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"11"[39m
+                [33mcy[39m=[32m"11"[39m
+                [33mr[39m=[32m"8"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex w-full border px-3 py-1 text-sm shadow-sm file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-12 h-12 bg-background border-border text-foreground rounded-2xl focus:ring-primary transition-all"[39m
+              [33mplaceholder[39m=[32m"Search by name or email..."[39m
+              [33mvalue[39m=[32m"super"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"all"[39m
+            [36m>[39m
+              [0mAll Roles[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"super"[39m
+            [36m>[39m
+              [0mSuper Admins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"admin"[39m
+            [36m>[39m
+              [0mAdmins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"user"[39m
+            [36m>[39m
+              [0mUsers[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"relative w-full overflow-auto"[39m
+        [36m>[39m
+          [36m<table[39m
+            [33mclass[39m=[32m"w-full caption-bottom text-sm"[39m
+          [36m>[39m
+            [36m<thead[39m
+              [33mclass[39m=[32m"[&_tr]:border-b"[39m
+            [36m>[39m
+              [36m<tr[39m
+                [33mclass[39m=[32m"border-b transition-colors data-[state=selected]:bg-muted border-none hover:bg-transparent"[39m
+              [36m>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mUser Details[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSecurity Role[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSystem Status[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mRegistration[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 align-mi...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getElementError node_modules/@testing-library/dom/dist/query-helpers.js:20:35
+ ❯ getMultipleElementsFoundError node_modules/@testing-library/dom/dist/query-helpers.js:23:10
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/admin/AdminUserTable.test.tsx:125:19
+    123|     fireEvent.change(searchInput, { target: { value: "super" } });
+    124|
+    125|     expect(screen.getByText("Super Admin")).toBeInTheDocument();
+       |                   ^
+    126|     expect(screen.queryByText("Regular User")).not.toBeInTheDocument();
+    127|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/components/admin/AdminUserTable.test.tsx > AdminUserTable > filters users by role
+TestingLibraryElementError: Found multiple elements with the role "combobox"
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<select[39m
+  [33mclass[39m=[32m"bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"[39m
+[36m>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"all"[39m
+  [36m>[39m
+    [0mAll Roles[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"super"[39m
+  [36m>[39m
+    [0mSuper Admins[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"admin"[39m
+  [36m>[39m
+    [0mAdmins[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"user"[39m
+  [36m>[39m
+    [0mUsers[0m
+  [36m</option>[39m
+[36m</select>[39m
+
+Ignored nodes: comments, script, style
+[36m<select[39m
+  [33mclass[39m=[32m"inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-background border border-border/50 focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer text-slate-400"[39m
+[36m>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"super"[39m
+  [36m>[39m
+    [0mSuper Admin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"admin"[39m
+  [36m>[39m
+    [0mAdmin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"user"[39m
+  [36m>[39m
+    [0mUser[0m
+  [36m</option>[39m
+[36m</select>[39m
+
+Ignored nodes: comments, script, style
+[36m<select[39m
+  [33mclass[39m=[32m"inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-background border border-border/50 focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer text-amber-500"[39m
+[36m>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"super"[39m
+  [36m>[39m
+    [0mSuper Admin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"admin"[39m
+  [36m>[39m
+    [0mAdmin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"user"[39m
+  [36m>[39m
+    [0mUser[0m
+  [36m</option>[39m
+[36m</select>[39m
+
+Ignored nodes: comments, script, style
+[36m<select[39m
+  [33mclass[39m=[32m"inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-background border border-border/50 focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer text-indigo-500"[39m
+[36m>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"super"[39m
+  [36m>[39m
+    [0mSuper Admin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"admin"[39m
+  [36m>[39m
+    [0mAdmin[0m
+  [36m</option>[39m
+  [36m<option[39m
+    [33mvalue[39m=[32m"user"[39m
+  [36m>[39m
+    [0mUser[0m
+  [36m</option>[39m
+[36m</select>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"bg-card rounded-3xl border border-border shadow-2xl overflow-hidden"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-8 border-b border-border space-y-6 bg-muted/30"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row justify-between items-start md:items-center gap-6"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-black text-foreground tracking-tight"[39m
+            [36m>[39m
+              [0mUser Directory[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-muted-foreground font-medium text-sm mt-1"[39m
+            [36m>[39m
+              [0mManage platform access and security roles[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m2[0m
+              [0m [0m
+              [0mActive[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow hover:bg-primary/80 bg-indigo-500/10 text-indigo-500 border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase"[39m
+            [36m>[39m
+              [0m3[0m
+              [0m Visible[0m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col md:flex-row gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex-1 relative"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-search w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21 21-4.34-4.34"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"11"[39m
+                [33mcy[39m=[32m"11"[39m
+                [33mr[39m=[32m"8"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex w-full border px-3 py-1 text-sm shadow-sm file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-12 h-12 bg-background border-border text-foreground rounded-2xl focus:ring-primary transition-all"[39m
+              [33mplaceholder[39m=[32m"Search by name or email..."[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<select[39m
+            [33mclass[39m=[32m"bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"all"[39m
+            [36m>[39m
+              [0mAll Roles[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"super"[39m
+            [36m>[39m
+              [0mSuper Admins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"admin"[39m
+            [36m>[39m
+              [0mAdmins[0m
+            [36m</option>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m"user"[39m
+            [36m>[39m
+              [0mUsers[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"p-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"relative w-full overflow-auto"[39m
+        [36m>[39m
+          [36m<table[39m
+            [33mclass[39m=[32m"w-full caption-bottom text-sm"[39m
+          [36m>[39m
+            [36m<thead[39m
+              [33mclass[39m=[32m"[&_tr]:border-b"[39m
+            [36m>[39m
+              [36m<tr[39m
+                [33mclass[39m=[32m"border-b transition-colors data-[state=selected]:bg-muted border-none hover:bg-transparent"[39m
+              [36m>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mUser Details[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSecurity Role[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mSystem Status[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]"[39m
+                [36m>[39m
+                  [0mRegistration[0m
+                [36m</th>[39m
+                [36m<th[39m
+                  [33mclass[39m=[32m"h-10 align-middle ...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getElementError node_modules/@testing-library/dom/dist/query-helpers.js:20:35
+ ❯ getMultipleElementsFoundError node_modules/@testing-library/dom/dist/query-helpers.js:23:10
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/admin/AdminUserTable.test.tsx:135:27
+    133|     );
+    134|
+    135|     const select = screen.getByRole("combobox");
+       |                           ^
+    136|     fireEvent.change(select, { target: { value: "user" } });
+    137|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/components/admin/AdminUserTable.test.tsx > AdminUserTable > calls onUpdateUser when role is changed by SUPER
+AssertionError: expected "vi.fn()" to be called with arguments: [ 'user-2', { role: 'admin' } ]
+
+Number of calls: 0
+
+ ❯ src/components/admin/AdminUserTable.test.tsx:241:30
+    239|     }
+    240|
+    241|     expect(mockOnUpdateUser).toHaveBeenCalledWith("user-2", { role: "a…
+       |                              ^
+    242|   });
+    243| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+ReferenceError: onUpdateUser is not defined
+ ❯ onChange src/components/admin/AdminUserTable.tsx:1:1
+      1| import { useState } from "react";
+       | ^
+      2| import { useQuery } from "@tanstack/react-query";
+      3| import {
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:874:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:19767:9
+ ❯ batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:40
+ ❯ dispatchEventForPluginEventSystem node_modules/react-dom/cjs/react-dom-client.development.js:19320:7
+ ❯ dispatchEvent node_modules/react-dom/cjs/react-dom-client.development.js:23585:11
+ ❯ dispatchDiscreteEvent node_modules/react-dom/cjs/react-dom-client.development.js:23553:11
+ ❯ HTMLDivElement.callTheUserObjectsOperation node_modules/jsdom/lib/generated/idl/EventListener.js:26:30
+
+This error originated in "src/components/admin/AdminUserTable.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "calls onUpdateUser when role is changed by SUPER". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 5 passed (9)
+     Errors  1 error
+   Start at  10:10:38
+   Duration  9.84s (transform 398ms, setup 378ms, import 1.23s, tests 4.18s, environment 3.03s)

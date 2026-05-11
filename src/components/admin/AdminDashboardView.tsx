@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserPlus, ShieldAlert, Terminal } from "lucide-react";
 import AdminUserTable from "./AdminUserTable";
 import CreateAdminForm from "./CreateAdminForm";
@@ -24,6 +25,7 @@ const AdminDashboardView = ({
   currentUser,
   initialTab,
 }: AdminDashboardViewProps) => {
+  const queryClient = useQueryClient();
   const { role: currentUserRole, user: authUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,6 +64,7 @@ const AdminDashboardView = ({
         path: { id: user.id },
         body: { is_active: !user.is_active } as any,
       });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       setTableKey((prev) => prev + 1);
     } catch (err) {
       console.error("Failed to toggle status:", err);

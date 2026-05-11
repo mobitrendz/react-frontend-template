@@ -483,8 +483,9 @@ describe("Dashboard edge cases", () => {
 
     fireEvent.click(await screen.findByText("Users"));
     await screen.findByText("user2@x.com");
-    const toggleButton = await screen.findByRole("button", { name: /Active/i });
-    fireEvent.click(toggleButton);
+    // It's now a select dropdown
+    const statusSelect = await screen.findByDisplayValue("Active");
+    fireEvent.change(statusSelect, { target: { value: "inactive" } });
 
     await waitFor(() =>
       expect(sdk.updateUserApiV1UsersIdPatch).toHaveBeenCalledWith({

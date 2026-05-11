@@ -9,6 +9,9 @@ import {
   ChevronRight,
   Shield,
   Loader2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { UserPublic } from "../../client/types.gen";
 import { readUsersApiV1UsersGet } from "../../client/sdk.gen";
@@ -41,6 +44,10 @@ const AdminUserTable = ({
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sortField, setSortField] = useState<
+    "full_name" | "created_at" | "role" | "is_active"
+  >("created_at");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const { data: usersData, isLoading } = useQuery({
     queryKey: ["users", currentPage, pageSize],
@@ -68,22 +75,76 @@ const AdminUserTable = ({
     return false;
   };
 
-  const filteredUsers = users.filter((user: UserPublic) => {
-    const matchesSearch =
-      user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredUsers = users
+    .filter((user: UserPublic) => {
+      const matchesSearch =
+        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
 
-    if (user.id === currentUser?.id) return false;
+      if (user.id === currentUser?.id) return false;
 
-    if (currentUserRole === Role.ADMIN) {
-      const targetRole = user.role?.toUpperCase();
-      if (targetRole === Role.SUPER) return false;
+      if (currentUserRole === Role.ADMIN) {
+        const targetRole = user.role?.toUpperCase();
+        if (targetRole === Role.SUPER) return false;
+      }
+
+      return matchesSearch && matchesRole;
+    })
+    .sort((a: UserPublic, b: UserPublic) => {
+      const direction = sortDirection === "asc" ? 1 : -1;
+
+      if (sortField === "full_name") {
+        const nameA = a.full_name || "";
+        const nameB = b.full_name || "";
+        return nameA.localeCompare(nameB) * direction;
+      }
+
+      if (sortField === "created_at") {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        return (dateA - dateB) * direction;
+      }
+
+      if (sortField === "role") {
+        const roleA = a.role || "";
+        const roleB = b.role || "";
+        return roleA.localeCompare(roleB) * direction;
+      }
+
+      if (sortField === "is_active") {
+        const statusA = a.is_active ? 1 : 0;
+        const statusB = b.is_active ? 1 : 0;
+        return (statusA - statusB) * direction;
+      }
+
+      return a.id.localeCompare(b.id);
+    });
+
+  const handleSort = (
+    field: "full_name" | "created_at" | "role" | "is_active",
+  ) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
     }
+  };
 
-    return matchesSearch && matchesRole;
-  });
+  const SortIcon = ({
+    field,
+  }: {
+    field: "full_name" | "created_at" | "role" | "is_active";
+  }) => {
+    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 ml-2" />;
+    return sortDirection === "asc" ? (
+      <ArrowUp className="w-3 h-3 ml-2 text-primary" />
+    ) : (
+      <ArrowDown className="w-3 h-3 ml-2 text-primary" />
+    );
+  };
 
   return (
     <div className="bg-card rounded-3xl border border-border shadow-2xl overflow-hidden">
@@ -119,6 +180,7 @@ const AdminUserTable = ({
             />
           </div>
           <select
+            data-testid="role-filter"
             className="bg-background border border-border rounded-2xl px-6 h-12 text-muted-foreground text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
@@ -137,17 +199,41 @@ const AdminUserTable = ({
         <Table>
           <TableHeader>
             <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
-                User Details
+              <TableHead
+                className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("full_name")}
+              >
+                <div className="flex items-center">
+                  User Details
+                  <SortIcon field="full_name" />
+                </div>
               </TableHead>
-              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
-                Security Role
+              <TableHead
+                className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("role")}
+              >
+                <div className="flex items-center">
+                  Security Role
+                  <SortIcon field="role" />
+                </div>
               </TableHead>
-              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
-                System Status
+              <TableHead
+                className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("is_active")}
+              >
+                <div className="flex items-center">
+                  System Status
+                  <SortIcon field="is_active" />
+                </div>
               </TableHead>
-              <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px]">
-                Registration
+              <TableHead
+                className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("created_at")}
+              >
+                <div className="flex items-center">
+                  Registration
+                  <SortIcon field="created_at" />
+                </div>
               </TableHead>
               <TableHead className="px-6 py-5 text-muted-foreground font-black uppercase tracking-widest text-[10px] text-right">
                 Actions
@@ -206,9 +292,9 @@ const AdminUserTable = ({
                   <TableCell className="px-6 py-5">
                     <div
                       className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
-                        user.role === "super"
+                        user.role?.toLowerCase() === "super"
                           ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                          : user.role === "admin"
+                          : user.role?.toLowerCase() === "admin"
                             ? "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20"
                             : "bg-slate-700/20 text-slate-400 border border-slate-700/30"
                       }`}
@@ -218,30 +304,42 @@ const AdminUserTable = ({
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-5">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onToggleStatus(user)}
-                      disabled={
-                        !canManageUser(user) || user.id === currentUser?.id
-                      }
-                      className={`h-auto p-2 rounded-xl transition-all ${
-                        user.is_active
-                          ? "text-emerald-500 hover:bg-emerald-500/10"
-                          : "text-rose-500 hover:bg-rose-500/10"
-                      }`}
-                    >
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full mr-2 ${
-                          user.is_active
-                            ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                            : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                    {canManageUser(user) && user.id !== currentUser?.id ? (
+                      <select
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-background border border-border/50 focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer ${
+                          user.is_active ? "text-emerald-500" : "text-rose-500"
                         }`}
-                      />
-                      <span className="font-black uppercase tracking-tight text-[11px]">
-                        {user.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </Button>
+                        value={user.is_active ? "active" : "inactive"}
+                        onChange={(e) => {
+                          const newValue = e.target.value === "active";
+                          if (newValue !== user.is_active) {
+                            onToggleStatus(user);
+                          }
+                        }}
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    ) : (
+                      <div
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
+                          user.is_active
+                            ? "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20"
+                            : "text-rose-500 bg-rose-500/10 border border-rose-500/20"
+                        }`}
+                      >
+                        <div
+                          className={`w-2.5 h-2.5 rounded-full mr-2 ${
+                            user.is_active
+                              ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                              : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                          }`}
+                        />
+                        <span className="font-black uppercase tracking-tight text-[11px]">
+                          {user.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="px-6 py-5">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground font-black">

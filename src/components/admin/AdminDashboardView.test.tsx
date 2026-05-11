@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdminDashboardView from "./AdminDashboardView";
 import * as sdk from "../../client/sdk.gen";
 import { useAuth, Role } from "../../contexts/AuthContext";
@@ -57,6 +58,13 @@ vi.mock("./activity/AdminActivityDashboard", () => ({
   default: () => <div data-testid="admin-activity-dashboard" />,
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
 describe("AdminDashboardView", () => {
   const mockCurrentUser = {
     id: "admin-1",
@@ -71,13 +79,18 @@ describe("AdminDashboardView", () => {
       role: Role.SUPER,
       user: mockCurrentUser,
     });
+    queryClient = createTestQueryClient();
   });
 
-  const renderView = (props = {}) => {
+  let queryClient: QueryClient;
+
+  const renderView = (props = {}, initialEntries = ["/"]) => {
     return render(
-      <MemoryRouter>
-        <AdminDashboardView currentUser={mockCurrentUser} {...props} />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={initialEntries}>
+          <AdminDashboardView currentUser={mockCurrentUser} {...props} />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
   };
 
