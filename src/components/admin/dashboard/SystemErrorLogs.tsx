@@ -3,6 +3,8 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Terminal,
   Clock,
   User,
@@ -23,6 +25,8 @@ const SystemErrorLogs: React.FC = () => {
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [levelFilter, setLevelFilter] = useState<string>("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
 
   const fetchLogs = useCallback(async () => {
     if (!token) return;
@@ -57,6 +61,17 @@ const SystemErrorLogs: React.FC = () => {
 
     return matchesSearch && matchesLevel;
   });
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, levelFilter]);
+
+  const totalPages = Math.ceil(filteredLogs.length / pageSize);
+  const paginatedLogs = filteredLogs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const toggleExpand = (id: string) => {
     setExpandedLogId(expandedLogId === id ? null : id);
@@ -163,7 +178,7 @@ const SystemErrorLogs: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredLogs.map((log) => (
+                paginatedLogs.map((log) => (
                   <React.Fragment key={log.id}>
                     <tr
                       className={`group hover:bg-accent/30 transition-colors cursor-pointer ${expandedLogId === log.id ? "bg-accent/50" : ""}`}
@@ -314,11 +329,39 @@ const SystemErrorLogs: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 bg-accent/10 border-t border-border flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-lg border border-border bg-card hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="p-1.5 rounded-lg border border-border bg-card hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between text-xs font-bold text-muted-foreground px-2">
         <div>
-          Showing {filteredLogs.length} of {logs.length} system events
+          Showing {paginatedLogs.length} of {filteredLogs.length} matching
+          events
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

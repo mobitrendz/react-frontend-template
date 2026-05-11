@@ -180,4 +180,50 @@ describe("SystemErrorLogs", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("handles pagination with multiple pages of logs", async () => {
+    // Generate 15 logs (page size is 10)
+    const manyLogs = {
+      data: {
+        data: Array.from({ length: 15 }, (_, i) => ({
+          id: `${i}`,
+          level: "INFO",
+          message: `Log message ${i}`,
+          created_at: "2026-05-10T20:00:00Z",
+        })),
+        count: 15,
+      },
+    };
+
+    vi.mocked(readSystemLogsApiV1AdminDashboardLogsGet).mockResolvedValue(
+      manyLogs as any,
+    );
+
+    renderWithProviders(<SystemErrorLogs />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Log message 0")).toBeInTheDocument();
+    });
+
+    // Should show page 1 of 2
+    expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    expect(screen.getByText("Log message 9")).toBeInTheDocument();
+    expect(screen.queryByText("Log message 10")).not.toBeInTheDocument();
+
+    // Go to next page
+    const nextButton = screen.getAllByRole("button").find((b) => {
+      const svg = b.querySelector("svg");
+      return svg?.classList.contains("lucide-chevron-right");
+    });
+
+    if (nextButton) fireEvent.click(nextButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText("Log message 9")).not.toBeInTheDocument();
+    expect(screen.getByText("Log message 10")).toBeInTheDocument();
+    expect(screen.getByText("Log message 14")).toBeInTheDocument();
+  });
 });
