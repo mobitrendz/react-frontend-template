@@ -125,25 +125,42 @@ Before every commit, **pre-commit** runs ESLint, Prettier, and TypeScript type-c
 2.  **Python**: 3.12+ (required for `pre-commit`).
 3.  **Backend**: FastAPI backend running (default: `http://localhost:8000`).
 
-### Installation
+### 🚀 Quick Start
+
+Get up and running in less than 60 seconds. This template is designed for **Zero-Config** local development.
 
 1.  **Install dependencies**:
     ```bash
     npm install
     pre-commit install
     ```
-2.  **Configure Environment**:
-    ```bash
-    cp .env.example .env
-    ```
-3.  **Generate the API Client**:
+2.  **Generate the API Client**:
     ```bash
     npm run generate-client
     ```
-4.  **Start the development server**:
+3.  **Start development**:
     ```bash
     npm run dev
     ```
+
+> [!TIP]
+> The app defaults to `http://localhost:8000` for the backend. To customize this or other settings, see the [Environment Configuration](#-environment-configuration) section below.
+
+## ⚙️ Environment Configuration
+
+While the app works out-of-the-box with sensible defaults, you can customize your environment by creating a `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+### Configuration Options
+
+| Variable                | Description                            | Default                 |
+| :---------------------- | :------------------------------------- | :---------------------- |
+| `VITE_API_URL`          | The base URL for your FastAPI backend. | `http://localhost:8000` |
+| `VITE_ENV`              | Current execution environment.         | `development`           |
+| `VITE_ENABLE_ANALYTICS` | Toggle for premium analytics tracking. | `false`                 |
 
 ## 🧬 API Integration (@hey-api/openapi-ts)
 
