@@ -35,7 +35,15 @@ vi.mock("jwt-decode", () => ({
 vi.mock("../client/client.gen", () => ({
   client: {
     interceptors: {
+      request: {
+        use: vi.fn(),
+        eject: vi.fn(),
+      },
       response: {
+        use: vi.fn(),
+        eject: vi.fn(),
+      },
+      error: {
         use: vi.fn(),
         eject: vi.fn(),
       },
@@ -279,6 +287,36 @@ describe("AuthContext", () => {
       });
 
       expect(screen.getByTestId("access-denied")).toHaveTextContent("Denied");
+    });
+
+    it("logs out user on 401 status", async () => {
+      (auth.getToken as any).mockReturnValue("valid-token");
+      (sdk.getCurrentUserApiV1LoginCurrentUserGet as any).mockResolvedValue({
+        data: { role: "USER" },
+      });
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("auth-status")).toHaveTextContent(
+          "Authenticated",
+        );
+      });
+
+      const [onError] = (client.interceptors.error.use as any).mock.calls[0];
+
+      act(() => {
+        onError(new Error("Unauthorized"), { status: 401 });
+      });
+
+      expect(screen.getByTestId("auth-status")).toHaveTextContent(
+        "Not Authenticated",
+      );
+      expect(auth.clearToken).toHaveBeenCalled();
     });
 
     it("logs out on auth initialization error", async () => {

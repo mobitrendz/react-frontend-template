@@ -605,6 +605,10 @@ export type UserUpdate = {
    */
   full_name?: string | null;
   /**
+   * Email
+   */
+  email?: string | null;
+  /**
    * Is Active
    */
   is_active?: boolean | null;

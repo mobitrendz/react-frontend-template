@@ -104,6 +104,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setRole(null);
     setAccessDenied(false);
     auth.clearToken();
+
+    // Force immediate navigation to login if token expired or user logging out
+    // Using window.location.replace for a definitive redirect
+    if (window.location.pathname !== "/login") {
+      window.location.replace("/login?expired=true");
+    }
   };
 
   const hasPermission = (requiredRole: Role): boolean => {
@@ -126,18 +132,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setIsLoading(false);
     };
 
-    // Setup Interceptor for 403 Forbidden
-    const interceptor = client.interceptors.response.use((response) => {
-      if (response.status === 403) {
+    // Setup Interceptors for Auth errors
+    const responseInterceptor = client.interceptors.response.use((response) => {
+      if (response.status === 401) {
+        logout();
+      } else if (response.status === 403) {
         setAccessDenied(true);
       }
       return response;
     });
 
+    const errorInterceptor = client.interceptors.error.use(
+      (error, response) => {
+        const errorDetail = (error as any)?.detail || "";
+        const isTokenExpired =
+          response?.status === 401 &&
+          (errorDetail === "Token expired" ||
+            errorDetail.toLowerCase().includes("expired"));
+
+        if (response?.status === 401 || isTokenExpired) {
+          logout();
+        } else if (response?.status === 403) {
+          setAccessDenied(true);
+        }
+        return error;
+      },
+    );
+
     initAuth();
 
     return () => {
-      client.interceptors.response.eject(interceptor);
+      client.interceptors.response.eject(responseInterceptor);
+      client.interceptors.error.eject(errorInterceptor);
     };
   }, []);
 

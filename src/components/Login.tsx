@@ -29,6 +29,8 @@ const Login: React.FC = () => {
   const location = useLocation();
 
   const from = (location.state as any)?.from?.pathname || "/";
+  const isExpired =
+    new URLSearchParams(location.search).get("expired") === "true";
 
   const loginMutation = useMutation({
     mutationFn: async () => {
@@ -87,6 +89,12 @@ const Login: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isExpired && !error && (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3 text-amber-600 text-sm font-bold animate-in fade-in slide-in-from-top-2">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                Token Expired, please login again.
+              </div>
+            )}
             {error && (
               <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm font-bold animate-in fade-in slide-in-from-top-2">
                 <AlertCircle className="w-5 h-5 shrink-0" />
