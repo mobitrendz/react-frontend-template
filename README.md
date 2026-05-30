@@ -10,6 +10,8 @@ A modern, high-performance full-stack template featuring a React 19 frontend and
 
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
+- **Expo Template**: [Expo Mobile App Template](https://github.com/mobitrendz/expo-mobile-template)
+
 ## 🛠 Tech Stack
 
 - **Frontend**: React 19 (TypeScript)
