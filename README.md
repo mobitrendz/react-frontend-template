@@ -6,7 +6,9 @@
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. Optimized for **2026 industry standards**, this template is pre-configured with a premium design system, TanStack Query orchestration, and comprehensive unit testing.
 
-### 🔗 Related Repositories
+### 🔗 Related Repositories & Documentation
+
+- **Live Documentation**: [Zensical Developer Docs](https://mobitrendz.github.io/react-frontend-template/)
 
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
@@ -193,6 +195,8 @@ const { data, isLoading, error } = useQuery({
 ## 📖 Developer Documentation (Zensical)
 
 We maintain comprehensive developer documentation inside the `/docs` directory. This documentation is written as a "docs-as-code" repository powered by **Zensical**, a Rust-powered static site generator.
+
+The live hosted version of this documentation is available at **[https://mobitrendz.github.io/react-frontend-template/](https://mobitrendz.github.io/react-frontend-template/)**.
 
 For details on configuration, architecture, and workflows, consult the respective guides:
 
