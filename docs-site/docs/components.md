@@ -1,4 +1,8 @@
-# UI Component Library
+---
+id: components
+title: UI Component Library
+sidebar_label: UI Components
+---
 
 This catalog details the structural shell layouts, interactive dashboard panels, task boards, and administrative widgets powering the user interface.
 

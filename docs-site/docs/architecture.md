@@ -1,4 +1,8 @@
-# Architecture Overview
+---
+id: architecture
+title: Architecture Overview
+sidebar_label: Architecture
+---
 
 This page provides an architectural deep dive into the frontend template, detailing folder layouts, execution lifecycles, routing definitions, global state handlers, and the styling system.
 

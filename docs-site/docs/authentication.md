@@ -1,4 +1,8 @@
-# Authentication & Security
+---
+id: authentication
+title: Authentication & Security
+sidebar_label: Authentication
+---
 
 This guide outlines the authorization architecture, session lifecycle, role hierarches, interceptor loops, and route-protection wrappers.
 

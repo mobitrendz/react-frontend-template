@@ -1,4 +1,8 @@
-# Quality Assurance & Testing Guide
+---
+id: testing
+title: Quality Assurance & Testing Guide
+sidebar_label: Testing
+---
 
 This guide details the Vitest framework setup, JSDOM browser simulation, custom React Testing Library render overrides, code coverage specifications, and automatic Git commit guardrails.
 

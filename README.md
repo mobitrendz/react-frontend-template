@@ -8,7 +8,7 @@ A modern, high-performance full-stack template featuring a React 19 frontend and
 
 ### 🔗 Related Repositories & Documentation
 
-- **Live Documentation**: [Zensical Developer Docs](https://mobitrendz.github.io/react-frontend-template/)
+- **Live Documentation**: [Docusaurus Developer Docs](https://mobitrendz.github.io/react-frontend-template/)
 
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
@@ -184,38 +184,30 @@ const { data, isLoading, error } = useQuery({
 
 ## 📂 Project Structure
 
-- `docs/`: Zensical developer documentation source pages (Markdown).
+- `docs-site/`: Docusaurus documentation website source code and markdown guides.
 - `src/client/`: Auto-generated API client and TanStack Query hooks.
 - `src/components/ui/`: shadcn/ui primitives (Button, Input, Card, etc.).
 - `src/lib/`: Shared utilities (Auth logic, error handling, env validation).
 - `src/env.ts`: Zod-validated environment schema.
 - `src/index.css`: Tailwind 4 design system.
-- `zensical.toml`: Main Zensical static site generator configuration.
 
-## 📖 Developer Documentation (Zensical)
+## 📖 Developer Documentation (Docusaurus)
 
-We maintain comprehensive developer documentation inside the `/docs` directory. This documentation is written as a "docs-as-code" repository powered by **Zensical**, a Rust-powered static site generator.
+We maintain detailed developer documentation inside the `/docs-site` directory, powered by **Docusaurus**.
 
 The live hosted version of this documentation is available at **[https://mobitrendz.github.io/react-frontend-template/](https://mobitrendz.github.io/react-frontend-template/)**.
 
-For details on configuration, architecture, and workflows, consult the respective guides:
-
-- **[Overview](./docs/index.md)**: Main landing portal containing project architecture overview and technology stack highlights.
-- **[Getting Started](./docs/getting-started.md)**: Standard developer setup, package manager guidelines, and environmental variable schemas.
-- **[Architecture](./docs/architecture.md)**: File hierarchies, application execution lifecycles, and Tailwind CSS 4 theme configurations.
-- **[Authentication & Security](./docs/authentication.md)**: Role matrices, dynamic JWT decoding fallbacks, and API interceptor wrappers.
-- **[UI Component Library](./docs/components.md)**: Responsive dashboard shell elements, sidebar controls, task boards, and admin widgets.
-- **[API Contract & SDK](./docs/api.md)**: OpenAPI TypeScript client definitions, React Query integrations, and CI sync checks.
-- **[Quality Assurance](./docs/testing.md)**: Vitest specifications, custom isolated provider setups, and pre-commit Git check hooks.
-
-To build or preview the documentation locally using Zensical:
+To run or build the documentation site locally from the root folder:
 
 ```bash
-# Preview documentation locally
-zensical serve
+# Start the local Docusaurus development server
+npm run docs:dev
 
-# Build production static documentation site
-zensical build
+# Build the static documentation website
+npm run docs:build
+
+# Clear Docusaurus build caches
+npm run docs:clear
 ```
 
 ---

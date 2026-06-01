@@ -1,4 +1,8 @@
-# API Contract & SDK Integration
+---
+id: api
+title: API Contract & SDK Integration
+sidebar_label: API & SDK
+---
 
 This guide details the contract-first SDK generation, schema parsers, client authorization headers, and automated contract synchronization guardrails.
 
