@@ -6,7 +6,9 @@
 
 A modern, high-performance full-stack template featuring a React 19 frontend and a FastAPI backend. Optimized for **2026 industry standards**, this template is pre-configured with a premium design system, TanStack Query orchestration, and comprehensive unit testing.
 
-### 🔗 Related Repositories
+### 🔗 Related Repositories & Documentation
+
+- **Live Documentation**: [Docusaurus Developer Docs](https://mobitrendz.github.io/react-frontend-template/)
 
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
@@ -182,11 +184,31 @@ const { data, isLoading, error } = useQuery({
 
 ## 📂 Project Structure
 
+- `docs-site/`: Docusaurus documentation website source code and markdown guides.
 - `src/client/`: Auto-generated API client and TanStack Query hooks.
 - `src/components/ui/`: shadcn/ui primitives (Button, Input, Card, etc.).
 - `src/lib/`: Shared utilities (Auth logic, error handling, env validation).
 - `src/env.ts`: Zod-validated environment schema.
 - `src/index.css`: Tailwind 4 design system.
+
+## 📖 Developer Documentation (Docusaurus)
+
+We maintain detailed developer documentation inside the `/docs-site` directory, powered by **Docusaurus**.
+
+The live hosted version of this documentation is available at **[https://mobitrendz.github.io/react-frontend-template/](https://mobitrendz.github.io/react-frontend-template/)**.
+
+To run or build the documentation site locally from the root folder:
+
+```bash
+# Start the local Docusaurus development server
+npm run docs:dev
+
+# Build the static documentation website
+npm run docs:build
+
+# Clear Docusaurus build caches
+npm run docs:clear
+```
 
 ---
 

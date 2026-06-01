@@ -112,7 +112,7 @@ const AppContent = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="system" storageKey="mobitrendz-theme">
+      <ThemeProvider defaultTheme="system" storageKey="MobiTrendz-theme">
         <AuthProvider>
           <AppContent />
         </AuthProvider>
