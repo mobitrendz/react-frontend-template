@@ -96,7 +96,7 @@ const Sidebar = ({
             </div>
             {(!isCollapsed || isOpen) && (
               <span className="font-bold text-lg text-foreground whitespace-nowrap">
-                MobiTrendz<span className="text-primary">.</span>
+                MobiTrendz<span className="text-primary"></span>
               </span>
             )}
           </div>
