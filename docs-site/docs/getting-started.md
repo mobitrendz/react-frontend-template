@@ -1,4 +1,8 @@
-# Getting Started
+---
+id: getting-started
+title: Getting Started
+sidebar_label: Getting Started
+---
 
 Follow this guide to set up, configure, and launch the frontend environment on your local development machine.
 
@@ -43,8 +47,9 @@ Generate the contract-first SDK classes and TanStack hooks from the active backe
 npm run generate-client
 ```
 
-> [!NOTE]
-> If your backend is running on a port other than `8000`, verify the backend setup or define the `VITE_API_URL` configuration environment variable before running this command.
+:::note
+If your backend is running on a port other than `8000`, verify the backend setup or define the `VITE_API_URL` configuration environment variable before running this command.
+:::
 
 ### 4. Start the Vite Development Server
 

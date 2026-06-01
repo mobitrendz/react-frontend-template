@@ -1,6 +1,11 @@
-# React 19 + FastAPI Frontend Template
+---
+id: index
+title: React 19 + FastAPI Frontend Template
+sidebar_label: Overview
+slug: /
+---
 
-Welcome to the official developer documentation for the **React 19 + FastAPI Frontend Template**. This documentation is organized as a docs-as-code site powered by **Zensical**, detailing every aspect of the project's modern tech stack, design choices, API lifecycle, and quality assurance framework.
+Welcome to the official developer documentation for the **React 19 + FastAPI Frontend Template**. This documentation is organized as a docs-as-code site powered by **Docusaurus**, detailing every aspect of the project's modern tech stack, design choices, API lifecycle, and quality assurance framework.
 
 ---
 

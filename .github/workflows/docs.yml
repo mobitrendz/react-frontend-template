@@ -1,4 +1,4 @@
-name: Deploy Zensical Docs
+name: Deploy Docusaurus Docs
 
 on:
   push:
@@ -22,24 +22,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: docs-site/package-lock.json
 
-      - name: Install Zensical
-        run: |
-          python -m pip install --upgrade pip
-          pip install zensical
+      - name: Install Documentation Dependencies
+        run: npm ci
+        working-directory: docs-site
 
-      - name: Build Docs
-        run: zensical build --clean
+      - name: Build Docusaurus Documentation Site
+        run: npm run build
+        working-directory: docs-site
 
       - name: Upload Artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: docs-site/build
 
   deploy:
     environment:
