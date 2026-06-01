@@ -1,0 +1,31 @@
+[project]
+site_name = "React 19 + FastAPI Frontend Template"
+site_description = "Comprehensive developer documentation for the React 19 and FastAPI frontend template, featuring modern architecture, type-safe API clients, and robust testing standards."
+site_author = "mobitrendz"
+site_url = "https://github.com/mobitrendz/react-frontend-template"
+
+nav = [
+    { "Overview" = "index.md" },
+    { "Getting Started" = "getting-started.md" },
+    { "Architecture" = "architecture.md" },
+    { "Authentication & Security" = "authentication.md" },
+    { "UI Component Library" = "components.md" },
+    { "API Contract Integration" = "api.md" },
+    { "Testing & CI/CD" = "testing.md" }
+]
+
+[project.theme]
+variant = "modern"
+language = "en"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "indigo"
+accent = "indigo"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "indigo"
+accent = "blue"

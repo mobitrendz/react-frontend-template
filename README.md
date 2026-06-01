@@ -10,6 +10,8 @@ A modern, high-performance full-stack template featuring a React 19 frontend and
 
 - **Backend Template**: [FastAPI Backend Template](https://github.com/mobitrendz/fastapi-backend-template)
 
+- **Expo Template**: [Expo Mobile App Template](https://github.com/mobitrendz/expo-mobile-template)
+
 ## 🛠 Tech Stack
 
 - **Frontend**: React 19 (TypeScript)
@@ -180,11 +182,37 @@ const { data, isLoading, error } = useQuery({
 
 ## 📂 Project Structure
 
+- `docs/`: Zensical developer documentation source pages (Markdown).
 - `src/client/`: Auto-generated API client and TanStack Query hooks.
 - `src/components/ui/`: shadcn/ui primitives (Button, Input, Card, etc.).
 - `src/lib/`: Shared utilities (Auth logic, error handling, env validation).
 - `src/env.ts`: Zod-validated environment schema.
 - `src/index.css`: Tailwind 4 design system.
+- `zensical.toml`: Main Zensical static site generator configuration.
+
+## 📖 Developer Documentation (Zensical)
+
+We maintain comprehensive developer documentation inside the `/docs` directory. This documentation is written as a "docs-as-code" repository powered by **Zensical**, a Rust-powered static site generator.
+
+For details on configuration, architecture, and workflows, consult the respective guides:
+
+- **[Overview](./docs/index.md)**: Main landing portal containing project architecture overview and technology stack highlights.
+- **[Getting Started](./docs/getting-started.md)**: Standard developer setup, package manager guidelines, and environmental variable schemas.
+- **[Architecture](./docs/architecture.md)**: File hierarchies, application execution lifecycles, and Tailwind CSS 4 theme configurations.
+- **[Authentication & Security](./docs/authentication.md)**: Role matrices, dynamic JWT decoding fallbacks, and API interceptor wrappers.
+- **[UI Component Library](./docs/components.md)**: Responsive dashboard shell elements, sidebar controls, task boards, and admin widgets.
+- **[API Contract & SDK](./docs/api.md)**: OpenAPI TypeScript client definitions, React Query integrations, and CI sync checks.
+- **[Quality Assurance](./docs/testing.md)**: Vitest specifications, custom isolated provider setups, and pre-commit Git check hooks.
+
+To build or preview the documentation locally using Zensical:
+
+```bash
+# Preview documentation locally
+zensical serve
+
+# Build production static documentation site
+zensical build
+```
 
 ---
 
